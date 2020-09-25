@@ -14,7 +14,7 @@
 
 #include "SFML/Graphics.hpp"
 
-#include "Util.hpp"
+#include "Candle/Util.hpp"
 
 namespace candle{
     /**
@@ -28,6 +28,9 @@ namespace candle{
         sf::FloatRect m_bounds; 
         sf::Color m_color;
         bool m_glow;
+#ifdef CANDLE_DEBUG
+        sf::VertexArray m_debug;
+#endif
         
         /**
          * @brief Pools of segments that cast shadows.

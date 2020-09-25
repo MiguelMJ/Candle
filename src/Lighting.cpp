@@ -1,4 +1,4 @@
-#include "Lighting.hpp"
+#include "Candle/Lighting.hpp"
 
 namespace candle{
 
@@ -22,9 +22,10 @@ namespace candle{
     , m_fogQuad(ll.m_fogQuad)
     , m_fogOffset(ll.m_fogOffset)
     , m_fogColor(ll.m_fogColor)
+    , m_segmentPool(ll.m_segmentPool)
     {
-        auto s = m_fogTexture.getSize();
-        m_fogTexture.create(s.x, s.y);
+        setFogSize(ll.getFogSize());
+        setFogPosition(ll.getFogPosition());
         updateFog();
     }
     void  Lighting::draw(sf::RenderTarget& t, sf::RenderStates s) const{
@@ -39,10 +40,12 @@ namespace candle{
     }
     void Lighting::addLightSource(LightSource* ls) {
         ls->m_ptrSegmentPool.insert(&m_segmentPool);
+        ls->m_ptrSegmentPool.insert(&m_boundsSegments);
         m_lights.insert(ls);
     }
     void Lighting::removeLightSource(LightSource* ls){
         ls->m_ptrSegmentPool.erase(&m_segmentPool);
+        ls->m_ptrSegmentPool.erase(&m_boundsSegments);
         m_lights.erase(ls);
     }
     void Lighting::clear(){
@@ -60,6 +63,10 @@ namespace candle{
         m_fogQuad[3].position =
         m_fogQuad[3].texCoords = {0,y};
         candle::move(m_fogQuad, m_fogOffset);
+        m_boundsSegments.clear();
+        sf::FloatRect boundRec(m_fogQuad[0].position,m_fogQuad[2].position);
+        auto segs = candle::segments(boundRec);
+        m_boundsSegments.insert(m_boundsSegments.begin(),segs.begin(), segs.end());
     }
     void Lighting::setFogSize(sf::Vector2f size){
         setFogSize(size.x, size.y);
@@ -68,12 +75,16 @@ namespace candle{
         return m_fogQuad[2].position - m_fogQuad[0].position;
     }
     void Lighting::setFogPosition(float x, float y){
-        candle::move(m_fogQuad, -m_fogOffset);
-        m_fogOffset = {x,y};
-        candle::move(m_fogQuad, m_fogOffset);
+        setFogPosition(sf::Vector2f(x, y));
     }
     void Lighting::setFogPosition(sf::Vector2f position){
-        setFogPosition(position.x, position.y);
+        sf::Vector2f delta = position - m_fogOffset;
+        candle::move(m_fogQuad, delta);
+        m_fogOffset += delta;
+        for(auto& seg : m_boundsSegments){
+            seg.first += delta;
+            seg.second += delta;
+        }
     }
     sf::Vector2f Lighting::getFogPosition() const{
         return m_fogOffset;

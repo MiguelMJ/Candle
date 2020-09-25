@@ -11,8 +11,8 @@
 
 #include "SFML/Graphics.hpp"
 
-#include "Util.hpp"
-#include "LightSource.hpp"
+#include "Candle/Util.hpp"
+#include "Candle/LightSource.hpp"
 
 namespace candle{
     /**
@@ -26,7 +26,7 @@ namespace candle{
         sf::VertexArray m_fogQuad;
         sf::Vector2f m_fogOffset;
         sf::Color m_fogColor;
-        // sf::Vector2f m_fog;
+        std::vector<Segment> m_boundsSegments;
         
         /**
          * @brief Function to draw all the fog and the light sources.

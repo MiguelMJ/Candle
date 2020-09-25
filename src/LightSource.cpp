@@ -1,4 +1,4 @@
-#include "LightSource.hpp"
+#include "Candle/LightSource.hpp"
 
 namespace candle{
     
@@ -10,6 +10,9 @@ namespace candle{
         : m_polygon(sf::TriangleFan, 1)
         , m_color(sf::Color::White)
         , m_glow(true)
+#ifdef CANDLE_DEBUG
+        , m_debug(sf::Lines, 0)
+#endif
         {
         // The first time we call a contructor, we create the texture
         // for all LightSources
@@ -49,6 +52,17 @@ namespace candle{
         s.transform *= Transformable::getTransform();
         s.texture = &l_lightTexture;
         t.draw(m_polygon, s);
+#ifdef CANDLE_DEBUG
+        sf::RenderStates debs;
+        debs.transform = s.transform;
+        auto gb = getLocalBounds();
+        sf::RectangleShape debr(sf::Vector2f(gb.left,gb.top));
+        debr.setFillColor(sf::Color::Transparent);
+        debr.setOutlineThickness(1);
+        debr.setSize(sf::Vector2f(gb.width, gb.height));
+        t.draw(debr, debs);
+        t.draw(m_debug, debs);
+#endif
     }
     
     sf::FloatRect LightSource::getGlobalBounds() const{
@@ -77,6 +91,7 @@ namespace candle{
         return color;
     }
     void LightSource::setRadius(float r){
+        r /= 100;
         r = std::max(0.f,r);
         Transformable::setScale(r,r);
     }
@@ -90,7 +105,7 @@ namespace candle{
         return m_glow;
     }
     void LightSource::castLight(){
-        auto bounds = candle::segments(Transformable::getTransform().transformRect(m_bounds));
+        //auto bounds = candle::segments(Transformable::getTransform().transformRect(m_bounds));
         auto castRay = [&] (Ray r) -> sf::Vector2f {
             sf::Vector2f ret(r.origin);   
             float minRange = std::numeric_limits<float>::infinity();
@@ -104,14 +119,14 @@ namespace candle{
                     }
                 }
             }
-            for(auto& seg : bounds){
+            /*for(auto& seg : bounds){
                 auto t = candle::intersection(r, candle::make_ray(seg));
                 if(t.first > 0 && t.first < minRange && 
                     t.second >= 0 && t.second <= 1){
                     minRange = t.first;
                     ret = r.origin + r.direction * minRange;
                 }
-            }
+            }*/
             return ret;
         };
         std::vector<Ray> rays;
@@ -121,10 +136,10 @@ namespace candle{
         }
         rays.reserve(4 + s * 2 * 3); // 4: corners of bounds, 2: pnts/sgmnt, 3 rays/pnt
         auto castPoint = Transformable::getPosition();
-        rays.push_back(make_ray(castPoint, deg2rad(45.f)));
-        rays.push_back(make_ray(castPoint, deg2rad(135.f)));
-        rays.push_back(make_ray(castPoint, deg2rad(225.f)));
-        rays.push_back(make_ray(castPoint, deg2rad(315.f)));
+//         rays.push_back(make_ray(castPoint, deg2rad(45.f)));
+//         rays.push_back(make_ray(castPoint, deg2rad(135.f)));
+//         rays.push_back(make_ray(castPoint, deg2rad(225.f)));
+//         rays.push_back(make_ray(castPoint, deg2rad(315.f)));
         for(auto& pool : m_ptrSegmentPool){
             for(auto& s : *pool){
                 Ray r1 = make_ray(castPoint, s.first);
@@ -140,7 +155,10 @@ namespace candle{
         std::sort(rays.begin(), rays.end(),
                   [](Ray& r1, Ray& r2){ return r1.angle < r2.angle; });
         sf::Transform tr_i = Transformable::getTransform().getInverse();
-        m_polygon.resize(rays.size() + 2);
+#ifdef CANDLE_DEBUG
+        m_debug.resize(rays.size()*2);
+#endif
+        m_polygon.resize(rays.size() + 2); // + center and last
         m_polygon[0].color = m_color;
         m_polygon[0].position = 
         m_polygon[0].texCoords = tr_i.transformPoint(castPoint);
@@ -149,6 +167,11 @@ namespace candle{
             m_polygon[i+1].position = p;
             m_polygon[i+1].texCoords = p;
             m_polygon[i+1].color = m_color;
+#ifdef CANDLE_DEBUG
+            m_debug[i*2].position = m_polygon[0].position;
+            m_debug[i*2+1].position = p;
+            m_debug[i*2].color = m_debug[i*2+1].color = sf::Color::Red;
+#endif            
         }
         m_polygon[rays.size()+1] = m_polygon[1];
     }

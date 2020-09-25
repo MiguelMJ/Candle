@@ -1,4 +1,4 @@
-#include "Lighting.hpp"
+#include "Candle/Lighting.hpp"
 #include <iostream>
 #include <iomanip>
 #include <memory>
@@ -55,9 +55,12 @@ int main(){
     bool lightOrBlock = true;
     ll.addLightSource(&mouseLight);
     int color = 0;
-    float mouseLightRadius = 1.0;
+    float mouseLightRadius = 100;
     float mouseLightIntensity = 1.0;
     float fogOpacity = 1.0;
+    mouseLight.setRadius(mouseLightRadius);
+    mouseLight.setIntensity(mouseLightIntensity);
+    ll.setFogOpacity(fogOpacity);
     sf::Time dt;
     
     // === FUNCTIONS ===
@@ -164,7 +167,7 @@ int main(){
                         updateCastOnMouseMove();
                     break;
                 case sf::Event::MouseWheelScrolled:
-                    mouseLightRadius += e.mouseWheelScroll.delta/3;
+                    mouseLightRadius += 100*e.mouseWheelScroll.delta/3;
                     mouseLight.setRadius(mouseLightRadius);
                     mouseLight.castLight();
                     break;
