@@ -24,7 +24,7 @@ DBGDIR = debug
 DBGEXEC = $(DBGDIR)/$(EXEC)
 DBGOBJ = $(addprefix $(DBGDIR)/, $(OBJ))
 DBGDEP = $(addprefix $(DBGDIR)/, $(DEP))
-DBGCFLAGS = -g -O0 -DDEBUG
+DBGCFLAGS = -g -O0 -DDEBUG -DCANDLE_DEBUG
 
 #
 # Release build settings
