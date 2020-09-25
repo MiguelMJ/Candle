@@ -1,0 +1,6 @@
+#projectlogo img{
+    max-height: 70px;
+}
+img[src="logotype.svg"]{
+    width:10cm;
+} 
