@@ -1,4 +1,4 @@
-<p align="center"><a href="miguelmj.github.io/Candle"><img src="doc/logo.svg" alt="logo" height="200px"/></a></p>
+<p align="center"><a href="https://miguelmj.github.io/Candle"><img src="doc/logo.svg" alt="logo" height="200px"/></a></p>
 <h1 align="center">Candle</h1>
 <h3 align="center">2D lighting for SFML</h3>
 <p align="center">
