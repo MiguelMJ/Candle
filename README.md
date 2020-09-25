@@ -95,7 +95,7 @@ int main(){
     sf::RenderWindow w(sf::VideoMode(400,400), "app");
     
     // create the lighting area
-	candle::Lighting lighting;
+    candle::Lighting lighting;
     lighting.setFogOpacity(0.6);
     lighting.adjustFog(w.getView());
     lighting.updateFog();
