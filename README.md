@@ -1,4 +1,4 @@
-<p align="center"><a href="miguelmj.github.io/Candle"><img src="doc/logo.svg" alt="logo" height="200px"/></a></p>
+<p align="center"><a href="https://miguelmj.github.io/Candle"><img src="doc/logo.svg" alt="logo" height="200px"/></a></p>
 <h1 align="center">Candle</h1>
 <h3 align="center">2D lighting for SFML</h3>
 <p align="center">
@@ -95,7 +95,7 @@ int main(){
     sf::RenderWindow w(sf::VideoMode(400,400), "app");
     
     // create the lighting area
-	candle::Lighting lighting;
+    candle::Lighting lighting;
     lighting.setFogOpacity(0.6);
     lighting.adjustFog(w.getView());
     lighting.updateFog();
@@ -166,4 +166,3 @@ Here's a To Do list for Candle:
 Candle uses the MIT license, a copy of which you can find [here](LICENSE), in the repo.
 
 It uses the external library SFML, that is licensed under the zlib/png license.
-
