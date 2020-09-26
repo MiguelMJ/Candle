@@ -69,7 +69,7 @@ make # build it
 - **SFML v2.5** 
   - Graphics module and System module.
 
-_This library is meant to be used in SFML applications, so I will assume that you are familiar with the process of compiling them. If you are not, [you can learn in the official website](https://www.sfml-dev.org/tutorials/2.5/)_ . 
+_This library is meant to be used in SFML applications, so it's assumed that you are familiar with the process of compiling them. If you are not, [you can learn in the official website](https://www.sfml-dev.org/tutorials/2.5/)_ . 
 
 ## Example program
 
@@ -145,7 +145,7 @@ The result will be a simple light casting a shadow over an invisible wall in the
 
 <p align="center"><img src="doc/img/example.gif" height="300"/></p>
 
-### Contributing
+## Contributing
 
 Here's a To Do list for Candle:
 
@@ -155,13 +155,15 @@ Here's a To Do list for Candle:
   - Functionality tests - there may be bugs I haven't found yet.
   - Tutorials and examples.
   - Documentation review - [the documentation](https://miguelmj.github.io/Candle) still needs some more writing and maybe spell checking.
-
 - The functionalities of the library are enough for a basic lighting system, but there is still room for more complex behaviours.
 
   - If you want to request some feel free to open a new issue or even implement it and make a pull request.
-
 - The integration is simple, but it would be even simpler with a better build system.
-
 - Finally, you can still star this repository and give it some visibility :star:
 
-  
+## License
+
+Candle uses the MIT license, a copy of which you can find [here](LICENSE), in the repo.
+
+It uses the external library SFML, that is licensed under the zlib/png license.
+
