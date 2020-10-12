@@ -26,6 +26,7 @@ Candle is a SFML based C++ library that provides light, shadow casting and field
 - [Requisites](#Requisites)
 - [Example program](#Example-program)
 - [Contributing](#Contributing)
+- [License](#License)
 
 ## Demo
 
@@ -151,15 +152,17 @@ Here's a To Do list for Candle:
 
 - Currently this library needs more testing and documentation.
 
-  - Performance tests - this library is not yet optimized.
-  - Functionality tests - there may be bugs I haven't found yet.
-  - Tutorials and examples.
-  - Documentation review - [the documentation](https://miguelmj.github.io/Candle) still needs some more writing and maybe spell checking.
-- The functionalities of the library are enough for a basic lighting system, but there is still room for more complex behaviours.
-
-  - If you want to request some feel free to open a new issue or even implement it and make a pull request.
-- The integration is simple, but it would be even simpler with a better build system.
-- Finally, you can still star this repository and give it some visibility :star:
+  - **Performance tests** - this library is not yet optimized.
+  - **Functionality tests** - there may be bugs I haven't found yet.
+  - **Tutorials and examples**.
+  - **Documentation review** - [the documentation](https://miguelmj.github.io/Candle) still needs some more writing and maybe spell checking.
+- The functionalities of the library are enough for a basic lighting system, but there is still room for **more complex behaviours**.
+- Some of the features I plan to implement are:
+  - _More type of light sources_ (directional, flashlight, etc).
+    - _More customization for the light intensity_ - Currently is simply linear; maximum intensity in the origin, zero in the radius; I'd like to add more options to customize that.
+  - If you want to request some **feel free to open a new issue or** even implement it and **make a pull request**.
+- The integration is simple, but it would be even simpler with a **better build system**.
+- Finally, you can still **star this repository** and give it some visibility :star:.
 
 ## License
 
