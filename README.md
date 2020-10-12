@@ -157,12 +157,15 @@ Here's a To Do list for Candle:
   - **Tutorials and examples**.
   - **Documentation review** - [the documentation](https://miguelmj.github.io/Candle) still needs some more writing and maybe spell checking.
 - The functionalities of the library are enough for a basic lighting system, but there is still room for **more complex behaviours**.
-- Some of the features I plan to implement are:
-  - _More type of light sources_ (directional, flashlight, etc).
+  - Some of the features I plan to implement are:
+    - _More type of light sources_ (directional, flashlight, etc).
     - _More customization for the light intensity_ - Currently is simply linear; maximum intensity in the origin, zero in the radius; I'd like to add more options to customize that.
-  - If you want to request some **feel free to open a new issue or** even implement it and **make a pull request**.
-- The integration is simple, but it would be even simpler with a **better build system**.
-- Finally, you can still **star this repository** and give it some visibility :star:.
+  - If you want to request some feel free to open a new issue ![](https://img.shields.io/github/issues/MiguelMJ/Candle?logo=github&style=social) or even implement it and make a pull request.
+- Use of several technologies I'm still not very familiar with.
+  - Use **shaders** to blur the light or create a penumbra effect.
+  - Implement the algorithms with **Box2D** ray casting and add a **compiler option** to use them instead of the ones I coded (this feature is inspired by the optional use of [fmtlib](https://github.com/fmtlib/fmt) in the [loguru](https://github.com/emilk/loguru) project).
+- The integration is simple, but it would be even simpler with a **better build system** (use Make/CMake to compile a static library, maybe).
+- Finally, you can still  :star:  **star this repository** and give it some visibility ![](https://img.shields.io/github/stars/MiguelMJ/Candle?style=social).
 
 ## License
 
