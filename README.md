@@ -25,6 +25,7 @@ Candle is a SFML based C++ library that provides light, shadow casting and field
   - [Build](#Build)
 - [Requisites](#Requisites)
 - [Example program](#Example-program)
+- [Contributors](#Contributors)
 - [Contributing](#Contributing)
 - [License](#License)
 
@@ -145,6 +146,10 @@ And we run it
 The result will be a simple light casting a shadow over an invisible wall in the center of the window.
 
 <p align="center"><img src="doc/img/example.gif" height="300"/></p>
+
+## Contributors
+
+Be the first one!
 
 ## Contributing
 
