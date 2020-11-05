@@ -10,11 +10,11 @@ int main(){
     float HEIGHT = 700;
     sf::RenderWindow w(sf::VideoMode(WIDTH,HEIGHT), "Candle - demo");
     w.setVerticalSyncEnabled(true);
-    
+
     // === LIGHTING ===
     candle::Lighting ll;
     ll.adjustFog(w.getView());
-    
+
     // === BACKGROUND ===
     int rowNum = 16; 
     int colNum = 16;
@@ -36,7 +36,7 @@ int main(){
         bg[ppp].position = sf::Vector2f(x+cellWidth,y+cellHeight);
         bg[pppp].position = sf::Vector2f(x+cellWidth,y);
     }
-    
+
     // === INTERACTIVITY===
     sf::Color lightColors[4] = {sf::Color::White, 
                                 sf::Color::Magenta, 
@@ -44,7 +44,7 @@ int main(){
                                 sf::Color::Cyan };
     sf::VertexArray segmentLines(sf::Lines, 0);
     std::vector<std::unique_ptr<candle::LightSource>> lights;
-    
+
     float blockWidth = 20;
     float blockHeight = 20;
     sf::RectangleShape mouseBlock(sf::Vector2f(blockWidth*2, blockHeight*2));
@@ -62,7 +62,7 @@ int main(){
     mouseLight.setIntensity(mouseLightIntensity);
     ll.setFogOpacity(fogOpacity);
     sf::Time dt;
-    
+
     // === FUNCTIONS ===
     auto info = [&](){
         std::cout << "\r";
@@ -151,12 +151,14 @@ int main(){
             exit(1);
         }
     };
-    
+
     // === INITIALIZATION ===
     mouseLight.setColor(lightColors[color]);
     sf::Clock clock;
     // === MAIN LOOP ===
     while(w.isOpen()){
+        int fps = int(std::round(1.f/dt.asSeconds()));
+        w.setTitle("Candle - demo - " + std::to_string(fps) + " fps");
         sf::Event e;
         while(w.pollEvent(e)){
             switch(e.type){
@@ -224,21 +226,21 @@ int main(){
                     break;
             }
         }
-        
+
         // Update fog
         ll.updateFog();
         // Print info
         info();
         // Draw
         w.clear();
-        
+
         w.draw(bg);
         w.draw(ll);
         if(!lightOrBlock){
             w.draw(mouseBlock);
         }
         w.draw(segmentLines);
-        
+
         w.display();
         dt = clock.restart();
     }
