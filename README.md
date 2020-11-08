@@ -152,7 +152,7 @@ The result will be a simple light casting a shadow over an invisible wall in the
 
 ## Contributors
 
-Be the first one!
+- <a href="https://github.com/Madour"><img src="https://avatars1.githubusercontent.com/u/11854124?s=400&u=0906a245444942f36510751b175403754553f9c0&v=4" title="Madour" style="border-radius:50%; width: 100px"> <b>Modar Nasser</b></a> - [Bug report](https://github.com/MiguelMJ/Candle/issues/created_by/Madour) · [Code](https://github.com/MiguelMJ/Candle/commits?author=Madour)
 
 ## Contributing
 
