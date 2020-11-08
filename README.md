@@ -155,6 +155,7 @@ The result will be a simple light casting a shadow over an invisible wall in the
 	<li> <a href="https://github.com/Madour"><img src="https://avatars1.githubusercontent.com/u/11854124?s=400&u=0906a245444942f36510751b175403754553f9c0&v=4" title="Madour" width="100px" > <b>Modar Nasser</b></a> - <a href="https://github.com/MiguelMJ/Candle/issues/created_by/Madour">Bug report</> · <a href="https://github.com/MiguelMJ/Candle/commits?author=Madour">Code</a>
 	</li>
 </ul>
+
 ## Contributing
 
 Here's a To Do list for Candle:
