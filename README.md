@@ -174,7 +174,6 @@ Here's a To Do list for Candle:
 - Use of several technologies I'm still not very familiar with.
   - Use **shaders** to blur the light or create a penumbra effect.
   - Implement the algorithms with **Box2D** ray casting and add a **compiler option** to use them instead of the ones I coded (this feature is inspired by the optional use of [fmtlib](https://github.com/fmtlib/fmt) in the [loguru](https://github.com/emilk/loguru) project).
-- The integration is simple, but it would be even simpler with a **better build system** (use Make/CMake to compile a static library, maybe).
 - Finally, you can still  :star:  **star this repository** and give it some visibility ![](https://img.shields.io/github/stars/MiguelMJ/Candle?style=social).
 
 ## License
