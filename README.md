@@ -69,7 +69,7 @@ This will generate libCandle-s.a or (Candle-s.lib on Windows) in build/lib folde
 
 <img src="https://www.sfml-dev.org/download/goodies/sfml-icon.svg" height="50">
 
-- **SFML v2.5** 
+- **SFML v2.5.1**
   - Graphics module and System module.
 
 _This library is meant to be used in SFML applications, so it's assumed that you are familiar with the process of compiling them. If you are not, [you can learn in the official website](https://www.sfml-dev.org/tutorials/2.5/)_ . 
@@ -151,9 +151,10 @@ The result will be a simple light casting a shadow over an invisible wall in the
 <p align="center"><img src="doc/img/example.gif" height="300"/></p>
 
 ## Contributors
-
-- <a href="https://github.com/Madour"><img src="https://avatars1.githubusercontent.com/u/11854124?s=400&u=0906a245444942f36510751b175403754553f9c0&v=4" title="Madour" style="border-radius:50%; width: 100px"> <b>Modar Nasser</b></a> - [Bug report](https://github.com/MiguelMJ/Candle/issues/created_by/Madour) · [Code](https://github.com/MiguelMJ/Candle/commits?author=Madour)
-
+<ul>
+	<li> <a href="https://github.com/Madour"><img src="https://avatars1.githubusercontent.com/u/11854124?s=400&u=0906a245444942f36510751b175403754553f9c0&v=4" title="Madour" width="100px" > <b>Modar Nasser</b></a> - <a href="https://github.com/MiguelMJ/Candle/issues/created_by/Madour">Bug report</> · <a href="https://github.com/MiguelMJ/Candle/commits?author=Madour">Code</a>
+	</li>
+</ul>
 ## Contributing
 
 Here's a To Do list for Candle:
