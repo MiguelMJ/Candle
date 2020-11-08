@@ -55,14 +55,15 @@ The code comes with a demo program showing the basic functionalities provided by
 
 #### Build
 
-You can build it with your usual SFML workflow or using the provided Makefile:
+You can build the static library and the demo program with CMake.
 
-```shell
-cd /repo/root/path
-make prep
-make # build it
-./release/demo # run it
+```cmake
+mkdir build && cd build
+cmake .. -DBUILD_DEMO=ON
+cmake --build .
 ```
+
+This will generate libCandle-s.a or (Candle-s.lib on Windows) in build/lib folder, and demo program (or demo.exe) in build/bin.
 
 ## Requisites
 
@@ -79,11 +80,13 @@ I will assume that you have SFML installed in your system. If we have a project 
 
 ```
 |- project
+   |- libCandle-s.a
    |- main.cpp
-   |- Candle # this repository
-      |- include
-      |- src
-      | ...
+   |- include
+      |- Candle   # Candle headers
+         |- Lighting.hpp
+         |- LightSource.hpp
+         |- Util.hpp
 ```
 
 the `main.cpp` file could look like this:
@@ -134,7 +137,7 @@ int main(){
 We can compile it with the following command:
 
 ```shell
-g++ -std=c++11 -o app -ICandle/include Candle/src/* main.cpp -lsfml-graphics -lsfml-window -lsfml-system
+g++ -o app main.cpp -Iinclude -L. -lCandle-s -lsfml-graphics -lsfml-window -lsfml-system
 ```
 
 And we run it
