@@ -54,11 +54,13 @@ endef
 #
 # Rules
 #
-.PHONY: all debug prep release remake clean clean-release clean-debug docs
+.PHONY: all debug release remake clean clean-release clean-debug docs
 
 # Default build
 all: release
 
+
+$(shell mkdir -p debug/src release/src )
 # Include dependency rules
 -include $(DBGDEP)
 -include $(RELDEP)
@@ -66,7 +68,7 @@ all: release
 #
 # Debug rules
 #
-debug: prep $(DBGEXEC)
+debug: $(DBGEXEC)
 
 $(DBGEXEC): $(DBGOBJ)
 	$(call print_info,Building $@)
@@ -86,7 +88,7 @@ $(DBGDIR)/%.d: %.cpp
 #
 # Release rules
 #
-release: prep $(RELEXEC)
+release: $(RELEXEC)
 	
 $(RELEXEC): $(RELOBJ)
 	$(call print_info,Building $@)
@@ -106,9 +108,6 @@ $(RELDIR)/%.d: %.cpp
 #
 # Other rules
 #
-prep:
-	@mkdir -p $(DBGDIR)/src
-	@mkdir -p $(RELDIR)/src
 
 remake: clean all
 
