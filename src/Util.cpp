@@ -1,3 +1,4 @@
+#include <cmath>
 #include "Candle/Util.hpp"
 
 namespace candle{
