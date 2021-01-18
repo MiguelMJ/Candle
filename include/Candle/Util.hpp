@@ -37,7 +37,6 @@ namespace candle{
     std::array<Segment, 4> segments(sf::FloatRect rect);
     
     std::pair<float, float> intersection(Ray r1, Ray r2);
-    float deg2rad(float deg);
 }
 
 #endif

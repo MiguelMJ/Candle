@@ -23,8 +23,6 @@ namespace candle{
             bottom,
             left
         };
-    }float deg2rad(float deg){
-        return deg * PI / 180;
     }
     Ray make_ray(sf::Vector2f p1, sf::Vector2f p2){
         sf::Vector2f d = p2 - p1;
