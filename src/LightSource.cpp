@@ -170,7 +170,7 @@ namespace candle{
 #ifdef CANDLE_DEBUG
             m_debug[i*2].position = m_polygon[0].position;
             m_debug[i*2+1].position = p;
-            m_debug[i*2].color = m_debug[i*2+1].color = sf::Color::Red;
+            m_debug[i*2].color = m_debug[i*2+1].color = sf::Color::Magenta;
 #endif            
         }
         m_polygon[rays.size()+1] = m_polygon[1];
