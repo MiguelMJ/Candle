@@ -22,7 +22,7 @@ namespace candle{
             sf::RenderTexture lightTexture;
             lightTexture.create(maxRadius*2, maxRadius*2);
             sf::VertexArray lightShape(sf::TriangleFan, points+2);
-            float step = 2*3.1415/points;
+            float step = candle::PI2/points;
             lightShape[0].position = {maxRadius,maxRadius};
             for(int i = 1; i < points+2; i++){
                 lightShape[i].position = {
