@@ -11,7 +11,7 @@
 
 #include "SFML/Graphics.hpp"
 
-#include "Candle/Util.hpp"
+#include "sfml-util/geometry/Line.hpp"
 #include "Candle/LightSource.hpp"
 
 namespace candle{
@@ -26,7 +26,7 @@ namespace candle{
         sf::VertexArray m_fogQuad;
         sf::Vector2f m_fogOffset;
         sf::Color m_fogColor;
-        std::vector<Segment> m_boundsSegments;
+        std::vector<sfu::Line> m_boundsSegments;
         
         /**
          * @brief Function to draw all the fog and the light sources.
@@ -40,7 +40,7 @@ namespace candle{
          * segment pool pointer to its list.
          * @see LightSource::m_ptrSegmentPool
          */
-        std::vector<Segment> m_segmentPool;
+        std::vector<sfu::Line> m_segmentPool;
         
         /**
          * @brief Constructor.

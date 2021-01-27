@@ -7,14 +7,12 @@
 #ifndef __CANDLE_LIGHTSOURCE_HPP__
 #define __CANDLE_LIGHTSOURCE_HPP__
 
-#include <cmath>
 #include <vector>
 #include <set>
-#include <algorithm>
 
 #include "SFML/Graphics.hpp"
 
-#include "Candle/Util.hpp"
+#include "sfml-util/geometry/Line.hpp"
 
 namespace candle{
     /**
@@ -28,6 +26,8 @@ namespace candle{
         sf::FloatRect m_bounds; 
         sf::Color m_color;
         bool m_glow;
+        sf::Vector2f m_beamLimit1;
+        sf::Vector2f m_beamLimit2;
 #ifdef CANDLE_DEBUG
         sf::VertexArray m_debug;
 #endif
@@ -37,7 +37,7 @@ namespace candle{
          * @details By default, it points to @ref s_defaultSegmentPool.
          * @see s_defaultSegmentPool
          */
-        std::set<std::vector<Segment>*> m_ptrSegmentPool;
+        std::set<std::vector<sfu::Line>*> m_ptrSegmentPool;
         
         /**
          * @brief This friendship is necessary to change the pointer of the 
@@ -50,6 +50,8 @@ namespace candle{
          * @brief Draw the object to a target
          */
         void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+        
+        bool inBeam(sf::Vector2f point) const;
     public:
         
         /**
@@ -57,7 +59,7 @@ namespace candle{
          * in its own pool.
          * @see m_ptrSegmentPool
          */
-        static std::vector<Segment> s_defaultSegmentPool;
+        static std::vector<sfu::Line> s_defaultSegmentPool;
         
         /**
          * @brief Constructor.
@@ -117,6 +119,17 @@ namespace candle{
         float getRadius() const;
         
         /**
+         * @brief Set the beam angle of the light.
+         * @param angle New beam angle.
+         */
+        void setBeamAngle(float angle);
+        
+        /**
+         * @brief Get the beam angle of the light.
+         */
+        float getBeamAngle() const;
+        
+        /**
          * @brief Set the value of the _glow_ flag.
          * @details When the @p glow is inactive, the @ref Lighting 
          * will only use the light to reveal the area under the fog. If 
@@ -131,7 +144,7 @@ namespace candle{
          * @brief Check if the light glows or not.
          * @return The value of the _glow_ flag.
          */
-        bool getGlow();
+        bool getGlow() const;
         
         /**
          * @brief Calculates the area that should be iluminated with a 

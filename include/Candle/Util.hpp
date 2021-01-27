@@ -31,6 +31,8 @@ namespace candle{
         float angle; // rads
     } Ray;
     
+    float angle(sf::Vector2f v1, sf::Vector2f v2); // clockwise
+    
     Ray make_ray(sf::Vector2f p1, sf::Vector2f p2);
     Ray make_ray(sf::Vector2f orig, float ang); // rads
     Ray make_ray(Segment s);

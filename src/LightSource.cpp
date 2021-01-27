@@ -1,11 +1,22 @@
 #include "Candle/LightSource.hpp"
 
+#include <algorithm>
+#include <cmath>
+
+#include "sfml-util/geometry/Line.hpp"
+#include "sfml-util/geometry/Vector2.hpp"
+
 namespace candle{
     
     bool l_firstConstructor(true);
     sf::Texture l_lightTexture;
     
-    std::vector<Segment> LightSource::s_defaultSegmentPool;
+    void initializeLightTexture(){
+        
+    }
+    
+    std::vector<sfu::Line> LightSource::s_defaultSegmentPool;
+    
     LightSource::LightSource()
         : m_polygon(sf::TriangleFan, 1)
         , m_color(sf::Color::White)
@@ -22,7 +33,7 @@ namespace candle{
             sf::RenderTexture lightTexture;
             lightTexture.create(maxRadius*2, maxRadius*2);
             sf::VertexArray lightShape(sf::TriangleFan, points+2);
-            float step = candle::PI2/points;
+            float step = M_PI*2/points;
             lightShape[0].position = {maxRadius,maxRadius};
             for(int i = 1; i < points+2; i++){
                 lightShape[i].position = {
@@ -45,6 +56,7 @@ namespace candle{
         m_bounds.width = s.x;
         m_bounds.height = s.y;
         setRadius(1.0f);
+        setBeamAngle(360);
         castLight();
     }
     
@@ -98,63 +110,93 @@ namespace candle{
     float LightSource::getRadius() const{
         return Transformable::getScale().x;
     }
+    void LightSource::setBeamAngle(float r){
+        r = (float)std::fmod(r, 360);
+        m_beamLimit1 = {std::cos(-r/2), std::sin(-r/2)};
+        m_beamLimit2 = {std::cos(r/2), std::sin(r/2)};
+    }
+    float LightSource::getBeamAngle() const{
+        return sfu::angle(m_beamLimit1, m_beamLimit2);
+    }
     void LightSource::setGlow(bool g){
         m_glow = g;
     }
-    bool LightSource::getGlow(){
+    bool LightSource::getGlow() const{
         return m_glow;
     }
     void LightSource::castLight(){
         //auto bounds = candle::segments(Transformable::getTransform().transformRect(m_bounds));
-        auto castRay = [&] (Ray r) -> sf::Vector2f {
-            sf::Vector2f ret(r.origin);   
+        auto castRay = [&] (const sfu::Line r) -> sf::Vector2f {
+            sf::Vector2f ret(r.m_origin);   
             float minRange = std::numeric_limits<float>::infinity();
-            for(auto& pool : m_ptrSegmentPool){
+            for(auto& pool: m_ptrSegmentPool){
                 for(auto& seg : *pool){
-                    auto t = candle::intersection(r, candle::make_ray(seg));
-                    if(t.first > 0 && t.first < minRange && 
-                        t.second >= 0 && t.second <= 1){
-                        minRange = t.first;
-                        ret = r.origin + r.direction * minRange;
+                    float t_seg, t_ray;
+                    if(
+                        seg.intersection(r, t_seg, t_ray) == sfu::Line::SECANT
+                        && t_ray <= minRange
+                        && t_ray >= 0.f
+                        && t_seg <= 1.f
+                        && t_seg >= 0.f
+                    ){
+                        minRange = t_ray;
+                        ret = r.m_origin + t_ray*r.m_direction;
                     }
                 }
             }
-            /*for(auto& seg : bounds){
-                auto t = candle::intersection(r, candle::make_ray(seg));
-                if(t.first > 0 && t.first < minRange && 
-                    t.second >= 0 && t.second <= 1){
-                    minRange = t.first;
-                    ret = r.origin + r.direction * minRange;
-                }
-            }*/
             return ret;
         };
-        std::vector<Ray> rays;
+        std::vector<sfu::Line> rays;
         int s = 0;
         for(auto& pool : m_ptrSegmentPool){
             s += pool->size();
         }
-        rays.reserve(4 + s * 2 * 3); // 4: corners of bounds, 2: pnts/sgmnt, 3 rays/pnt
+        rays.reserve(2 + 4 + s * 2 * 3); // 2: beam angle, 4: corners of bounds, 2: pnts/sgmnt, 3 rays/pnt
+        
+        // Start casting
         auto castPoint = Transformable::getPosition();
-//         rays.push_back(make_ray(castPoint, deg2rad(45.f)));
-//         rays.push_back(make_ray(castPoint, deg2rad(135.f)));
-//         rays.push_back(make_ray(castPoint, deg2rad(225.f)));
-//         rays.push_back(make_ray(castPoint, deg2rad(315.f)));
+        float off = .001f;
         for(auto& pool : m_ptrSegmentPool){
             for(auto& s : *pool){
-                Ray r1 = make_ray(castPoint, s.first);
-                Ray r2 = make_ray(castPoint, s.second);
+                sfu::Line r1(castPoint, s.m_origin);
+                sfu::Line r2(castPoint, s.m_origin+s.m_direction);
+                float a1 = sfu::angle(r1.m_direction);
+                float a2 = sfu::angle(r2.m_direction);
                 rays.push_back(r1);
-                rays.push_back(make_ray(castPoint, r1.angle + 0.001f));
-                rays.push_back(make_ray(castPoint, r1.angle - 0.001f));
+                rays.emplace_back(castPoint, a1 - off);
+                rays.emplace_back(castPoint, a1 + off);
                 rays.push_back(r2);
-                rays.push_back(make_ray(castPoint, r2.angle + 0.001f));
-                rays.push_back(make_ray(castPoint, r2.angle - 0.001f));
+                rays.emplace_back(castPoint, a2 - off);
+                rays.emplace_back(castPoint, a2 + off);
+                
             }
         }
-        std::sort(rays.begin(), rays.end(),
-                  [](Ray& r1, Ray& r2){ return r1.angle < r2.angle; });
+        std::sort(
+            rays.begin(),
+            rays.end(),
+            [] (sfu::Line& r1, sfu::Line& r2){
+                return sfu::angle(r1.m_direction) < sfu::angle(r2.m_direction);
+            }
+        );
         sf::Transform tr_i = Transformable::getTransform().getInverse();
+        // keep only the ones within the area
+        std::vector<sf::Vector2f> points;
+        points.reserve(rays.size());
+        if(360 - sfu::angle(m_beamLimit1, m_beamLimit2) < 0.1){
+            for (auto& r: rays){
+                points.push_back(tr_i.transformPoint(castRay(r)));
+            }
+        }else{
+            sf::Vector2f o = getPosition();
+            for (auto& r: rays){
+                sf::Vector2f p = castRay(r);
+                sfu::Line beamLimit1(o, o+m_beamLimit1);
+                sfu::Line beamLimit2(o, o+m_beamLimit2);
+                if(beamLimit2.relativePosition(p) - beamLimit1.relativePosition(p) >= 0){
+                    points.push_back(tr_i.transformPoint(p));
+                }
+            }
+        }
 #ifdef CANDLE_DEBUG
         m_debug.resize(rays.size()*2);
 #endif

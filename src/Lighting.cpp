@@ -1,4 +1,5 @@
 #include "Candle/Lighting.hpp"
+#include "Candle/Util.hpp"
 
 namespace candle{
 
@@ -64,9 +65,10 @@ namespace candle{
         m_fogQuad[3].texCoords = {0,y};
         candle::move(m_fogQuad, m_fogOffset);
         m_boundsSegments.clear();
-        sf::FloatRect boundRec(m_fogQuad[0].position,m_fogQuad[2].position);
-        auto segs = candle::segments(boundRec);
-        m_boundsSegments.insert(m_boundsSegments.begin(),segs.begin(), segs.end());
+        m_boundsSegments.emplace_back(sf::Vector2f(0,0), sf::Vector2f(x,0));
+        m_boundsSegments.emplace_back(sf::Vector2f(x,0), sf::Vector2f(x,y));
+        m_boundsSegments.emplace_back(sf::Vector2f(x,y), sf::Vector2f(0,y));
+        m_boundsSegments.emplace_back(sf::Vector2f(0,y), sf::Vector2f(0,0));
     }
     void Lighting::setFogSize(sf::Vector2f size){
         setFogSize(size.x, size.y);
@@ -82,8 +84,7 @@ namespace candle{
         candle::move(m_fogQuad, delta);
         m_fogOffset += delta;
         for(auto& seg : m_boundsSegments){
-            seg.first += delta;
-            seg.second += delta;
+            seg.m_origin += delta;
         }
     }
     sf::Vector2f Lighting::getFogPosition() const{

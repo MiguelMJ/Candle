@@ -1,8 +1,10 @@
 #include "Candle/Lighting.hpp"
+#include "Candle/Util.hpp"
 #include <iostream>
 #include <iomanip>
 #include <memory>
 #include <ctime>
+#include <cmath>
 
 int main(){
     // === WINDOW ===
@@ -56,6 +58,7 @@ int main(){
     ll.addLightSource(&mouseLight);
     int color = 0;
     float mouseLightRadius = 100;
+    float mouseLightAngle = 360;
     float mouseLightIntensity = 1.0;
     float fogOpacity = 1.0;
     mouseLight.setRadius(mouseLightRadius);
@@ -78,8 +81,19 @@ int main(){
         }
     };
     auto addMouseBlockSegments = [&](){
-        auto mbs = candle::segments(mouseBlock.getGlobalBounds());
-        ll.m_segmentPool.insert(ll.m_segmentPool.end(),mbs.begin(), mbs.end());
+        auto mbb = mouseBlock.getGlobalBounds();
+        float l = mbb.left;
+        float t = mbb.top;
+        float r = l + mbb.width;
+        float b = t + mbb.height;
+        sf::Vector2f lt(l,t);
+        sf::Vector2f rt(r,t);
+        sf::Vector2f lb(l,b);
+        sf::Vector2f rb(r,b);
+        ll.m_segmentPool.emplace_back(lt, rt);
+        ll.m_segmentPool.emplace_back(rt, rb);
+        ll.m_segmentPool.emplace_back(rb, lb);
+        ll.m_segmentPool.emplace_back(lb, lt);
     };
     auto castAllLights = [&](){
         for(auto &l : lights){
@@ -108,22 +122,22 @@ int main(){
         }else{
             auto mpi = sf::Mouse::getPosition(w);
             sf::Vector2f mp(mpi.x, mpi.y);
-            candle::Segment t = {{mp.x-blockWidth,mp.y-blockHeight}, {mp.x+blockWidth, mp.y-blockHeight}};
-            candle::Segment l = {{mp.x+blockWidth,mp.y-blockHeight}, {mp.x+blockWidth, mp.y+blockHeight}};
-            candle::Segment b = {{mp.x+blockWidth,mp.y+blockHeight}, {mp.x-blockWidth, mp.y+blockHeight}};
-            candle::Segment r = {{mp.x-blockWidth,mp.y+blockHeight}, {mp.x-blockWidth, mp.y-blockHeight}};
+            sfu::Line t({mp.x-blockWidth,mp.y-blockHeight}, {mp.x+blockWidth, mp.y-blockHeight});
+            sfu::Line l({mp.x+blockWidth,mp.y-blockHeight}, {mp.x+blockWidth, mp.y+blockHeight});
+            sfu::Line b({mp.x+blockWidth,mp.y+blockHeight}, {mp.x-blockWidth, mp.y+blockHeight});
+            sfu::Line r({mp.x-blockWidth,mp.y+blockHeight}, {mp.x-blockWidth, mp.y-blockHeight});
             ll.m_segmentPool.push_back(t);
             ll.m_segmentPool.push_back(l);
             ll.m_segmentPool.push_back(b);
             ll.m_segmentPool.push_back(r);
-            segmentLines.append(sf::Vertex(t.first, sf::Color::White));
-            segmentLines.append(sf::Vertex(t.second, sf::Color::White));
-            segmentLines.append(sf::Vertex(l.first, sf::Color::White));
-            segmentLines.append(sf::Vertex(l.second, sf::Color::White));
-            segmentLines.append(sf::Vertex(b.first, sf::Color::White));
-            segmentLines.append(sf::Vertex(b.second, sf::Color::White));
-            segmentLines.append(sf::Vertex(r.first, sf::Color::White));
-            segmentLines.append(sf::Vertex(r.second, sf::Color::White));
+            segmentLines.append(sf::Vertex(t.m_origin, sf::Color::White));
+            segmentLines.append(sf::Vertex(t.m_origin+t.m_direction, sf::Color::White));
+            segmentLines.append(sf::Vertex(l.m_origin, sf::Color::White));
+            segmentLines.append(sf::Vertex(l.m_origin+l.m_direction, sf::Color::White));
+            segmentLines.append(sf::Vertex(b.m_origin, sf::Color::White));
+            segmentLines.append(sf::Vertex(b.m_origin+b.m_direction, sf::Color::White));
+            segmentLines.append(sf::Vertex(r.m_origin, sf::Color::White));
+            segmentLines.append(sf::Vertex(r.m_origin+r.m_direction, sf::Color::White));
             castAllLights();
         }
     };
@@ -169,9 +183,17 @@ int main(){
                         updateCastOnMouseMove();
                     break;
                 case sf::Event::MouseWheelScrolled:
-                    mouseLightRadius += 100*e.mouseWheelScroll.delta/3;
-                    mouseLight.setRadius(mouseLightRadius);
-                    mouseLight.castLight();
+                    if (
+                        sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
+                        || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)
+                    ){
+                        mouseLightAngle += copysign(36, e.mouseWheelScroll.delta);
+                        std::cout << std::endl << "mouse light angle " << mouseLightAngle << std::endl;
+                    }else{
+                        mouseLightRadius += 100*e.mouseWheelScroll.delta/3;
+                        mouseLight.setRadius(mouseLightRadius);
+                        mouseLight.castLight();
+                    }
                     break;
                 case sf::Event::MouseButtonPressed:
                     if(e.mouseButton.button == sf::Mouse::Left){

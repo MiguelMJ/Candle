@@ -24,6 +24,11 @@ namespace candle{
             left
         };
     }
+    float angle(sf::Vector2f v1, sf::Vector2f v2){
+        float dot = v1.x*v2.x + v1.y*v2.y;
+        float det = v1.x*v2.y - v1.y*v2.x;
+        return std::atan2(det,dot);
+    }
     Ray make_ray(sf::Vector2f p1, sf::Vector2f p2){
         sf::Vector2f d = p2 - p1;
         return {
