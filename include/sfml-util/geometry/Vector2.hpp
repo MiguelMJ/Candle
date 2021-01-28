@@ -29,7 +29,7 @@ namespace sfu{
     }
     template <typename T>
     float angle(const sf::Vector2<T>& v){
-        return std::atan2(v.y, v.x) * 180.f/M_PI;
+        return fmod(std::atan2(v.y, v.x) * 180.f/M_PI + 360.f, 360.f);
     }
 }
 
