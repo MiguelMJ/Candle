@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Candle/LightSource.hpp"
 
 #include <algorithm>
@@ -7,6 +8,12 @@
 #include "sfml-util/geometry/Vector2.hpp"
 
 namespace candle{
+    float module360(float x){
+        x = (float)fmod(x,360.f);
+        if(x < 0.f) x += 360.f;
+        return x;
+    }
+    
     
     bool l_firstConstructor(true);
     sf::Texture l_lightTexture;
@@ -65,15 +72,25 @@ namespace candle{
         s.texture = &l_lightTexture;
         t.draw(m_polygon, s);
 #ifdef CANDLE_DEBUG
-        sf::RenderStates debs;
-        debs.transform = s.transform;
+        sf::RenderStates deb_s;
+        deb_s.transform = s.transform;
         auto gb = getLocalBounds();
-        sf::RectangleShape debr(sf::Vector2f(gb.left,gb.top));
-        debr.setFillColor(sf::Color::Transparent);
-        debr.setOutlineThickness(1);
-        debr.setSize(sf::Vector2f(gb.width, gb.height));
-        t.draw(debr, debs);
-        t.draw(m_debug, debs);
+        sf::RectangleShape deb_r(sf::Vector2f(gb.left,gb.top));
+        deb_r.setFillColor(sf::Color::Transparent);
+        deb_r.setOutlineThickness(1);
+        deb_r.setSize(sf::Vector2f(gb.width, gb.height));
+        sf::VertexArray deb_beam(sf::Lines, 4);
+        for (size_t i=0; i < 4; i++){
+            deb_beam[i].color = i < 2 ? sf::Color::Cyan : sf::Color::Yellow;
+            deb_beam[i].position = {100.f, 100.f};
+        }
+        float bl1 = -m_beamAngle/2 * M_PI/180.f;
+        float bl2 = m_beamAngle/2 * M_PI/180.f;
+        deb_beam[1].position += 100.f*sf::Vector2f(std::cos(bl1), std::sin(bl1));
+        deb_beam[3].position += 100.f*sf::Vector2f(std::cos(bl2), std::sin(bl2));
+        t.draw(deb_r, deb_s);
+        t.draw(m_debug, deb_s);
+        t.draw(deb_beam, deb_s);
 #endif
     }
     
@@ -112,11 +129,14 @@ namespace candle{
     }
     void LightSource::setBeamAngle(float r){
         r = (float)std::fmod(r, 360);
-        m_beamLimit1 = {std::cos(-r/2), std::sin(-r/2)};
-        m_beamLimit2 = {std::cos(r/2), std::sin(r/2)};
+        if(r<0.f) r += 360;
+        m_beamAngle = r;
+        r *= M_PI/180;
+        m_beamLimit1 = {std::cos(-r/2.f), std::sin(-r/2.f)};
+        m_beamLimit2 = {std::cos(r/2.f), std::sin(r/2.f)};
     }
     float LightSource::getBeamAngle() const{
-        return sfu::angle(m_beamLimit1, m_beamLimit2);
+        return m_beamAngle;
     }
     void LightSource::setGlow(bool g){
         m_glow = g;
@@ -125,7 +145,7 @@ namespace candle{
         return m_glow;
     }
     void LightSource::castLight(){
-        //auto bounds = candle::segments(Transformable::getTransform().transformRect(m_bounds));
+        sf::Transform trm = Transformable::getTransform();
         auto castRay = [&] (const sfu::Line r) -> sf::Vector2f {
             sf::Vector2f ret(r.m_origin);   
             float minRange = std::numeric_limits<float>::infinity();
@@ -151,9 +171,12 @@ namespace candle{
         for(auto& pool : m_ptrSegmentPool){
             s += pool->size();
         }
-        rays.reserve(2 + 4 + s * 2 * 3); // 2: beam angle, 4: corners of bounds, 2: pnts/sgmnt, 3 rays/pnt
+        rays.reserve(2 + 4*3*2 + s * 2 * 3); // 2: beam angle, 4: corners of bounds, 2: pnts/sgmnt, 3 rays/pnt
         
         // Start casting
+        float bl1 = module360(getRotation() - m_beamAngle/2);
+        float bl2 = module360(getRotation() + m_beamAngle/2);
+        bool beamAngleBigEnough = m_beamAngle < 0.1;
         auto castPoint = Transformable::getPosition();
         float off = .001f;
         for(auto& pool : m_ptrSegmentPool){
@@ -162,50 +185,94 @@ namespace candle{
                 sfu::Line r2(castPoint, s.m_origin+s.m_direction);
                 float a1 = sfu::angle(r1.m_direction);
                 float a2 = sfu::angle(r2.m_direction);
-                rays.push_back(r1);
-                rays.emplace_back(castPoint, a1 - off);
-                rays.emplace_back(castPoint, a1 + off);
-                rays.push_back(r2);
-                rays.emplace_back(castPoint, a2 - off);
-                rays.emplace_back(castPoint, a2 + off);
+                if(
+                    beamAngleBigEnough 
+                    || (
+                        bl1 < bl2
+                        && a1 > bl1
+                        && a1 < bl2
+                    )
+                    || (
+                        bl1 > bl2
+                        && (
+                            a1 > bl1
+                            || a1 < bl2
+                        )
+                    )
+                ){
+                    rays.push_back(r1);
+                    rays.emplace_back(castPoint, a1 - off);
+                    rays.emplace_back(castPoint, a1 + off);
+                }
+                if(
+                    beamAngleBigEnough 
+                    || (
+                        bl1 < bl2
+                        && a2 > bl1
+                        && a2 < bl2
+                    )
+                    || (
+                        bl1 > bl2
+                        && (
+                            a2 > bl1
+                            || a2 < bl2
+                        )
+                    )
+                ){
+                    rays.push_back(r2);
+                    rays.emplace_back(castPoint, a2 - off);
+                    rays.emplace_back(castPoint, a2 + off);
+                }
                 
             }
         }
-        std::sort(
-            rays.begin(),
-            rays.end(),
-            [] (sfu::Line& r1, sfu::Line& r2){
-                return sfu::angle(r1.m_direction) < sfu::angle(r2.m_direction);
-            }
-        );
-        sf::Transform tr_i = Transformable::getTransform().getInverse();
+        if(bl1 > bl2){
+            std::sort(
+                rays.begin(),
+                rays.end(),
+                [bl1, bl2] (sfu::Line& r1, sfu::Line& r2){
+                    float _bl1 = bl1-0.1;
+                    float _bl2 = bl2+0.1;
+                    float a1 = sfu::angle(r1.m_direction);
+                    float a2 = sfu::angle(r2.m_direction);
+                    return (a1 >= _bl1 && a2 <= _bl2) || (a1 < a2 && (_bl1 <= a1 || a2 <= _bl2));
+                }
+            );
+        }else{
+            std::sort(
+                rays.begin(),
+                rays.end(),
+                [bl1] (sfu::Line& r1, sfu::Line& r2){
+                    return 
+                        sfu::angle(r1.m_direction) < sfu::angle(r2.m_direction);
+                }
+            );
+        }
+        if(!beamAngleBigEnough){
+            rays.emplace(rays.begin(), castPoint, bl1);
+            rays.emplace_back(castPoint, bl2);
+        }
+        std::cout << std::endl;
+        for(auto& r: rays){
+            std::cout << sfu::angle(r.m_direction) << " ";
+        }
+        std::cout << std::endl;
+        sf::Transform tr_i = trm.getInverse();
         // keep only the ones within the area
         std::vector<sf::Vector2f> points;
         points.reserve(rays.size());
-        if(360 - sfu::angle(m_beamLimit1, m_beamLimit2) < 0.1){
-            for (auto& r: rays){
-                points.push_back(tr_i.transformPoint(castRay(r)));
-            }
-        }else{
-            sf::Vector2f o = getPosition();
-            for (auto& r: rays){
-                sf::Vector2f p = castRay(r);
-                sfu::Line beamLimit1(o, o+m_beamLimit1);
-                sfu::Line beamLimit2(o, o+m_beamLimit2);
-                if(beamLimit2.relativePosition(p) - beamLimit1.relativePosition(p) >= 0){
-                    points.push_back(tr_i.transformPoint(p));
-                }
-            }
+        for (auto& r: rays){
+            points.push_back(tr_i.transformPoint(castRay(r)));
         }
 #ifdef CANDLE_DEBUG
-        m_debug.resize(rays.size()*2);
+        m_debug.resize(points.size()*2);
 #endif
-        m_polygon.resize(rays.size() + 2); // + center and last
+        m_polygon.resize(points.size() + 1 + beamAngleBigEnough); // + center and last
         m_polygon[0].color = m_color;
         m_polygon[0].position = 
         m_polygon[0].texCoords = tr_i.transformPoint(castPoint);
-        for(unsigned i=0; i < rays.size(); i++){
-            sf::Vector2f p = tr_i.transformPoint(castRay(rays[i]));
+        for(unsigned i=0; i < points.size(); i++){
+            sf::Vector2f p = points[i];
             m_polygon[i+1].position = p;
             m_polygon[i+1].texCoords = p;
             m_polygon[i+1].color = m_color;
@@ -215,6 +282,8 @@ namespace candle{
             m_debug[i*2].color = m_debug[i*2+1].color = sf::Color::Magenta;
 #endif            
         }
-        m_polygon[rays.size()+1] = m_polygon[1];
+        if(beamAngleBigEnough){
+            m_polygon[points.size()+1] = m_polygon[1];
+        }
     }
 }

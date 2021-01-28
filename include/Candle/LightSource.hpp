@@ -26,6 +26,7 @@ namespace candle{
         sf::FloatRect m_bounds; 
         sf::Color m_color;
         bool m_glow;
+        float m_beamAngle;
         sf::Vector2f m_beamLimit1;
         sf::Vector2f m_beamLimit2;
 #ifdef CANDLE_DEBUG
