@@ -1,4 +1,3 @@
-#include <iostream>
 #include "Candle/LightSource.hpp"
 
 #include <algorithm>
@@ -252,11 +251,6 @@ namespace candle{
             rays.emplace(rays.begin(), castPoint, bl1);
             rays.emplace_back(castPoint, bl2);
         }
-        std::cout << std::endl;
-        for(auto& r: rays){
-            std::cout << sfu::angle(r.m_direction) << " ";
-        }
-        std::cout << std::endl;
         sf::Transform tr_i = trm.getInverse();
         // keep only the ones within the area
         std::vector<sf::Vector2f> points;

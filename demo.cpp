@@ -11,7 +11,7 @@ int main(){
     float WIDTH = 700;
     float HEIGHT = 700;
     sf::RenderWindow w(sf::VideoMode(WIDTH,HEIGHT), "Candle - demo");
-    w.setVerticalSyncEnabled(true);
+    w.setFramerateLimit(60);
 
     // === LIGHTING ===
     candle::Lighting ll;
@@ -198,11 +198,6 @@ int main(){
                         mouseLightRadius += 100*e.mouseWheelScroll.delta/3;
                         mouseLight.setRadius(mouseLightRadius);
                     }
-                    std::cout << std::endl 
-                        << "R: " << mouseLight.getRotation() << " A: " << mouseLight.getBeamAngle()
-                        << " L: " << mouseLight.getRotation() - mouseLight.getBeamAngle()/2
-                        << "->" << mouseLight.getRotation() + mouseLight.getBeamAngle()/2 
-                        << std::endl;
                     mouseLight.castLight();
                     break;
                 case sf::Event::MouseButtonPressed:
