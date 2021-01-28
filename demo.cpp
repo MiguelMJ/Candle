@@ -187,13 +187,23 @@ int main(){
                         sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
                         || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)
                     ){
-                        mouseLightAngle += copysign(36, e.mouseWheelScroll.delta);
-                        std::cout << std::endl << "mouse light angle " << mouseLightAngle << std::endl;
+                        mouseLightAngle += copysign(4, e.mouseWheelScroll.delta);
+                        mouseLight.setBeamAngle(mouseLightAngle);
+                    }else if(
+                        sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt)
+                        || sf::Keyboard::isKeyPressed(sf::Keyboard::RAlt)
+                    ){
+                        mouseLight.rotate(copysign(4, e.mouseWheelScroll.delta));
                     }else{
                         mouseLightRadius += 100*e.mouseWheelScroll.delta/3;
                         mouseLight.setRadius(mouseLightRadius);
-                        mouseLight.castLight();
                     }
+                    std::cout << std::endl 
+                        << "R: " << mouseLight.getRotation() << " A: " << mouseLight.getBeamAngle()
+                        << " L: " << mouseLight.getRotation() - mouseLight.getBeamAngle()/2
+                        << "->" << mouseLight.getRotation() + mouseLight.getBeamAngle()/2 
+                        << std::endl;
+                    mouseLight.castLight();
                     break;
                 case sf::Event::MouseButtonPressed:
                     if(e.mouseButton.button == sf::Mouse::Left){
