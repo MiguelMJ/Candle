@@ -1,3 +1,4 @@
+#include "Candle/RadialLight.hpp"
 #include "Candle/Lighting.hpp"
 #include "Candle/Util.hpp"
 #include <iostream>
@@ -45,7 +46,7 @@ int main(){
                                 sf::Color::Yellow,
                                 sf::Color::Cyan };
     sf::VertexArray segmentLines(sf::Lines, 0);
-    std::vector<std::unique_ptr<candle::LightSource>> lights;
+    std::vector<std::unique_ptr<candle::RadialLight>> lights;
 
     float blockWidth = 20;
     float blockHeight = 20;
@@ -53,7 +54,7 @@ int main(){
     mouseBlock.setOrigin(blockWidth,blockHeight);
     mouseBlock.setFillColor(sf::Color::Transparent);
     mouseBlock.setOutlineThickness(1);
-    candle::LightSource mouseLight;
+    candle::RadialLight mouseLight;
     bool lightOrBlock = true;
     ll.addLightSource(&mouseLight);
     int color = 0;
@@ -61,7 +62,7 @@ int main(){
     float mouseLightAngle = 360;
     float mouseLightIntensity = 1.0;
     float fogOpacity = 1.0;
-    mouseLight.setRadius(mouseLightRadius);
+    mouseLight.setRange(mouseLightRadius);
     mouseLight.setIntensity(mouseLightIntensity);
     ll.setFogOpacity(fogOpacity);
     sf::Time dt;
@@ -115,7 +116,7 @@ int main(){
     };
     auto putLightOrBlock = [&](){
         if(lightOrBlock){
-            auto lptr = new candle::LightSource(mouseLight);
+            auto lptr = new candle::RadialLight(mouseLight);
             lights.emplace_back(lptr);
             ll.addLightSource(lptr);
             mouseLight.castLight();
@@ -195,8 +196,8 @@ int main(){
                     ){
                         mouseLight.rotate(copysign(4, e.mouseWheelScroll.delta));
                     }else{
-                        mouseLightRadius += 100*e.mouseWheelScroll.delta/3;
-                        mouseLight.setRadius(mouseLightRadius);
+                        mouseLightRadius += copysign(10, e.mouseWheelScroll.delta);
+                        mouseLight.setRange(mouseLightRadius);
                     }
                     mouseLight.castLight();
                     break;

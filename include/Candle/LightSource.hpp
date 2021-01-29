@@ -16,29 +16,12 @@
 
 namespace candle{
     /**
-     * @brief Object that emits light within a 
-     * Lighting object
+     * @brief Interface for objects that emits light within a Lighting object
      * @details These objects are meant to be drawn as part of a Lighting object.
      */
     class LightSource: public sf::Transformable, private sf::Drawable{
     private:
-        sf::VertexArray m_polygon;
-        sf::FloatRect m_bounds; 
-        sf::Color m_color;
         bool m_glow;
-        float m_beamAngle;
-        sf::Vector2f m_beamLimit1;
-        sf::Vector2f m_beamLimit2;
-#ifdef CANDLE_DEBUG
-        sf::VertexArray m_debug;
-#endif
-        
-        /**
-         * @brief Pools of segments that cast shadows.
-         * @details By default, it points to @ref s_defaultSegmentPool.
-         * @see s_defaultSegmentPool
-         */
-        std::set<std::vector<sfu::Line>*> m_ptrSegmentPool;
         
         /**
          * @brief This friendship is necessary to change the pointer of the 
@@ -50,9 +33,28 @@ namespace candle{
         /**
          * @brief Draw the object to a target
          */
-        void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-    public:
+        virtual void draw(sf::RenderTarget& t, sf::RenderStates st) const = 0;
+  
+    protected:
+        sf::Color m_color;
+        sf::VertexArray m_polygon;
+        float m_range;
+        bool m_fade;
+        bool m_shouldRecast;
+        sf::Transform m_transformOfLastCast;
         
+        /**
+         * @brief Pools of segments that cast shadows.
+         * @details By default, it points to @ref s_defaultSegmentPool.
+         * @see s_defaultSegmentPool
+         */
+        std::set<std::vector<sfu::Line>*> m_ptrSegmentPool;
+
+#ifdef CANDLE_DEBUG        
+        sf::VertexArray m_debug;
+#endif
+        
+    public:
         /**
          * @brief Default segment pool for shadow casting. Every LightSource contains it
          * in its own pool.
@@ -61,21 +63,11 @@ namespace candle{
         static std::vector<sfu::Line> s_defaultSegmentPool;
         
         /**
-         * @brief Constructor.
+         * @brief Constructor
          */
         LightSource();
-                
-        /**
-         * @brief Get the global bounding rectangle of the light source.
-         */
-        sf::FloatRect getGlobalBounds() const;
         
-        /**
-         * @brief Get the local bounding rectangle of the light source.
-         */
-        sf::FloatRect getLocalBounds() const;
-        
-        /**
+         /**
          * @brief Set the light intensity.
          * @details The @p intensity of the light determines two things: 
          * how much fog opacity it reduces, and how much of its color is 
@@ -98,7 +90,7 @@ namespace candle{
          * @param color New color of the light.
          * @see setGlow
          */
-        void setColor(sf::Color color);
+        void setColor(const sf::Color& color);
         
         /**
          * @brief Get the plain color of the light.
@@ -107,26 +99,19 @@ namespace candle{
         sf::Color getColor() const;
         
         /**
-         * @brief Set the radius of the iluminated area.
-         * @param radius New radius of the area.
+         * @brief Set the falue of the _fade_ flag.
+         * @details when the @p fade is set, the light will lose intensity
+         * in the limits of its range. Otherwise, the intensity will remain
+         * constant.
+         * @param fade Value to set the flag.
          */
-        void setRadius(float radius);
+        virtual void setFade(bool fade);
         
         /**
-         * @brief Get the radius of the light.
+         * @brief Check if the light fades or not.
+         * @return The value of the _fade_ flag.
          */
-        float getRadius() const;
-        
-        /**
-         * @brief Set the beam angle of the light.
-         * @param angle New beam angle.
-         */
-        void setBeamAngle(float angle);
-        
-        /**
-         * @brief Get the beam angle of the light.
-         */
-        float getBeamAngle() const;
+        virtual bool getFade() const;
         
         /**
          * @brief Set the value of the _glow_ flag.
@@ -144,6 +129,25 @@ namespace candle{
          * @return The value of the _glow_ flag.
          */
         bool getGlow() const;
+            
+        /**
+         * @brief Set the range of the illuminated area.
+         * @param range Range of the illuminated area.
+         */
+        virtual void setRange(float range) = 0;
+        
+        /**
+         * @brief Get the range of the illuminated area.
+         */
+        float getRange() const;
+        
+        /**
+         * @brief Checks if the light may require a call to @ref castLight.
+         * @details This function should be taken only as a guideline, as 
+         * they are external factors that require a light to recast, so it
+         * can return false negatives (but true will always be correct).
+         */
+        bool shouldRecast() const;
         
         /**
          * @brief Calculates the area that should be iluminated with a 
@@ -155,7 +159,7 @@ namespace candle{
          * this function and the next draw.
          * @see m_ptrSegmentPool
          */
-        void castLight();
+        virtual void castLight() = 0;
     };
 }
 
