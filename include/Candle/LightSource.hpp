@@ -51,8 +51,6 @@ namespace candle{
          * @brief Draw the object to a target
          */
         void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-        
-        bool inBeam(sf::Vector2f point) const;
     public:
         
         /**

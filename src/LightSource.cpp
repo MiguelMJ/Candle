@@ -17,10 +17,6 @@ namespace candle{
     bool l_firstConstructor(true);
     sf::Texture l_lightTexture;
     
-    void initializeLightTexture(){
-        
-    }
-    
     std::vector<sfu::Line> LightSource::s_defaultSegmentPool;
     
     LightSource::LightSource()
