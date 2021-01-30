@@ -18,6 +18,7 @@ namespace sfu{
         LineRelativePosition intersection(const Line& l) const;
         LineRelativePosition intersection(const Line& l, float& t) const;
         LineRelativePosition intersection(const Line& l, float& t1, float& t2) const;
+        sf::Vector2f point(float param);
     };
 }
 
