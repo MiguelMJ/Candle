@@ -54,6 +54,8 @@ namespace candle{
         sf::VertexArray m_debug;
 #endif
         
+        sf::Vector2f castRay(const sfu::Line ray);
+        
     public:
         /**
          * @brief Default segment pool for shadow casting. Every LightSource contains it

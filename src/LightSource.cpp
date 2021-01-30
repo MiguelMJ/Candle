@@ -64,4 +64,25 @@ namespace candle{
         return m_shouldRecast 
             || Transformable::getTransform() != m_transformOfLastCast;
     }
+    
+    sf::Vector2f LightSource::castRay(const sfu::Line r){
+        sf::Vector2f ret(r.m_origin);   
+        float minRange = std::numeric_limits<float>::infinity();
+        for(auto& pool: m_ptrSegmentPool){
+            for(auto& seg : *pool){
+                float t_seg, t_ray;
+                if(
+                    seg.intersection(r, t_seg, t_ray) == sfu::Line::SECANT
+                    && t_ray <= minRange
+                    && t_ray >= 0.f
+                    && t_seg <= 1.f
+                    && t_seg >= 0.f
+                ){
+                    minRange = t_ray;
+                    ret = r.m_origin + t_ray*r.m_direction;
+                }
+            }
+        }
+        return ret;
+    };
 }

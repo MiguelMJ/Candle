@@ -94,26 +94,6 @@ namespace candle{
     }
     
     void RadialLight::castLight(){
-        auto castRay = [&] (const sfu::Line r) -> sf::Vector2f {
-            sf::Vector2f ret(r.m_origin);   
-            float minRange = std::numeric_limits<float>::infinity();
-            for(auto& pool: m_ptrSegmentPool){
-                for(auto& seg : *pool){
-                    float t_seg, t_ray;
-                    if(
-                        seg.intersection(r, t_seg, t_ray) == sfu::Line::SECANT
-                        && t_ray <= minRange
-                        && t_ray >= 0.f
-                        && t_seg <= 1.f
-                        && t_seg >= 0.f
-                    ){
-                        minRange = t_ray;
-                        ret = r.m_origin + t_ray*r.m_direction;
-                    }
-                }
-            }
-            return ret;
-        };
         sf::Transform trm = Transformable::getTransform();
         trm.scale(m_range, m_range, BASE_RADIUS, BASE_RADIUS);
         std::vector<sfu::Line> rays;
@@ -121,7 +101,7 @@ namespace candle{
         for(auto& pool : m_ptrSegmentPool){
             s += pool->size();
         }
-        rays.reserve(2 + 4*3*2 + s * 2 * 3); // 2: beam angle, 4: corners of bounds, 2: pnts/sgmnt, 3 rays/pnt
+        rays.reserve(2 + s * 2 * 3); // 2: beam angle, 2: pnts/sgmnt, 3 rays/pnt
         
         // Start casting
         float bl1 = module360(getRotation() - m_beamAngle/2);
@@ -202,6 +182,7 @@ namespace candle{
             rays.emplace(rays.begin(), castPoint, bl1);
             rays.emplace_back(castPoint, bl2);
         }
+        
         sf::Transform tr_i = trm.getInverse();
         // keep only the ones within the area
         std::vector<sf::Vector2f> points;
