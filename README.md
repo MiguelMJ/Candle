@@ -2,19 +2,14 @@
 <h1 align="center">Candle</h1>
 <h3 align="center">2D lighting for SFML</h3>
 <p align="center">
-<img src="https://img.shields.io/badge/C++-11-informational">
-<img src="https://img.shields.io/badge/SFML-2.5.1-informational">
-<a href="https://miguelmj.github.io/Candle">
-    <img src="https://img.shields.io/badge/code-documented-success"/>
-</a>
-<a href="https://github.com/MiguelMJ/Candle">
-    <img src="https://img.shields.io/github/repo-size/MiguelMJ/Candle"/>
-</a>
-<img src="https://img.shields.io/badge/version-v0.1-informational"/>
-<a href="LICENSE">
-    <img src="https://img.shields.io/badge/license-MIT-informational"/>
-</a>
+<img src="https://img.shields.io/badge/C++-11-00599C?style=flat-square&logo=c%2B%2B">
+<img src="https://img.shields.io/badge/SFML-v2.5.1-8CC445?logo=SFML&style=flat-square">
+<a href="https://miguelmj.github.io/Candle"><img src="https://img.shields.io/badge/code-documented-success?style=flat-square"/></a>
+<a href="https://github.com/MiguelMJ/Candle"><img src="https://img.shields.io/github/repo-size/MiguelMJ/Candle?style=flat-square"/></a>
+<img src="https://img.shields.io/badge/version-v0.1-informational?style=flat-square"/>
+<a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-informational?style=flat-square"/></a>
 </p>
+
 
 Candle is a SFML based C++ library that provides light, shadow casting and field of view  functionalities with easy integration.
 
