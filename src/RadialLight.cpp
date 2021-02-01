@@ -62,7 +62,8 @@ namespace candle{
         Transformable::setOrigin(BASE_RADIUS, BASE_RADIUS);
         setRange(1.0f);
         setBeamAngle(360.f);
-        castLight();
+        m_shouldRecast = true;
+        // castLight();
     }
     
     void RadialLight::draw(sf::RenderTarget& t, sf::RenderStates s) const{

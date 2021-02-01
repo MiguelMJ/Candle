@@ -53,7 +53,7 @@ namespace sfu{
         
         return SECANT;
     }
-    sf::Vector2f Line::point(float param){
+    sf::Vector2f Line::point(float param) const{
         return m_origin + param*m_direction;
     }
 }

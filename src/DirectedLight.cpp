@@ -16,7 +16,8 @@ namespace candle{
         m_polygon.resize(2);
         setBeamInclination(0.f);
         setBeamWidth(10.f);
-        castLight();
+        m_shouldRecast = true;
+        // castLight();
     }
     
     void DirectedLight::setRange(float range){
