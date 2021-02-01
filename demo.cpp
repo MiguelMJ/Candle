@@ -1,277 +1,314 @@
-#include "Candle/RadialLight.hpp"
-#include "Candle/Lighting.hpp"
-#include "Candle/Util.hpp"
 #include <iostream>
 #include <iomanip>
 #include <memory>
 #include <ctime>
 #include <cmath>
 
+#include "sfml-util/geometry/Polygon.hpp"
+
+#include "Candle/Lighting.hpp"
+#include "Candle/LightSource.hpp"
+#include "Candle/RadialLight.hpp"
+#include "Candle/DirectedLight.hpp"
+
+/*
+ * WINDOW
+ */
+const float WIDTH = 700;
+const float HEIGHT = 700;
+sf::RenderWindow w(sf::VideoMode(WIDTH, HEIGHT), "Candle - demo");
+
+/*
+ * LIGHTING
+ */
+candle::Lighting lighting;
+std::vector<std::unique_ptr<candle::LightSource>> lights;
+sf::VertexArray segmentVertices(sf::Lines, 0);
+
+/*
+ * BACKGROUND
+ */
+const int ROWS = 16;
+const int COLS = 16;
+float CELL_W = WIDTH / COLS;
+float CELL_H = HEIGHT / ROWS;
+const sf::Color BG_COLORS[] = {
+    sf::Color::Red,
+    sf::Color::Green,
+    sf::Color::Blue};
+sf::VertexArray background(sf::Quads, ROWS * COLS * 4);
+
+/*
+ * INTERACTIVITY - Brushes - Lights
+ */
+enum Brush{
+    NONE = -1,
+    RADIAL = 0,
+    DIRECTED = 1,
+    BLOCK = 2,
+    LINE = 3};
+Brush brush;
+bool lineStarted;
+
+const sf::Color L_COLORS[] = {
+    sf::Color::White,
+    sf::Color::Magenta,
+    sf::Color::Yellow,
+    sf::Color::Cyan};
+
+sf::VertexArray mouseBlock(sf::Lines, 8);
+float blockSize;
+
+candle::RadialLight radialLight;
+candle::DirectedLight directedLight;
+bool control, shift, alt;
+
+/*
+ * INTERACTIVITY - Menu
+ */
+struct Button: public sf::RectangleShape{
+    void (*function)();
+};
+std::vector<Button> buttons;
+
+/*
+ * SUBROUTINES
+ */
+void initialize();
+void setMouseBlockSize(float size);
+void pushSegment(const sfu::Line& segment);
+void popSegment();
+void pushBlock(const sf::Vector2f& pos);
+void popBlock();
+void setBrush(Brush b);
+void castAllLights();
+void click();
+void updateOnMouseMove();
+void updateOnMouseScroll(int d);
+/*
+ * MAIN
+ */
 int main(){
-    // === WINDOW ===
-    float WIDTH = 700;
-    float HEIGHT = 700;
-    sf::RenderWindow w(sf::VideoMode(WIDTH,HEIGHT), "Candle - demo");
-    w.setFramerateLimit(60);
-
-    // === LIGHTING ===
-    candle::Lighting ll;
-    ll.adjustFog(w.getView());
-
-    // === BACKGROUND ===
-    int rowNum = 16; 
-    int colNum = 16;
-    sf::Color bgc[3] = {sf::Color::Red, sf::Color::Green, sf::Color::Blue};
-    sf::VertexArray bg(sf::Quads, colNum*rowNum*4);
-    float cellWidth = WIDTH/colNum;
-    float cellHeight = HEIGHT/rowNum;
-    for(int i=0; i < colNum*rowNum; i++){
-        int p = i*4;
-        int pp = p+1;
-        int ppp = p+2;
-        int pppp = p+3;
-        float x, y;
-        x = cellWidth * (i%colNum);
-        y = cellHeight * (i/colNum); // integer division, don't simplify
-        bg[p].color = bg[pp].color = bg[ppp].color = bg[pppp].color = bgc[i%3];
-        bg[p].position = sf::Vector2f(x,y);
-        bg[pp].position = sf::Vector2f(x,y+cellHeight);
-        bg[ppp].position = sf::Vector2f(x+cellWidth,y+cellHeight);
-        bg[pppp].position = sf::Vector2f(x+cellWidth,y);
-    }
-
-    // === INTERACTIVITY===
-    sf::Color lightColors[4] = {sf::Color::White, 
-                                sf::Color::Magenta, 
-                                sf::Color::Yellow,
-                                sf::Color::Cyan };
-    sf::VertexArray segmentLines(sf::Lines, 0);
-    std::vector<std::unique_ptr<candle::RadialLight>> lights;
-
-    float blockWidth = 20;
-    float blockHeight = 20;
-    sf::RectangleShape mouseBlock(sf::Vector2f(blockWidth*2, blockHeight*2));
-    mouseBlock.setOrigin(blockWidth,blockHeight);
-    mouseBlock.setFillColor(sf::Color::Transparent);
-    mouseBlock.setOutlineThickness(1);
-    candle::RadialLight mouseLight;
-    bool lightOrBlock = true;
-    ll.addLightSource(&mouseLight);
-    int color = 0;
-    float mouseLightRadius = 100;
-    float mouseLightAngle = 360;
-    float mouseLightIntensity = 1.0;
-    float fogOpacity = 1.0;
-    mouseLight.setRange(mouseLightRadius);
-    mouseLight.setIntensity(mouseLightIntensity);
-    ll.setFogOpacity(fogOpacity);
-    sf::Time dt;
-
-    // === FUNCTIONS ===
-    auto info = [&](){
-        std::cout << "\r";
-        std::cout << "Bloques: " << std::setw(3) << ll.m_segmentPool.size()/4;
-        std::cout << " - Luces: " << std::setw(3) << lights.size();
-        std::cout << " - " << std::setw(8) << dt.asMilliseconds() << "ms";
-    };
-    auto removeMouseBlockSegments = [&](){
-        if(!ll.m_segmentPool.empty()){
-            for(int i=0; i<4; i++){
-                ll.m_segmentPool.pop_back();
-            }
-        }
-    };
-    auto addMouseBlockSegments = [&](){
-        auto mbb = mouseBlock.getGlobalBounds();
-        float l = mbb.left;
-        float t = mbb.top;
-        float r = l + mbb.width;
-        float b = t + mbb.height;
-        sf::Vector2f lt(l,t);
-        sf::Vector2f rt(r,t);
-        sf::Vector2f lb(l,b);
-        sf::Vector2f rb(r,b);
-        ll.m_segmentPool.emplace_back(lt, rt);
-        ll.m_segmentPool.emplace_back(rt, rb);
-        ll.m_segmentPool.emplace_back(rb, lb);
-        ll.m_segmentPool.emplace_back(lb, lt);
-    };
-    auto castAllLights = [&](){
-        for(auto &l : lights){
-            l->castLight();
-        }
-    };
-    auto updateCastOnMouseMove = [&](){
-        auto mpi = sf::Mouse::getPosition(w);
-        sf::Vector2f mp(mpi.x, mpi.y);
-        mouseLight.setPosition(mpi.x,mpi.y);
-        mouseBlock.setPosition(mpi.x,mpi.y);
-        if(lightOrBlock){
-            mouseLight.castLight();
-        }else{
-            removeMouseBlockSegments();
-            addMouseBlockSegments();
-            castAllLights();
-        }
-    };
-    auto putLightOrBlock = [&](){
-        if(lightOrBlock){
-            auto lptr = new candle::RadialLight(mouseLight);
-            lights.emplace_back(lptr);
-            ll.addLightSource(lptr);
-            mouseLight.castLight();
-        }else{
-            auto mpi = sf::Mouse::getPosition(w);
-            sf::Vector2f mp(mpi.x, mpi.y);
-            sfu::Line t({mp.x-blockWidth,mp.y-blockHeight}, {mp.x+blockWidth, mp.y-blockHeight});
-            sfu::Line l({mp.x+blockWidth,mp.y-blockHeight}, {mp.x+blockWidth, mp.y+blockHeight});
-            sfu::Line b({mp.x+blockWidth,mp.y+blockHeight}, {mp.x-blockWidth, mp.y+blockHeight});
-            sfu::Line r({mp.x-blockWidth,mp.y+blockHeight}, {mp.x-blockWidth, mp.y-blockHeight});
-            ll.m_segmentPool.push_back(t);
-            ll.m_segmentPool.push_back(l);
-            ll.m_segmentPool.push_back(b);
-            ll.m_segmentPool.push_back(r);
-            segmentLines.append(sf::Vertex(t.m_origin, sf::Color::White));
-            segmentLines.append(sf::Vertex(t.m_origin+t.m_direction, sf::Color::White));
-            segmentLines.append(sf::Vertex(l.m_origin, sf::Color::White));
-            segmentLines.append(sf::Vertex(l.m_origin+l.m_direction, sf::Color::White));
-            segmentLines.append(sf::Vertex(b.m_origin, sf::Color::White));
-            segmentLines.append(sf::Vertex(b.m_origin+b.m_direction, sf::Color::White));
-            segmentLines.append(sf::Vertex(r.m_origin, sf::Color::White));
-            segmentLines.append(sf::Vertex(r.m_origin+r.m_direction, sf::Color::White));
-            castAllLights();
-        }
-    };
-    auto cleanScreen = [&](){
-        ll.clear(); // clear light pointers
-        ll.m_segmentPool.clear(); // clear logic segments
-        lights.clear(); // clear lights
-        segmentLines.clear(); // clear visible segments
-        if(lightOrBlock) ll.addLightSource(&mouseLight);
-    };
-    auto saveCapture = [&](){
-        sf::Texture tex;
-        tex.create(w.getSize().x, w.getSize().y);
-        tex.update(w);
-        std::string name = "candle-capture-";
-        char timestr[13];
-        time_t rawtime;
-        struct tm * timeinfo;
-        time(&rawtime);
-        timeinfo = localtime(&rawtime);
-        strftime(timestr,13,"%y%m%d%H%M%S",timeinfo);
-        name += timestr;
-        name += ".png";
-        if(!tex.copyToImage().saveToFile(name)){
-            exit(1);
-        }
-    };
-
-    // === INITIALIZATION ===
-    mouseLight.setColor(lightColors[color]);
-    sf::Clock clock;
-    // === MAIN LOOP ===
-    while(w.isOpen()){
-        int fps = int(std::round(1.f/dt.asSeconds()));
-        w.setTitle("Candle - demo - " + std::to_string(fps) + " fps");
-        sf::Event e;
-        while(w.pollEvent(e)){
-            switch(e.type){
-                case sf::Event::Closed:
-                    w.close();
-                    break;
-                case sf::Event::MouseMoved:
-                        updateCastOnMouseMove();
-                    break;
-                case sf::Event::MouseWheelScrolled:
-                    if (
-                        sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
-                        || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)
-                    ){
-                        mouseLightAngle += copysign(4, e.mouseWheelScroll.delta);
-                        mouseLight.setBeamAngle(mouseLightAngle);
-                    }else if(
-                        sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt)
-                        || sf::Keyboard::isKeyPressed(sf::Keyboard::RAlt)
-                    ){
-                        mouseLight.rotate(copysign(4, e.mouseWheelScroll.delta));
-                    }else{
-                        mouseLightRadius += copysign(10, e.mouseWheelScroll.delta);
-                        mouseLight.setRange(mouseLightRadius);
-                    }
-                    mouseLight.castLight();
-                    break;
-                case sf::Event::MouseButtonPressed:
-                    if(e.mouseButton.button == sf::Mouse::Left){
-                            putLightOrBlock();
-                    }else if(e.mouseButton.button == sf::Mouse::Right){
-                        lightOrBlock = !lightOrBlock;
-                        if(lightOrBlock){
-                            ll.addLightSource(&mouseLight);
-                            removeMouseBlockSegments();
-                        }else{
-                            ll.removeLightSource(&mouseLight);
-                            addMouseBlockSegments();
-                        }
-                        castAllLights();
-                    }
-                    break;
-                case sf::Event::KeyPressed:
-                    if(e.key.code == sf::Keyboard::Space){
-                        cleanScreen();
-                    }else if(e.key.code == sf::Keyboard::C){
-                        mouseLight.setColor(lightColors[(++color)%4]);
-                        mouseLight.castLight();
-                    }else if(e.key.code == sf::Keyboard::A){
-                        if(lightOrBlock && mouseLightIntensity > 0){
-                            mouseLightIntensity-=0.05;
-                            mouseLight.setIntensity(mouseLightIntensity);
-                            mouseLight.castLight();
-                        }
-                    }else if(e.key.code == sf::Keyboard::S){
-                        if(lightOrBlock && mouseLightIntensity < 1){
-                            mouseLightIntensity+=0.05;
-                            mouseLight.setIntensity(mouseLightIntensity);
-                            mouseLight.castLight();
-                        }
-                    }else if(e.key.code == sf::Keyboard::G){
-                        mouseLight.setGlow(!mouseLight.getGlow());
-                    }else if(e.key.code == sf::Keyboard::Z){
-                        if(fogOpacity > 0){
-                            fogOpacity-=0.05;
-                            ll.setFogOpacity(fogOpacity);
-                        }
-                    }else if(e.key.code == sf::Keyboard::X){
-                        if(fogOpacity < 1){
-                            fogOpacity+=0.05;
-                            ll.setFogOpacity(fogOpacity);
-                        }
-                    }else if(e.key.code == sf::Keyboard::P){
-                        saveCapture();
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        // Update fog
-        ll.updateFog();
-        // Print info
-        info();
-        // Draw
-        w.clear();
-
-        w.draw(bg);
-        w.draw(ll);
-        if(!lightOrBlock){
-            w.draw(mouseBlock);
-        }
-        w.draw(segmentLines);
-
-        w.display();
-        dt = clock.restart();
-    }
-    std::cout << std::endl;
+    
+    initialize();
+    
     return 0;
+}
+
+void initialize(){
+    w.setFramerateLimit(60);
+    lighting.adjustFog(w.getView());
+    int colors = sizeof(BG_COLORS) / sizeof(*BG_COLORS);
+    for (int i = 0; i < COLS * ROWS; i++){
+        int p1 = i*4;
+        int p2 = p1+1;
+        int p3 = p1+2;
+        int p4 = p1+3;
+        float x = CELL_W * (i % COLS);
+        float y = CELL_H * (i / COLS);
+        background[p1].color =
+            background[p2].color = 
+            background[p3].color = 
+            background[p4].color = BG_COLORS[i % colors];
+        background[p1].position = {x, y};
+        background[p2].position = {x, y + CELL_H};
+        background[p3].position = {x + CELL_W, y + CELL_H};
+        background[p4].position = {x + CELL_W, y};
+    }
+    setMouseBlockSize(CELL_W);
+    brush = NONE;
+    lineStarted = false;
+    control = false;
+    shift = false;
+    alt = false;
+}
+void setMouseBlockSize(float size){
+    mouseBlock[7].position = 
+        mouseBlock[0].position = {-size/2, -size/2};
+    mouseBlock[1].position = 
+        mouseBlock[2].position = {size/2, -size/2};
+    mouseBlock[3].position = 
+        mouseBlock[4].position = {size/2, size/2};
+    mouseBlock[5].position = 
+        mouseBlock[6].position = {-size/2, size/2};
+    blockSize = size;
+    if(brush == BLOCK){
+        popBlock();
+        pushBlock(sf::Vector2f(sf::Mouse::getPosition(w)));
+    }
+}
+void pushSegment(const sfu::Line& segment){
+    lighting.m_segmentPool.push_back(segment);
+    segmentVertices.append(sf::Vertex(segment.m_origin));
+    segmentVertices.append(sf::Vertex(segment.point(1.f)));
+}
+void popSegment(){
+    lighting.m_segmentPool.pop_back();
+    segmentVertices.resize(segmentVertices.getVertexCount() - 2);
+}
+void pushBlock(const sf::Vector2f& pos){
+    const sf::Vector2f points[] = {
+        pos + mouseBlock[0].position,
+        pos + mouseBlock[2].position,
+        pos + mouseBlock[4].position,
+        pos + mouseBlock[6].position,
+    };
+    sfu::Polygon p(points);
+    for(auto& l: p.lines){
+        pushSegment(l);
+    }
+}
+void popBlock(){
+    for(int i = 0; i < 4; i++){
+        popSegment();
+    }
+}
+void drawBrush(){
+    sf::Transform t;
+    t.translate(sf::Vector2f(sf::Mouse::getPosition(w)));
+    switch(brush){
+    case LINE:
+        w.draw(sf::CircleShape(1.5f), sf::RenderStates(t));
+        break;
+    case BLOCK:
+        w.draw(mouseBlock, sf::RenderStates(t));
+        break;
+    default:
+        break;
+    }
+}
+void setBrush(Brush b){
+    if(b != brush){
+        if(b == RADIAL){
+            lighting.addLightSource(&radialLight);
+        }else{
+            lighting.removeLightSource(&radialLight);
+        }
+        if(b == DIRECTED){
+            lighting.addLightSource(&directedLight);
+        }else{
+            lighting.removeLightSource(&directedLight);
+        }
+        if(b == BLOCK){
+            pushBlock(sf::Vector2f(sf::Mouse::getPosition(w)));
+        }
+        if(brush == BLOCK){
+            popBlock();
+        }
+        if(lineStarted){
+            popSegment();
+            lineStarted = false;
+        }
+        brush = b;
+        updateOnMouseMove();
+    }
+}
+void castAllLights(){
+    for(auto& l: lights){
+        l -> castLight();
+    }
+}
+void click(){
+    sf::Vector2f mp(sf::Mouse::getPosition(w));
+    for(auto& button: buttons){
+        if(button.getGlobalBounds().contains(mp)){
+            button.function();
+            return;
+        }
+    }
+    switch(brush){
+    case RADIAL:
+        lights.emplace_back(new candle::RadialLight(radialLight));
+        break;
+    case DIRECTED:
+        lights.emplace_back(new candle::DirectedLight(directedLight));
+        break;
+    case LINE:
+        if(!lineStarted){
+            pushSegment(sfu::Line(mp, 0.f));
+        }
+        lineStarted = !lineStarted;
+        break;
+    case BLOCK:
+        pushBlock(mp);
+        break;
+    default:
+        break;
+    }
+}
+void updateOnMouseMove(){
+    sf::Vector2f mp(sf::Mouse::getPosition(w));
+    switch(brush){
+    case BLOCK:
+        popBlock();
+        pushBlock(mp);
+        castAllLights();
+        break;
+    case RADIAL:
+        radialLight.setPosition(mp);
+        radialLight.castLight();
+        break;
+    case DIRECTED:
+        directedLight.setPosition(mp);
+        directedLight.castLight();
+        break;
+    case LINE:
+        if(lineStarted){
+            int n = lighting.m_segmentPool.size();
+            sf::Vector2f orig = lighting.m_segmentPool[n-1].m_origin;
+            popSegment();
+            pushSegment(sfu::Line(orig, mp));
+            castAllLights();
+        }
+    default:
+        break;
+    }
+}
+void updateOnMouseScroll(int d){
+    switch(brush){
+    case RADIAL:
+        if(control){
+            radialLight.rotate(6 * d);
+        }else if(shift){
+            radialLight.setBeamAngle(radialLight.getBeamAngle() + d*5);
+        }else{
+            radialLight.setRange(radialLight.getRange() + d*5);
+        }
+        radialLight.castLight();
+        break;
+    case DIRECTED:
+        if(control){
+            directedLight.rotate(6 * d);
+        }else if(shift){
+            directedLight.setBeamWidth(directedLight.getBeamWidth() + d*5);
+        }else if(alt){
+            directedLight.setBeamInclination(directedLight.getBeamInclination() + d*5);
+        }else{
+            directedLight.setRange(directedLight.getRange() + d*5);
+        }
+        directedLight.castLight();
+        break;
+    case BLOCK:
+        setMouseBlockSize(blockSize + d*CELL_W);
+        break;
+    default:
+        break;
+    }
+}
+void clearLights(){
+    lights.clear();
+    lighting.clear();
+    if(brush == RADIAL){
+        lighting.addLightSource(&radialLight);
+    }else if(brush == DIRECTED){
+        lighting.addLightSource(&directedLight);
+    }
+}
+void clearSegments(){
+    segmentVertices.clear();
+    lighting.m_segmentPool.clear();
+}
+void clearAll(){
+    clearLights();
+    clearSegments();
 }
