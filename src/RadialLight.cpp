@@ -7,38 +7,38 @@
 #include "sfml-util/geometry/Line.hpp"
 
 namespace candle{
-    const float BASE_RADIUS = 100.0f;
-    bool l_firstConstructor(true);
+    const float BASE_RADIUS = 50.0f;
+    bool l_texturesReady(false);
     sf::Texture l_lightTextureFade;
     sf::Texture l_lightTexturePlain;
       
     void initializeTextures(){
-        int points = 48;
+        int points = 100;
         
         sf::RenderTexture lightTextureFade, lightTexturePlain;
         lightTextureFade.create(BASE_RADIUS*2, BASE_RADIUS*2);
         lightTexturePlain.create(BASE_RADIUS*2, BASE_RADIUS*2);
         
         sf::VertexArray lightShape(sf::TriangleFan, points+2);
-        float step = M_PI*2/points;
+        float step = M_PI*2.f/points;
         lightShape[0].position = {BASE_RADIUS,BASE_RADIUS};
         for(int i = 1; i < points+2; i++){
             lightShape[i].position = {
-                std::sin(step*(i))*BASE_RADIUS+BASE_RADIUS,
-                std::cos(step*(i))*BASE_RADIUS+BASE_RADIUS
+                (std::sin(step*(i)) + 1) * BASE_RADIUS,
+                (std::cos(step*(i)) + 1) * BASE_RADIUS
             };
             lightShape[i].color.a = 0;
         }
-        lightTextureFade.setSmooth(true);
         lightTextureFade.clear(sf::Color::Transparent);
         lightTextureFade.draw(lightShape);
         lightTextureFade.display();
+        lightTextureFade.setSmooth(true);
         
         sfu::setColor(lightShape, sf::Color::White);
-        lightTexturePlain.setSmooth(true);
         lightTexturePlain.clear(sf::Color::Transparent);
         lightTexturePlain.draw(lightShape);
         lightTexturePlain.display();
+        // lightTexturePlain.setSmooth(true);
         
         l_lightTextureFade = lightTextureFade.getTexture();
         l_lightTexturePlain = lightTexturePlain.getTexture();
@@ -53,10 +53,10 @@ namespace candle{
     RadialLight::RadialLight()
         : LightSource()
         {
-        if(l_firstConstructor){
+        if(!l_texturesReady){
             // The first time we create a RadialLight, we must create the textures
             initializeTextures();
-            l_firstConstructor = false;
+            l_texturesReady = true;
         }
         m_polygon.setPrimitiveType(sf::TriangleFan);
         Transformable::setOrigin(BASE_RADIUS, BASE_RADIUS);
@@ -68,7 +68,7 @@ namespace candle{
     
     void RadialLight::draw(sf::RenderTarget& t, sf::RenderStates s) const{
         sf::Transform trm = Transformable::getTransform();
-        trm.scale(m_range, m_range, BASE_RADIUS, BASE_RADIUS);
+        trm.scale(m_range/BASE_RADIUS, m_range/BASE_RADIUS, BASE_RADIUS, BASE_RADIUS);
         s.transform *= trm;
         s.texture = m_fade ? &l_lightTextureFade : &l_lightTexturePlain;
         t.draw(m_polygon, s);
@@ -78,11 +78,8 @@ namespace candle{
         t.draw(m_debug, deb_s);
 #endif
     }
-    
-    void RadialLight::setRange(float r){
-        r /= BASE_RADIUS;
-        m_range = std::max(r, 0.f);
-        m_shouldRecast = true;
+    void RadialLight::resetColor(){
+        sfu::setColor(m_polygon, m_color);
     }
     
     void RadialLight::setBeamAngle(float r){
@@ -95,8 +92,9 @@ namespace candle{
     }
     
     void RadialLight::castLight(){
+        float scaledRange = m_range / BASE_RADIUS;
         sf::Transform trm = Transformable::getTransform();
-        trm.scale(m_range, m_range, BASE_RADIUS, BASE_RADIUS);
+        trm.scale(scaledRange, scaledRange, BASE_RADIUS, BASE_RADIUS);
         std::vector<sfu::Line> rays;
         int s = 0;
         for(auto& pool : m_ptrSegmentPool){

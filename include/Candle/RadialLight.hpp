@@ -9,10 +9,10 @@ namespace candle{
         float m_beamAngle;
         
         void draw(sf::RenderTarget& t, sf::RenderStates st) const;
+        void resetColor();
         
     public:
         RadialLight();
-        void setRange(float range);
         void castLight();
         void setBeamAngle(float angle);
         float getBeamAngle() const;

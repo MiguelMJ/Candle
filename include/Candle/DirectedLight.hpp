@@ -10,10 +10,10 @@ namespace candle{
         float m_beamInclination;
         
         void draw(sf::RenderTarget& t, sf::RenderStates st) const;
+        void resetColor();
         
     public:
         DirectedLight();
-        void setRange(float range);
         void castLight();
         void setBeamInclination(float angle);
         float getBeamInclination() const;

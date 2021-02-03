@@ -30,9 +30,11 @@ namespace candle{
         updateFog();
     }
     void  Lighting::draw(sf::RenderTarget& t, sf::RenderStates s) const{
+        const sf::Texture *oldT = s.texture;
         s.texture = &m_fogTexture.getTexture();
         t.draw(m_fogQuad, s);
         s.blendMode = l_glowBlend;
+        s.texture = oldT;
         for(auto& ls: m_lights){
             if(ls->m_glow){
                 t.draw(*ls, s);

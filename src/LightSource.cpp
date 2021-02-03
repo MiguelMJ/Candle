@@ -23,7 +23,7 @@ namespace candle{
     
     void LightSource::setIntensity(float intensity){
         m_color.a = 255 * intensity;
-        sfu::setColor(m_polygon, m_color);
+        resetColor();
     }
     
     float LightSource::getIntensity() const{
@@ -32,7 +32,7 @@ namespace candle{
     
     void LightSource::setColor(const sf::Color& c){
         m_color = {c.r, c.g, c.b, m_color.a};
-        sfu::setColor(m_polygon, m_color);
+        resetColor();
     }
     
     sf::Color LightSource::getColor() const{
@@ -42,6 +42,7 @@ namespace candle{
     
     void LightSource::setFade(bool fade){
         m_fade = fade;
+        resetColor();
     }
     
     bool LightSource::getFade() const{
@@ -56,6 +57,11 @@ namespace candle{
         return m_glow;
     }
     
+    void LightSource::setRange(float r){
+        m_range = r;
+        m_shouldRecast = true;
+    }
+    
     float LightSource::getRange() const{
         return m_range;
     }
@@ -65,9 +71,8 @@ namespace candle{
             || Transformable::getTransform() != m_transformOfLastCast;
     }
     
-    sf::Vector2f LightSource::castRay(const sfu::Line r){
-        sf::Vector2f ret(r.m_origin);   
-        float minRange = std::numeric_limits<float>::infinity();
+    sf::Vector2f LightSource::castRay(sfu::Line r, float minRange){
+        r.m_direction = sfu::normalize(r.m_direction);
         for(auto& pool: m_ptrSegmentPool){
             for(auto& seg : *pool){
                 float t_seg, t_ray;
@@ -79,10 +84,9 @@ namespace candle{
                     && t_seg >= 0.f
                 ){
                     minRange = t_ray;
-                    ret = r.m_origin + t_ray*r.m_direction;
                 }
             }
         }
-        return ret;
+        return r.point(minRange);
     };
 }

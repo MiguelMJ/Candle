@@ -15,6 +15,7 @@
 #include "sfml-util/geometry/Line.hpp"
 
 namespace candle{
+    void initializeTextures();
     /**
      * @brief Interface for objects that emits light within a Lighting object
      * @details These objects are meant to be drawn as part of a Lighting object.
@@ -54,7 +55,8 @@ namespace candle{
         sf::VertexArray m_debug;
 #endif
         
-        sf::Vector2f castRay(const sfu::Line ray);
+        sf::Vector2f castRay(sfu::Line ray, float maxRange=std::numeric_limits<float>::infinity());
+        virtual void resetColor() = 0;
         
     public:
         /**
@@ -136,7 +138,7 @@ namespace candle{
          * @brief Set the range of the illuminated area.
          * @param range Range of the illuminated area.
          */
-        virtual void setRange(float range) = 0;
+        void setRange(float range);
         
         /**
          * @brief Get the range of the illuminated area.
