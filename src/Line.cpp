@@ -8,7 +8,6 @@ namespace sfu{
         m_origin(p1),
         m_direction(p2 - p1){}
         
-        
     Line::Line(const sf::Vector2f& p, float angle):
         m_origin(p)
         {
@@ -40,7 +39,8 @@ namespace sfu{
         auto& b = l.m_origin;
         auto& w = l.m_direction;
         
-        if(1.f - dot(v, w) == 0.001){
+        float th = angle(v, w);
+        if(th < 0.001f || th > 359.99f){
             if(relativePosition(a) == 0){
                 return COINCIDENTIAL;
             }else{
@@ -48,8 +48,13 @@ namespace sfu{
             }
         }
         
-        t1 = (w.y * (b.x-a.x) + w.x * (a.y-b.y)) / (v.x*w.y - v.y*w.x);
-        t2 = (t1*v.y + a.y - b.y) / w.y;
+        if(std::abs(w.y) < 0.001f){
+            t1 = (b.y-a.y) / v.y;
+            t2 = (a.x + t1*v.x - b.x) / w.x;
+        }else{
+            t1 = (w.y * (b.x-a.x) + w.x * (a.y-b.y)) / (v.x*w.y - v.y*w.x);
+            t2 = (t1*v.y + a.y - b.y) / w.y;
+        }
         
         return SECANT;
     }
