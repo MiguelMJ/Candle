@@ -2,17 +2,12 @@
 <h1 align="center">Candle</h1>
 <h3 align="center">2D lighting for SFML</h3>
 <p align="center">
-<img src="https://img.shields.io/badge/C++-11-informational">
-<img src="https://img.shields.io/badge/SFML-2.5-informational">
-<a href="https://miguelmj.github.io/Candle">
-    <img src="https://img.shields.io/badge/code-documented-success"/>
-</a>
-<a href="https://github.com/MiguelMJ/Candle">
-    <img src="https://img.shields.io/github/repo-size/MiguelMJ/Candle"/>
-</a>
-<a href="LICENSE">
-    <img src="https://img.shields.io/badge/license-MIT-informational"/>
-</a>
+<img src="https://img.shields.io/badge/C++-11-00599C?style=flat-square&logo=c%2B%2B">
+<img src="https://img.shields.io/badge/SFML-v2.5.1-8CC445?logo=SFML&style=flat-square">
+<a href="https://miguelmj.github.io/Candle"><img src="https://img.shields.io/badge/code-documented-success?style=flat-square"/></a>
+<a href="https://github.com/MiguelMJ/Candle"><img src="https://img.shields.io/github/repo-size/MiguelMJ/Candle?style=flat-square"/></a>
+<img src="https://img.shields.io/badge/version-v0.1-informational?style=flat-square"/>
+<a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-informational?style=flat-square"/></a>
 </p>
 
 
@@ -69,7 +64,7 @@ This will generate libCandle-s.a or (Candle-s.lib on Windows) in build/lib folde
 
 <img src="https://www.sfml-dev.org/download/goodies/sfml-icon.svg" height="50">
 
-- **SFML v2.5** 
+- **SFML v2.5.1**
   - Graphics module and System module.
 
 _This library is meant to be used in SFML applications, so it's assumed that you are familiar with the process of compiling them. If you are not, [you can learn in the official website](https://www.sfml-dev.org/tutorials/2.5/)_ . 
@@ -151,8 +146,10 @@ The result will be a simple light casting a shadow over an invisible wall in the
 <p align="center"><img src="doc/img/example.gif" height="300"/></p>
 
 ## Contributors
-
-- <a href="https://github.com/Madour"><img src="https://avatars1.githubusercontent.com/u/11854124?s=400&u=0906a245444942f36510751b175403754553f9c0&v=4" title="Madour" style="border-radius:50%; width: 100px"> <b>Modar Nasser</b></a> - [Bug report](https://github.com/MiguelMJ/Candle/issues/created_by/Madour) · [Code](https://github.com/MiguelMJ/Candle/commits?author=Madour)
+<ul>
+	<li> <a href="https://github.com/Madour"><img src="https://avatars1.githubusercontent.com/u/11854124?s=400&u=0906a245444942f36510751b175403754553f9c0&v=4" title="Madour" width="100px" > <b>Modar Nasser</b></a> - <a href="https://github.com/MiguelMJ/Candle/issues/created_by/Madour">Bug report</> · <a href="https://github.com/MiguelMJ/Candle/commits?author=Madour">Code</a>
+	</li>
+</ul>
 
 ## Contributing
 
@@ -172,7 +169,6 @@ Here's a To Do list for Candle:
 - Use of several technologies I'm still not very familiar with.
   - Use **shaders** to blur the light or create a penumbra effect.
   - Implement the algorithms with **Box2D** ray casting and add a **compiler option** to use them instead of the ones I coded (this feature is inspired by the optional use of [fmtlib](https://github.com/fmtlib/fmt) in the [loguru](https://github.com/emilk/loguru) project).
-- The integration is simple, but it would be even simpler with a **better build system** (use Make/CMake to compile a static library, maybe).
 - Finally, you can still  :star:  **star this repository** and give it some visibility ![](https://img.shields.io/github/stars/MiguelMJ/Candle?style=social).
 
 ## License
