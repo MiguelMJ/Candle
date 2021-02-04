@@ -9,8 +9,6 @@
 <img src="https://img.shields.io/badge/version-v0.1-informational?style=flat-square"/>
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-informational?style=flat-square"/></a>
 </p>
-
-
 Candle is a SFML based C++ library that provides light, shadow casting and field of view  functionalities with easy integration.
 
 ### Contents

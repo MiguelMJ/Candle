@@ -638,7 +638,3 @@ int main(){
     app.mainLoop();
     return 0;
 }
-
-/*
- * SUBROUTINES - Definition
- */
