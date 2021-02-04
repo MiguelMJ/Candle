@@ -11,7 +11,7 @@ namespace candle{
         
         void draw(sf::RenderTarget& t, sf::RenderStates st) const;
         void resetColor();
-        
+        sf::Transform getActualTransform() const;
     public:
         DirectedLight();
         void castLight();

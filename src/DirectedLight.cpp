@@ -6,14 +6,20 @@
 #include "sfml-util/graphics/VertexArray.hpp"
 
 namespace candle{
-    void DirectedLight::draw(sf::RenderTarget& t, sf::RenderStates st) const{
-        sf::Transform trm(
+    sf::Transform DirectedLight::getActualTransform() const{
+        float f = std::tan(m_beamInclination * M_PI/180);
+        sf::Transform ret;
+        ret.combine(sf::Transform(
             1, 0, 0,
-            m_beamInclination, 1, 0,
+            f, 1, 0,
             0, 0, 1
-        );
-        trm *= Transformable::getTransform();
-        st.transform *= trm;
+        ));
+        ret.combine(getTransform());
+        return ret;
+    }
+    
+    void DirectedLight::draw(sf::RenderTarget& t, sf::RenderStates st) const{
+        st.transform *= getActualTransform();
         t.draw(m_polygon, st);
 #ifdef CANDLE_DEBUG
         sf::RenderStates deb_s;
@@ -83,12 +89,7 @@ namespace candle{
         return a.param < b.param;
     }
     void DirectedLight::castLight(){
-        sf::Transform trm(
-            1, 0, 0,
-            m_beamInclination, 1, 0,
-            0, 0, 1
-        );
-        trm *= Transformable::getTransform();
+        sf::Transform trm = getActualTransform();
         sf::Transform trm_i = trm.getInverse();
         
         float widthHalf = m_beamWidth/2.f;
@@ -186,8 +187,7 @@ namespace candle{
                 m_polygon[p2].color = m_polygon[p3].color = m_color;
                 m_polygon[p2].color.a = m_color.a * dr1;
                 m_polygon[p3].color.a = m_color.a * dr2;
-            }
-            
+            }  
         }
         m_transformOfLastCast = Transformable::getTransform();
         m_shouldRecast = false;
