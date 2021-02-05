@@ -26,7 +26,7 @@ namespace candle{
         sf::VertexArray m_fogQuad;
         sf::Vector2f m_fogOffset;
         sf::Color m_fogColor;
-        std::vector<sfu::Line> m_boundsSegments;
+        std::vector<sfu::Line> m_boundsEdges;
         
         /**
          * @brief Function to draw all the fog and the light sources.
@@ -35,12 +35,12 @@ namespace candle{
     public:
         
         /**
-         * @brief List of segments that cast shadows.
+         * @brief List of edges that cast shadows.
          * @details Every LightSource added to this layer will add this 
-         * segment pool pointer to its list.
-         * @see LightSource::m_ptrSegmentPool
+         * edge pool pointer to its list.
+         * @see LightSource::m_ptrEdgePool
          */
-        std::vector<sfu::Line> m_segmentPool;
+        std::vector<sfu::Line> m_edgePool;
         
         /**
          * @brief Constructor.
@@ -69,8 +69,8 @@ namespace candle{
         /**
          * @brief Removes all lights.
          * @details This function doesn't delete the pointers, only
-         * forgets them. Also, the segment pool is not deleted. To clear
-         * it, you must explicitly clear m_segmentPool.
+         * forgets them. Also, the edge pool is not deleted. To clear
+         * it, you must explicitly clear m_edgePool.
          */
         void clear() ;
         

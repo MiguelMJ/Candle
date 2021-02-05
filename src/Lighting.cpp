@@ -1,6 +1,7 @@
 #include "Candle/Lighting.hpp"
 #include "sfml-util/graphics/VertexArray.hpp"
 
+
 namespace candle{
 
     sf::BlendMode l_lightBlend(
@@ -23,7 +24,7 @@ namespace candle{
     , m_fogQuad(ll.m_fogQuad)
     , m_fogOffset(ll.m_fogOffset)
     , m_fogColor(ll.m_fogColor)
-    , m_segmentPool(ll.m_segmentPool)
+    , m_edgePool(ll.m_edgePool)
     {
         setFogSize(ll.getFogSize());
         setFogPosition(ll.getFogPosition());
@@ -42,13 +43,13 @@ namespace candle{
         }
     }
     void Lighting::addLightSource(LightSource* ls) {
-        ls->m_ptrSegmentPool.insert(&m_segmentPool);
-        ls->m_ptrSegmentPool.insert(&m_boundsSegments);
+        ls->m_ptrEdgePool.insert(&m_edgePool);
+        ls->m_ptrEdgePool.insert(&m_boundsEdges);
         m_lights.insert(ls);
     }
     void Lighting::removeLightSource(LightSource* ls){
-        ls->m_ptrSegmentPool.erase(&m_segmentPool);
-        ls->m_ptrSegmentPool.erase(&m_boundsSegments);
+        ls->m_ptrEdgePool.erase(&m_edgePool);
+        ls->m_ptrEdgePool.erase(&m_boundsEdges);
         m_lights.erase(ls);
     }
     void Lighting::clear(){
@@ -66,11 +67,11 @@ namespace candle{
         m_fogQuad[3].position =
         m_fogQuad[3].texCoords = {0,y};
         sfu::move(m_fogQuad, m_fogOffset);
-        m_boundsSegments.clear();
-        m_boundsSegments.emplace_back(sf::Vector2f(0,0), sf::Vector2f(x,0));
-        m_boundsSegments.emplace_back(sf::Vector2f(x,0), sf::Vector2f(x,y));
-        m_boundsSegments.emplace_back(sf::Vector2f(x,y), sf::Vector2f(0,y));
-        m_boundsSegments.emplace_back(sf::Vector2f(0,y), sf::Vector2f(0,0));
+        m_boundsEdges.clear();
+        m_boundsEdges.emplace_back(sf::Vector2f(0,0), sf::Vector2f(x,0));
+        m_boundsEdges.emplace_back(sf::Vector2f(x,0), sf::Vector2f(x,y));
+        m_boundsEdges.emplace_back(sf::Vector2f(x,y), sf::Vector2f(0,y));
+        m_boundsEdges.emplace_back(sf::Vector2f(0,y), sf::Vector2f(0,0));
     }
     void Lighting::setFogSize(sf::Vector2f size){
         setFogSize(size.x, size.y);
@@ -85,7 +86,7 @@ namespace candle{
         sf::Vector2f delta = position - m_fogOffset;
         sfu::move(m_fogQuad, delta);
         m_fogOffset += delta;
-        for(auto& seg : m_boundsSegments){
+        for(auto& seg : m_boundsEdges){
             seg.m_origin += delta;
         }
     }

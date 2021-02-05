@@ -8,7 +8,7 @@
 #include "sfml-util/graphics/VertexArray.hpp"
 
 namespace candle{
-    std::vector<sfu::Line> LightSource::s_defaultSegmentPool;
+    std::vector<sfu::Line> LightSource::s_defaultEdgePool;
     
     LightSource::LightSource()
         : m_glow(true)
@@ -18,7 +18,7 @@ namespace candle{
         , m_debug(sf::Lines, 0)
 #endif
         {
-        m_ptrSegmentPool.insert(&s_defaultSegmentPool);
+        m_ptrEdgePool.insert(&s_defaultEdgePool);
     }
     
     void LightSource::setIntensity(float intensity){
@@ -73,7 +73,7 @@ namespace candle{
     
     sf::Vector2f LightSource::castRay(sfu::Line r, float minRange){
         r.m_direction = sfu::normalize(r.m_direction);
-        for(auto& pool: m_ptrSegmentPool){
+        for(auto& pool: m_ptrEdgePool){
             for(auto& seg : *pool){
                 float t_seg, t_ray;
                 if(

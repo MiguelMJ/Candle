@@ -42,10 +42,10 @@ namespace candle{
         
         /**
          * @brief Vector of pointers to edge pools.
-         * @details By default, it points to @ref s_defaultSegmentPool.
-         * @see s_defaultSegmentPool
+         * @details By default, it points to @ref s_defaultEdgePool.
+         * @see s_defaultEdgePool
          */
-        std::vector<std::vector<sfu::Line>*> m_ptrSegmentPool;
+        std::set<std::vector<sfu::Line>*> m_ptrEdgePool;
 
 #ifdef CANDLE_DEBUG        
         sf::VertexArray m_debug;
@@ -56,11 +56,11 @@ namespace candle{
         
     public:
         /**
-         * @brief Default segment pool for shadow casting. Every LightSource contains it
+         * @brief Default edge pool for shadow casting. Every LightSource contains it
          * in its own pool.
-         * @see m_ptrSegmentPool
+         * @see m_ptrEdgePool
          */
-        static std::vector<sfu::Line> s_defaultSegmentPool;
+        static std::vector<sfu::Line> s_defaultEdgePool;
         
         /**
          * @brief Constructor
@@ -152,12 +152,12 @@ namespace candle{
         /**
          * @brief Calculates the area that should be iluminated with a 
          * ray casting algorithm.
-         * @details For the calculations, the segments from @ref 
-         * m_ptrSegmentPool are used. If the [fog opacity](@ref 
+         * @details For the calculations, the edges from @ref 
+         * m_ptrEdgePool are used. If the [fog opacity](@ref 
          * Lighting::setFogOpacity) is not 0, then @ref 
          * Lighting::updateFog should be called somewhere between 
          * this function and the next draw.
-         * @see m_ptrSegmentPool
+         * @see m_ptrEdgePool
          */
         virtual void castLight() = 0;
     };

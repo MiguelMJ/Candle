@@ -97,7 +97,7 @@ namespace candle{
         trm.scale(scaledRange, scaledRange, BASE_RADIUS, BASE_RADIUS);
         std::vector<sfu::Line> rays;
         int s = 0;
-        for(auto& pool : m_ptrSegmentPool){
+        for(auto& pool : m_ptrEdgePool){
             s += pool->size();
         }
         rays.reserve(2 + s * 2 * 3); // 2: beam angle, 2: pnts/sgmnt, 3 rays/pnt
@@ -108,7 +108,7 @@ namespace candle{
         bool beamAngleBigEnough = m_beamAngle < 0.1;
         auto castPoint = Transformable::getPosition();
         float off = .001f;
-        for(auto& pool : m_ptrSegmentPool){
+        for(auto& pool : m_ptrEdgePool){
             for(auto& s : *pool){
                 sfu::Line r1(castPoint, s.m_origin);
                 sfu::Line r2(castPoint, s.m_origin+s.m_direction);

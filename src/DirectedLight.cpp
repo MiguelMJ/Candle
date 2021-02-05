@@ -90,7 +90,7 @@ namespace candle{
         
         rays.emplace(0.f, lim1);
         rays.emplace(1.f, lim2);
-        for(auto& pool: m_ptrSegmentPool){
+        for(auto& pool: m_ptrEdgePool){
             for(auto& seg: *pool){
                 float tRng, tSeg;
                 if(

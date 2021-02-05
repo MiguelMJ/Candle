@@ -33,7 +33,7 @@ struct App{
     */
     candle::Lighting lighting;
     std::vector<std::unique_ptr<candle::LightSource>> lights;
-    sf::VertexArray segmentVertices;
+    sf::VertexArray edgeVertices;
 
     /*
     * BACKGROUND
@@ -117,7 +117,7 @@ struct App{
         w.create(sf::VideoMode(WIDTH+MENU_W, HEIGHT), "Candle - demo");
         w.setFramerateLimit(60);
         float totalWidth = WIDTH + MENU_W;
-        segmentVertices.setPrimitiveType(sf::Lines);
+        edgeVertices.setPrimitiveType(sf::Lines);
         background.setPrimitiveType(sf::Quads);
         background.resize(ROWS * COLS * 4);
         mouseBlock.setPrimitiveType(sf::Lines);
@@ -221,7 +221,7 @@ struct App{
         
         auto i6 = new sf::VertexArray(*i5);
         sfu::setColor(*i6, {25,25,25,255});
-        buttons.emplace_back(i6, [](App *app){ app->clearSegments(); app->castAllLights(); });
+        buttons.emplace_back(i6, [](App *app){ app->clearEdges(); app->castAllLights(); });
         
         
         
@@ -269,14 +269,14 @@ struct App{
             }
         }
     }
-    void pushSegment(const sfu::Line& segment){
-        lighting.m_segmentPool.push_back(segment);
-        segmentVertices.append(sf::Vertex(segment.m_origin));
-        segmentVertices.append(sf::Vertex(segment.point(1.f)));
+    void pushEdge(const sfu::Line& edge){
+        lighting.m_edgePool.push_back(edge);
+        edgeVertices.append(sf::Vertex(edge.m_origin));
+        edgeVertices.append(sf::Vertex(edge.point(1.f)));
     }
-    void popSegment(){
-        lighting.m_segmentPool.pop_back();
-        segmentVertices.resize(segmentVertices.getVertexCount() - 2);
+    void popEdge(){
+        lighting.m_edgePool.pop_back();
+        edgeVertices.resize(edgeVertices.getVertexCount() - 2);
     }
     void pushBlock(const sf::Vector2f& pos){
         const sf::Vector2f points[] = {
@@ -287,12 +287,12 @@ struct App{
         };
         sfu::Polygon p(points, 4);
         for(auto& l: p.lines){
-            pushSegment(l);
+            pushEdge(l);
         }
     }
     void popBlock(){
         for(int i = 0; i < 4; i++){
-            popSegment();
+            popEdge();
         }
     }
     void drawBrush(){
@@ -326,7 +326,7 @@ struct App{
                 castAllLights();
             }
             if(lineStarted){
-                popSegment();
+                popEdge();
                 castAllLights();
                 lineStarted = false;
             }
@@ -367,7 +367,7 @@ struct App{
                 lighting.addLightSource(lights.back().get());
                 break;
             case LINE:
-                pushSegment(sfu::Line(mp, 0.f));
+                pushEdge(sfu::Line(mp, 0.f));
                 lineStarted = true;
                 break;
             case BLOCK:
@@ -397,10 +397,10 @@ struct App{
                 break;
             case LINE:
                 if(lineStarted){
-                    int n = lighting.m_segmentPool.size();
-                    sf::Vector2f orig = lighting.m_segmentPool[n-1].m_origin;
-                    popSegment();
-                    pushSegment(sfu::Line(orig, mp));
+                    int n = lighting.m_edgePool.size();
+                    sf::Vector2f orig = lighting.m_edgePool[n-1].m_origin;
+                    popEdge();
+                    pushEdge(sfu::Line(orig, mp));
                     castAllLights();
                 }
             default:
@@ -517,7 +517,7 @@ struct App{
         case sf::Keyboard::Space:
             lineStarted = false;
             if(alt){
-                clearSegments();
+                clearEdges();
             }else if(shift){
                 clearLights();
             }else{
@@ -553,15 +553,15 @@ struct App{
             lighting.addLightSource(&directedLight);
         }
     }
-    void clearSegments(){
-        segmentVertices.clear();
-        lighting.m_segmentPool.clear();
+    void clearEdges(){
+        edgeVertices.clear();
+        lighting.m_edgePool.clear();
         lineStarted = false;
         if(brush == BLOCK) pushBlock(getMousePosition());
     }
     void clearAll(){
         clearLights();
-        clearSegments();
+        clearEdges();
     }
     void mainLoop(){
         //candle::initializeTextures();
@@ -619,7 +619,7 @@ struct App{
             w.setView(sandboxView);
             w.draw(background);
             w.draw(lighting);
-            w.draw(segmentVertices);
+            w.draw(edgeVertices);
             drawBrush();
             
             w.display();
@@ -633,7 +633,7 @@ struct App{
                         + " ms] ("
                         + std::to_string(lights.size() + (brush==RADIAL || brush==DIRECTED))
                         + " Light/s  "
-                        + std::to_string(lighting.m_segmentPool.size())
+                        + std::to_string(lighting.m_edgePool.size())
                         + " Edge/s)");
         }
     }
