@@ -15,7 +15,14 @@
 #include "sfml-util/geometry/Line.hpp"
 
 namespace candle{
+    /**
+     * @brief This function initializes the Texture used for the RadialLights.
+     * @details It is called byt the first constructor. Anyways, it could be 
+     * necessary to call it explicitly if you declare a RadialLight that, for 
+     * some reason, you have a global or static RadialLight.
+     */
     void initializeTextures();
+    
     /**
      * @brief Interface for objects that emit light
      * @details LightSources must be created and drawn from a @ref Lighting object.
@@ -42,7 +49,7 @@ namespace candle{
         
         /**
          * @brief Vector of pointers to edge pools.
-         * @details By default, it points to @ref s_defaultEdgePool.
+         * @details By default, it points at least to @ref s_defaultEdgePool.
          * @see s_defaultEdgePool
          */
         std::set<std::vector<sfu::Line>*> m_ptrEdgePool;
@@ -56,8 +63,7 @@ namespace candle{
         
     public:
         /**
-         * @brief Default edge pool for shadow casting. Every LightSource contains it
-         * in its own pool.
+         * @brief Default edge pool for shadow casting. Every LightSource contains it.
          * @see m_ptrEdgePool
          */
         static std::vector<sfu::Line> s_defaultEdgePool;
