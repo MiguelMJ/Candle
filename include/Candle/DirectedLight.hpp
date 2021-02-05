@@ -8,12 +8,11 @@ namespace candle{
     private:
         float m_beamWidth;
         
-        void draw(sf::RenderTarget& t, sf::RenderStates st) const;
-        void resetColor();
-        sf::Transform getActualTransform() const;
+        void draw(sf::RenderTarget& t, sf::RenderStates st) const override;
+        void resetColor() override;
     public:
         DirectedLight();
-        void castLight();
+        void castLight() override;
         void setBeamWidth(float width);
         float getBeamWidth() const;
         

@@ -75,8 +75,8 @@ namespace candle{
         void clear() ;
         
         /**
-         * @brief Set fog size.
-         * @details Requires to update the fog.
+         * @brief Set the size of the area covered by the lighting.
+         * @details Requires an update.
          * @param width Fog width.
          * @param height Fog height.
          * @see adjustFog updateFog
@@ -84,7 +84,7 @@ namespace candle{
         void setFogSize(float width, float height);
         
         /**
-         * @brief Set fog size.
+         * @brief Set the size of the area covered by the lighting.
          * @details Requires to update the fog.
          * @param size Fog size.
          * @see adjustFog updateFog

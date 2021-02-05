@@ -8,12 +8,12 @@ namespace candle{
     private:
         float m_beamAngle;
         
-        void draw(sf::RenderTarget& t, sf::RenderStates st) const;
-        void resetColor();
+        void draw(sf::RenderTarget& t, sf::RenderStates st) const override;
+        void resetColor() override;
         
     public:
         RadialLight();
-        void castLight();
+        void castLight() override;
         void setBeamAngle(float angle);
         float getBeamAngle() const;
         

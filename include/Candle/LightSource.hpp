@@ -17,18 +17,14 @@
 namespace candle{
     void initializeTextures();
     /**
-     * @brief Interface for objects that emits light within a Lighting object
-     * @details These objects are meant to be drawn as part of a Lighting object.
+     * @brief Interface for objects that emit light
+     * @details LightSources must be created and drawn from a @ref Lighting object.
      */
     class LightSource: public sf::Transformable, private sf::Drawable{
     private:
         bool m_glow;
         
-        /**
-         * @brief This friendship is necessary to change the pointer of the 
-         * segment pool
-         * @see m_ptrSegmentPool Lighting::m_segmentPool
-         */
+        // This friendship is necessary to change the pointer of the 
         friend class Lighting;
         
         /**
@@ -45,11 +41,11 @@ namespace candle{
         sf::Transform m_transformOfLastCast;
         
         /**
-         * @brief Pools of segments that cast shadows.
+         * @brief Vector of pointers to edge pools.
          * @details By default, it points to @ref s_defaultSegmentPool.
          * @see s_defaultSegmentPool
          */
-        std::set<std::vector<sfu::Line>*> m_ptrSegmentPool;
+        std::vector<std::vector<sfu::Line>*> m_ptrSegmentPool;
 
 #ifdef CANDLE_DEBUG        
         sf::VertexArray m_debug;
