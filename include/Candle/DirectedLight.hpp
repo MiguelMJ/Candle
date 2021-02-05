@@ -7,7 +7,6 @@ namespace candle{
     class DirectedLight: public LightSource{
     private:
         float m_beamWidth;
-        float m_beamInclination;
         
         void draw(sf::RenderTarget& t, sf::RenderStates st) const;
         void resetColor();
@@ -15,8 +14,6 @@ namespace candle{
     public:
         DirectedLight();
         void castLight();
-        void setBeamInclination(float angle);
-        float getBeamInclination() const;
         void setBeamWidth(float width);
         float getBeamWidth() const;
         
