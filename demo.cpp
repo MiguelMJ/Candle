@@ -62,7 +62,6 @@ struct App{
     candle::RadialLight radialLight;
     candle::DirectedLight directedLight;
     bool control, shift, alt;
-
     /*
     * INTERACTIVITY - Menu
     */
@@ -81,7 +80,7 @@ struct App{
             rect.setOutlineColor(buttonZ2);
             rect.setOutlineThickness(2);
             rect.setSize({bw, bw});
-            setPosition(0, 2 + (BC)*(bw + 4));
+            setPosition(2, 2 + (BC)*(bw + 4));
             icon = d;
             function = f;
             BC++;
@@ -427,8 +426,6 @@ struct App{
                     directedLight.rotate(6 * d);
                 }else if(shift){
                     directedLight.setBeamWidth(directedLight.getBeamWidth() + d*5);
-                }else if(alt){
-                    directedLight.setBeamInclination(directedLight.getBeamInclination() + d*5);
                 }else{
                     directedLight.setRange(std::max(0.f, directedLight.getRange() + d*10));
                 }
@@ -519,9 +516,9 @@ struct App{
             break;
         case sf::Keyboard::Space:
             lineStarted = false;
-            if(control){
+            if(alt){
                 clearSegments();
-            }else if(alt){
+            }else if(shift){
                 clearLights();
             }else{
                 clearAll();
@@ -568,6 +565,7 @@ struct App{
     }
     void mainLoop(){
         //candle::initializeTextures();
+        sf::Clock clock;
         while(w.isOpen()){
             sf::Event e;
             while(w.pollEvent(e)){
@@ -590,6 +588,8 @@ struct App{
                 case sf::Event::MouseButtonPressed:
                     if(e.mouseButton.button == sf::Mouse::Left){
                         click();
+                    }else{
+                        setBrush(NONE);
                     }
                     break;
                 case sf::Event::MouseButtonReleased:
@@ -608,6 +608,7 @@ struct App{
             
             lighting.updateFog();
             
+            
             w.clear();
             
             w.setView(menuView);
@@ -622,6 +623,18 @@ struct App{
             drawBrush();
             
             w.display();
+            
+            sf::Time dt = clock.restart();
+            int fps = int(std::round(1.f/dt.asSeconds()));
+            w.setTitle("Candle demo [" 
+                        + std::to_string(fps) 
+                        + " fps: " 
+                        + std::to_string(dt.asMilliseconds()) 
+                        + " ms] ("
+                        + std::to_string(lights.size() + (brush==RADIAL || brush==DIRECTED))
+                        + " Light/s  "
+                        + std::to_string(lighting.m_segmentPool.size())
+                        + " Edge/s)");
         }
     }
 };

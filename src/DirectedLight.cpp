@@ -6,20 +6,8 @@
 #include "sfml-util/graphics/VertexArray.hpp"
 
 namespace candle{
-    sf::Transform DirectedLight::getActualTransform() const{
-        float f = std::tan(m_beamInclination * M_PI/180);
-        sf::Transform ret;
-        ret.combine(sf::Transform(
-            1, 0, 0,
-            f, 1, 0,
-            0, 0, 1
-        ));
-        ret.combine(getTransform());
-        return ret;
-    }
-    
     void DirectedLight::draw(sf::RenderTarget& t, sf::RenderStates st) const{
-        st.transform *= getActualTransform();
+        st.transform *= Transformable::getTransform();
         t.draw(m_polygon, st);
 #ifdef CANDLE_DEBUG
         sf::RenderStates deb_s;
@@ -52,7 +40,6 @@ namespace candle{
     DirectedLight::DirectedLight(){
         m_polygon.setPrimitiveType(sf::Quads);
         m_polygon.resize(2);
-        setBeamInclination(0.f);
         setBeamWidth(10.f);
         m_shouldRecast = true;
         // castLight();
@@ -65,15 +52,6 @@ namespace candle{
     
     float DirectedLight::getBeamWidth() const{
         return m_beamWidth;
-    }
-    
-    void DirectedLight::setBeamInclination(float angle){
-        m_beamInclination = angle;
-        m_shouldRecast = true;
-    }
-    
-    float DirectedLight::getBeamInclination() const{
-        return m_beamInclination;
     }
     
     struct LineParam: public sfu::Line{
@@ -89,7 +67,7 @@ namespace candle{
         return a.param < b.param;
     }
     void DirectedLight::castLight(){
-        sf::Transform trm = getActualTransform();
+        sf::Transform trm = Transformable::getTransform();
         sf::Transform trm_i = trm.getInverse();
         
         float widthHalf = m_beamWidth/2.f;
