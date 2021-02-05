@@ -1,5 +1,5 @@
 #include "Candle/Lighting.hpp"
-#include "Candle/Util.hpp"
+#include "sfml-util/graphics/VertexArray.hpp"
 
 namespace candle{
 
@@ -65,7 +65,7 @@ namespace candle{
         m_fogQuad[2].texCoords = {x,y};
         m_fogQuad[3].position =
         m_fogQuad[3].texCoords = {0,y};
-        candle::move(m_fogQuad, m_fogOffset);
+        sfu::move(m_fogQuad, m_fogOffset);
         m_boundsSegments.clear();
         m_boundsSegments.emplace_back(sf::Vector2f(0,0), sf::Vector2f(x,0));
         m_boundsSegments.emplace_back(sf::Vector2f(x,0), sf::Vector2f(x,y));
@@ -83,7 +83,7 @@ namespace candle{
     }
     void Lighting::setFogPosition(sf::Vector2f position){
         sf::Vector2f delta = position - m_fogOffset;
-        candle::move(m_fogQuad, delta);
+        sfu::move(m_fogQuad, delta);
         m_fogOffset += delta;
         for(auto& seg : m_boundsSegments){
             seg.m_origin += delta;
