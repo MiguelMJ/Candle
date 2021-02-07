@@ -7,7 +7,7 @@
 #include "sfml-util/geometry/Line.hpp"
 
 namespace candle{
-    const float BASE_RADIUS = 50.0f;
+    const float BASE_RADIUS = 400.0f;
     bool l_texturesReady(false);
     sf::Texture l_lightTextureFade;
     sf::Texture l_lightTexturePlain;
@@ -16,16 +16,16 @@ namespace candle{
         int points = 100;
         
         sf::RenderTexture lightTextureFade, lightTexturePlain;
-        lightTextureFade.create(BASE_RADIUS*2, BASE_RADIUS*2);
-        lightTexturePlain.create(BASE_RADIUS*2, BASE_RADIUS*2);
+        lightTextureFade.create(BASE_RADIUS*2 + 2, BASE_RADIUS*2 + 2);
+        lightTexturePlain.create(BASE_RADIUS*2 + 2, BASE_RADIUS*2 + 2);
         
         sf::VertexArray lightShape(sf::TriangleFan, points+2);
         float step = M_PI*2.f/points;
-        lightShape[0].position = {BASE_RADIUS,BASE_RADIUS};
+        lightShape[0].position = {BASE_RADIUS + 1, BASE_RADIUS + 1};
         for(int i = 1; i < points+2; i++){
             lightShape[i].position = {
-                (std::sin(step*(i)) + 1) * BASE_RADIUS,
-                (std::cos(step*(i)) + 1) * BASE_RADIUS
+                (std::sin(step*(i)) + 1) * BASE_RADIUS + 1,
+                (std::cos(step*(i)) + 1) * BASE_RADIUS + 1
             };
             lightShape[i].color.a = 0;
         }
@@ -38,7 +38,7 @@ namespace candle{
         lightTexturePlain.clear(sf::Color::Transparent);
         lightTexturePlain.draw(lightShape);
         lightTexturePlain.display();
-        // lightTexturePlain.setSmooth(true);
+        lightTexturePlain.setSmooth(true);
         
         l_lightTextureFade = lightTextureFade.getTexture();
         l_lightTexturePlain = lightTexturePlain.getTexture();
@@ -105,54 +105,44 @@ namespace candle{
         // Start casting
         float bl1 = module360(getRotation() - m_beamAngle/2);
         float bl2 = module360(getRotation() + m_beamAngle/2);
-        bool beamAngleBigEnough = m_beamAngle < 0.1;
+        bool beamAngleBigEnough = m_beamAngle < 0.1f;
         auto castPoint = Transformable::getPosition();
         float off = .001f;
+        
+        auto angleInBeam = [&](float a)-> bool {
+            return beamAngleBigEnough 
+                   ||(bl1 < bl2 && a > bl1 && a < bl2)
+                   ||(bl1 > bl2 && (a > bl1 || a < bl2));
+        };
+        
+        for(float a = 45.f; a < 360.f; a += 90.f){
+            if(beamAngleBigEnough || angleInBeam(a)){
+                rays.emplace_back(castPoint, a);
+            }
+        }
+        
         for(auto& pool : m_ptrEdgePool){
             for(auto& s : *pool){
-                sfu::Line r1(castPoint, s.m_origin);
-                sfu::Line r2(castPoint, s.m_origin+s.m_direction);
-                float a1 = sfu::angle(r1.m_direction);
-                float a2 = sfu::angle(r2.m_direction);
-                if(
-                    beamAngleBigEnough 
-                    || (
-                        bl1 < bl2
-                        && a1 > bl1
-                        && a1 < bl2
-                    )
-                    || (
-                        bl1 > bl2
-                        && (
-                            a1 > bl1
-                            || a1 < bl2
-                        )
-                    )
-                ){
-                    rays.push_back(r1);
-                    rays.emplace_back(castPoint, a1 - off);
-                    rays.emplace_back(castPoint, a1 + off);
+                float d1 = s.distance(castPoint);
+                // float d2 = sfu::magnitude(s.m_origin - castPoint);
+                // float d3 = sfu::magnitude(s.point(1.f) - castPoint);
+                // if(std::max(std::min(d2, d3), d1) <= m_range){
+                if(d1 <= m_range){
+                    sfu::Line r1(castPoint, s.m_origin);
+                    sfu::Line r2(castPoint, s.point(1.f));
+                    float a1 = sfu::angle(r1.m_direction);
+                    float a2 = sfu::angle(r2.m_direction);
+                    if(angleInBeam(a1)){
+                        rays.push_back(r1);
+                        rays.emplace_back(castPoint, a1 - off);
+                        rays.emplace_back(castPoint, a1 + off);
+                    }
+                    if(angleInBeam(a2)){
+                        rays.push_back(r2);
+                        rays.emplace_back(castPoint, a2 - off);
+                        rays.emplace_back(castPoint, a2 + off);
+                    }
                 }
-                if(
-                    beamAngleBigEnough 
-                    || (
-                        bl1 < bl2
-                        && a2 > bl1
-                        && a2 < bl2
-                    )
-                    || (
-                        bl1 > bl2
-                        && (
-                            a2 > bl1
-                            || a2 < bl2
-                        )
-                    )
-                ){
-                    rays.push_back(r2);
-                    rays.emplace_back(castPoint, a2 - off);
-                    rays.emplace_back(castPoint, a2 + off);
-                }
-                
             }
         }
         if(bl1 > bl2){
@@ -187,7 +177,7 @@ namespace candle{
         std::vector<sf::Vector2f> points;
         points.reserve(rays.size());
         for (auto& r: rays){
-            points.push_back(tr_i.transformPoint(castRay(r)));
+            points.push_back(tr_i.transformPoint(castRay(r, m_range*std::sqrt(2))));
         }
         m_polygon.resize(points.size() + 1 + beamAngleBigEnough); // + center and last
         m_polygon[0].color = m_color;

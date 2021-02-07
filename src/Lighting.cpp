@@ -44,12 +44,12 @@ namespace candle{
     }
     void Lighting::addLightSource(LightSource* ls) {
         ls->m_ptrEdgePool.insert(&m_edgePool);
-        ls->m_ptrEdgePool.insert(&m_boundsEdges);
+        //ls->m_ptrEdgePool.insert(&m_boundsEdges);
         m_lights.insert(ls);
     }
     void Lighting::removeLightSource(LightSource* ls){
         ls->m_ptrEdgePool.erase(&m_edgePool);
-        ls->m_ptrEdgePool.erase(&m_boundsEdges);
+        //ls->m_ptrEdgePool.erase(&m_boundsEdges);
         m_lights.erase(ls);
     }
     void Lighting::clear(){
