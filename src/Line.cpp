@@ -24,6 +24,20 @@ namespace sfu{
         return (0.f < f) - (f < 0.f);
     }
     
+    float Line::distance(const sf::Vector2f& point) const{
+        float d;
+        if(m_direction.x == 0){
+            d = std::abs(point.y - m_origin.y);
+        }else if(m_direction.y == 0){
+            d = std::abs(point.x - m_origin.x);
+        }else{
+            float A = 1.f / m_direction.x;
+            float B = - 1.f / m_direction.y;
+            float C = - B*m_origin.y - A*m_origin.x;
+            d = std::abs(A*point.x + B*point.y + C) / std::sqrt(A*A + B*B);
+        }
+        return d;
+    }
     
     Line::LineRelativePosition Line::intersection(const Line& l) const{
         float t1, t2;
