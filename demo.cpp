@@ -412,8 +412,8 @@ struct App{
         if(getMousePosition().x < WIDTH){
             switch(brush){
             case RADIAL:
-                if(control){
-                    radialLight.rotate(d*5);
+                if(alt){
+                    radialLight.rotate(d*6);
                 }else if(shift){
                     radialLight.setBeamAngle(radialLight.getBeamAngle() + d*5);
                 }else{
@@ -422,7 +422,7 @@ struct App{
                 radialLight.castLight();
                 break;
             case DIRECTED:
-                if(control){
+                if(alt){
                     directedLight.rotate(6 * d);
                 }else if(shift){
                     directedLight.setBeamWidth(directedLight.getBeamWidth() + d*5);
