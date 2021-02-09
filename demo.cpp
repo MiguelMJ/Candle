@@ -7,7 +7,7 @@
 #include "sfml-util/geometry/Polygon.hpp"
 #include "sfml-util/graphics/VertexArray.hpp"
 
-#include "Candle/Lighting.hpp"
+#include "Candle/LightingArea.hpp"
 #include "Candle/LightSource.hpp"
 #include "Candle/RadialLight.hpp"
 #include "Candle/DirectedLight.hpp"
@@ -31,8 +31,10 @@ struct App{
     /*
     * LIGHTING
     */
-    candle::Lighting lighting;
-    std::vector<std::unique_ptr<candle::LightSource>> lights;
+    candle::LightingArea lighting;
+    bool glow = true;
+    std::vector<std::shared_ptr<candle::LightSource>> lights1; // all
+    std::vector<std::shared_ptr<candle::LightSource>> lights2; // glowing
     sf::VertexArray edgeVertices;
 
     /*
@@ -113,7 +115,9 @@ struct App{
         }
         return mp;
     }
-    App(){
+    App()
+    : lighting(candle::LightingArea::FOG, {0.f,0.f}, {WIDTH, HEIGHT})
+    {
         w.create(sf::VideoMode(WIDTH+MENU_W, HEIGHT), "Candle - demo");
         w.setFramerateLimit(60);
         float totalWidth = WIDTH + MENU_W;
@@ -128,7 +132,6 @@ struct App{
         menuView.setSize(MENU_W, HEIGHT);
         menuView.setCenter(MENU_W/2, HEIGHT/2);
         menuView.setViewport({WIDTH/totalWidth, 0.f, MENU_W/totalWidth, 1.f});
-        lighting.adjustFog(sandboxView);
         radialLight.setRange(100.f);
         directedLight.setRange(200.f);
         directedLight.setBeamWidth(200.f);
@@ -195,11 +198,11 @@ struct App{
                             0, 0, 1
                             });
         sfu::darken(*i7, 0.2);
-        buttons.emplace_back(i7, [](App *app){ app->lighting.setFogOpacity(clamp(app->lighting.getFogOpacity() - 0.1)); });
+        buttons.emplace_back(i7, [](App *app){ app->lighting.setAreaOpacity(clamp(app->lighting.getAreaOpacity() - 0.1)); });
         
         auto  i8 = new sf::VertexArray(*i7);
         sfu::darken(*i8, 0.5);
-        buttons.emplace_back(i8, [](App *app){ app->lighting.setFogOpacity(clamp(app->lighting.getFogOpacity() + 0.1)); });
+        buttons.emplace_back(i8, [](App *app){ app->lighting.setAreaOpacity(clamp(app->lighting.getAreaOpacity() + 0.1)); });
         
         auto i5 = new sf::VertexArray(sf::Quads, 8);
         (*i5)[0].position = {1, 0};
@@ -308,16 +311,6 @@ struct App{
     }
     void setBrush(Brush b){
         if(b != brush){
-            if(b == RADIAL){
-                lighting.addLightSource(&radialLight);
-            }else{
-                lighting.removeLightSource(&radialLight);
-            }
-            if(b == DIRECTED){
-                lighting.addLightSource(&directedLight);
-            }else{
-                lighting.removeLightSource(&directedLight);
-            }
             if(b == BLOCK){
                 pushBlock(getMousePosition());
             }
@@ -335,7 +328,7 @@ struct App{
         }
     }
     void castAllLights(){
-        for(auto& l: lights){
+        for(auto& l: lights1){
             l -> castLight();
         }
     }
@@ -358,14 +351,22 @@ struct App{
             if(!press) setBrush(NONE);
         }else{
             switch(brush){
-            case RADIAL:
-                lights.emplace_back(new candle::RadialLight(radialLight));
-                lighting.addLightSource(lights.back().get());
-                break;
-            case DIRECTED:
-                lights.emplace_back(new candle::DirectedLight(directedLight));
-                lighting.addLightSource(lights.back().get());
-                break;
+            case RADIAL:{
+                std::shared_ptr<candle::LightSource> nl(new candle::RadialLight(radialLight));
+                lights1.push_back(nl);
+                if(glow){
+                    lights2.push_back(nl);
+                }
+            }
+            break;
+            case DIRECTED:{
+                std::shared_ptr<candle::LightSource> nl(new candle::DirectedLight(directedLight));
+                lights1.push_back(nl);
+                if(glow){
+                    lights2.push_back(nl);
+                }
+            }
+            break;
             case LINE:
                 pushEdge(sfu::Line(mp, 0.f));
                 lineStarted = true;
@@ -470,10 +471,10 @@ struct App{
             setBrush(LINE);
             break;
         case sf::Keyboard::A:
-            lighting.setFogOpacity(clamp(lighting.getFogOpacity()+0.1));
+            lighting.setAreaOpacity(clamp(lighting.getAreaOpacity()+0.1));
             break;
         case sf::Keyboard::Z:
-            lighting.setFogOpacity(clamp(lighting.getFogOpacity()-0.1));
+            lighting.setAreaOpacity(clamp(lighting.getAreaOpacity()-0.1));
             break;
         case sf::Keyboard::S:
             if(brush == RADIAL || brush == DIRECTED){
@@ -489,8 +490,7 @@ struct App{
             break;
         case sf::Keyboard::G:
             if(brush == RADIAL || brush == DIRECTED){
-                radialLight.setGlow(!radialLight.getGlow());
-                directedLight.setGlow(!directedLight.getGlow());
+                glow = !glow;
             }
             break;
         case sf::Keyboard::F:
@@ -545,17 +545,11 @@ struct App{
         }
     }
     void clearLights(){
-        lights.clear();
-        lighting.clear();
-        if(brush == RADIAL){
-            lighting.addLightSource(&radialLight);
-        }else if(brush == DIRECTED){
-            lighting.addLightSource(&directedLight);
-        }
+        lights1.clear();
+        lights2.clear();
     }
     void clearEdges(){
         edgeVertices.clear();
-        lighting.m_edgePool.clear();
         lineStarted = false;
         if(brush == BLOCK) pushBlock(getMousePosition());
     }
@@ -606,7 +600,16 @@ struct App{
                 }
             }
             
-            lighting.updateFog();
+            lighting.clear();
+            for(auto& l: lights1){
+                lighting.draw(*l);
+            }
+            if(brush == RADIAL){
+                lighting.draw(radialLight);
+            }else if(brush == DIRECTED){
+                lighting.draw(directedLight);
+            }
+            lighting.display();
             
             
             w.clear();
@@ -619,6 +622,16 @@ struct App{
             w.setView(sandboxView);
             w.draw(background);
             w.draw(lighting);
+            for(auto& l: lights2){
+                w.draw(*l);
+            }
+            if(glow){
+                if(brush == RADIAL){
+                    w.draw(radialLight);
+                }else if(brush == DIRECTED){
+                    w.draw(directedLight);
+                }
+            }
             w.draw(edgeVertices);
             drawBrush();
             
@@ -631,7 +644,7 @@ struct App{
                         + " fps: " 
                         + std::to_string(dt.asMilliseconds()) 
                         + " ms] ("
-                        + std::to_string(lights.size() + (brush==RADIAL || brush==DIRECTED))
+                        + std::to_string(lights1.size() + (brush==RADIAL || brush==DIRECTED))
                         + " Light/s  "
                         + std::to_string(lighting.m_edgePool.size())
                         + " Edge/s)");

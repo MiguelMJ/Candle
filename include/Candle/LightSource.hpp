@@ -27,13 +27,8 @@ namespace candle{
      * @brief Interface for objects that emit light
      * @details LightSources must be created and drawn from a @ref Lighting object.
      */
-    class LightSource: public sf::Transformable, private sf::Drawable{
+    class LightSource: public sf::Transformable, public sf::Drawable{
     private:
-        bool m_glow;
-        
-        // This friendship is necessary to change the pointer of the 
-        friend class Lighting;
-        
         /**
          * @brief Draw the object to a target
          */
@@ -43,6 +38,7 @@ namespace candle{
         sf::Color m_color;
         sf::VertexArray m_polygon;
         float m_range;
+        float m_intensity; // only for fog
         bool m_fade;
         bool m_shouldRecast;
         sf::Transform m_transformOfLastCast;
@@ -118,23 +114,6 @@ namespace candle{
          * @return The value of the _fade_ flag.
          */
         virtual bool getFade() const;
-        
-        /**
-         * @brief Set the value of the _glow_ flag.
-         * @details When the @p glow is inactive, the @ref Lighting 
-         * will only use the light to reveal the area under the fog. If 
-         * it is active, it will also add the color to the image. Note 
-         * that when the glow is not set, the light won't be visible if 
-         * the [fog opacity](@ref Lighting::setFogOpacity) is 0.
-         * @param glow Value to set the flag.
-         */
-        void setGlow(bool glow);
-        
-        /**
-         * @brief Check if the light glows or not.
-         * @return The value of the _glow_ flag.
-         */
-        bool getGlow() const;
             
         /**
          * @brief Set the range of the illuminated area.

@@ -71,6 +71,9 @@ namespace candle{
         trm.scale(m_range/BASE_RADIUS, m_range/BASE_RADIUS, BASE_RADIUS, BASE_RADIUS);
         s.transform *= trm;
         s.texture = m_fade ? &l_lightTextureFade : &l_lightTexturePlain;
+        if(s.blendMode == sf::BlendAlpha){
+            s.blendMode = sf::BlendAdd;
+        }
         t.draw(m_polygon, s);
 #ifdef CANDLE_DEBUG
         sf::RenderStates deb_s;
@@ -124,10 +127,10 @@ namespace candle{
         for(auto& pool : m_ptrEdgePool){
             for(auto& s : *pool){
                 float d1 = s.distance(castPoint);
-                // float d2 = sfu::magnitude(s.m_origin - castPoint);
-                // float d3 = sfu::magnitude(s.point(1.f) - castPoint);
-                // if(std::max(std::min(d2, d3), d1) <= m_range){
-                if(d1 <= m_range){
+                float d2 = sfu::magnitude(s.m_origin - castPoint);
+                float d3 = sfu::magnitude(s.point(1.f) - castPoint);
+                if(std::max(std::min(d2, d3), d1) <= m_range*std::sqrt(2)){
+                // if(d1 <= m_range){
                     sfu::Line r1(castPoint, s.m_origin);
                     sfu::Line r2(castPoint, s.point(1.f));
                     float a1 = sfu::angle(r1.m_direction);

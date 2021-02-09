@@ -8,6 +8,9 @@
 namespace candle{
     void DirectedLight::draw(sf::RenderTarget& t, sf::RenderStates st) const{
         st.transform *= Transformable::getTransform();
+        if(st.blendMode == sf::BlendAlpha){ // the default
+            st.blendMode = sf::BlendAdd;
+        }
         t.draw(m_polygon, st);
 #ifdef CANDLE_DEBUG
         sf::RenderStates deb_s;

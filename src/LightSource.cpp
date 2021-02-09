@@ -11,8 +11,7 @@ namespace candle{
     std::vector<sfu::Line> LightSource::s_defaultEdgePool;
     
     LightSource::LightSource()
-        : m_glow(true)
-        , m_color(sf::Color::White)
+        : m_color(sf::Color::White)
         , m_fade(true)
 #ifdef CANDLE_DEBUG
         , m_debug(sf::Lines, 0)
@@ -47,14 +46,6 @@ namespace candle{
     
     bool LightSource::getFade() const{
         return m_fade;
-    }
-    
-    void LightSource::setGlow(bool g){
-        m_glow = g;
-    }
-    
-    bool LightSource::getGlow() const{
-        return m_glow;
     }
     
     void LightSource::setRange(float r){
