@@ -446,6 +446,15 @@ struct App{
     }
     void updateOnPressKey(sf::Keyboard::Key k){
         switch(k){
+        case sf::Keyboard::M:
+            if(lighting.getMode() == candle::LightingArea::FOG){
+                lighting.setMode(candle::LightingArea::AMBIENTAL);
+                lighting.setAreaColor(sf::Color::Yellow);
+            }else{
+                lighting.setMode(candle::LightingArea::FOG);
+                lighting.setAreaColor(sf::Color::Black);
+            }
+            break;
         case sf::Keyboard::T:
             persistent_fog = !persistent_fog;
             break;

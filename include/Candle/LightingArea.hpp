@@ -118,6 +118,16 @@ namespace candle{
         sf::IntRect getTextureRect() const;
         
         /**
+         * @brief Set the lighting mode
+         */
+        void setMode(Mode mode);
+        
+        /**
+         * @brief Set the lighting mode
+         */
+        Mode getMode() const;
+        
+        /**
          * @brief In FOG mode restores the covered areas.
          */
         void clear();

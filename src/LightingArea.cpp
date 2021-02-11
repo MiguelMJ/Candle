@@ -118,6 +118,14 @@ namespace candle{
         return m_baseTextureRect;
     }
     
+    void LightingArea::setMode(Mode mode){
+        m_mode = mode;
+    }
+    
+    LightingArea::Mode LightingArea::getMode() const{
+        return m_mode;
+    }
+    
     void LightingArea::display(){
         m_renderTexture.display();
     }
