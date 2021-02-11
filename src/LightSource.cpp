@@ -8,17 +8,13 @@
 #include "sfml-util/graphics/VertexArray.hpp"
 
 namespace candle{
-    std::vector<sfu::Line> LightSource::s_defaultEdgePool;
-    
     LightSource::LightSource()
         : m_color(sf::Color::White)
         , m_fade(true)
 #ifdef CANDLE_DEBUG
         , m_debug(sf::Lines, 0)
 #endif
-        {
-        m_ptrEdgePool.insert(&s_defaultEdgePool);
-    }
+        {}
     
     void LightSource::setIntensity(float intensity){
         m_color.a = 255 * intensity;
@@ -50,34 +46,10 @@ namespace candle{
     
     void LightSource::setRange(float r){
         m_range = r;
-        m_shouldRecast = true;
     }
     
     float LightSource::getRange() const{
         return m_range;
     }
     
-    bool LightSource::shouldRecast() const{
-        return m_shouldRecast 
-            || Transformable::getTransform() != m_transformOfLastCast;
-    }
-    
-    sf::Vector2f LightSource::castRay(sfu::Line r, float minRange){
-        r.m_direction = sfu::normalize(r.m_direction);
-        for(auto& pool: m_ptrEdgePool){
-            for(auto& seg : *pool){
-                float t_seg, t_ray;
-                if(
-                    seg.intersection(r, t_seg, t_ray) == sfu::Line::SECANT
-                    && t_ray <= minRange
-                    && t_ray >= 0.f
-                    && t_seg <= 1.f
-                    && t_seg >= 0.f
-                ){
-                    minRange = t_ray;
-                }
-            }
-        }
-        return r.point(minRange);
-    };
 }

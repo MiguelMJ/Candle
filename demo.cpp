@@ -33,8 +33,10 @@ struct App{
     */
     candle::LightingArea lighting;
     bool glow = true;
+    bool persistent_fog = true;
     std::vector<std::shared_ptr<candle::LightSource>> lights1; // all
     std::vector<std::shared_ptr<candle::LightSource>> lights2; // glowing
+    candle::EdgeVector edgePool;
     sf::VertexArray edgeVertices;
 
     /*
@@ -124,6 +126,8 @@ struct App{
         edgeVertices.setPrimitiveType(sf::Lines);
         background.setPrimitiveType(sf::Quads);
         background.resize(ROWS * COLS * 4);
+        lighting.setAreaColor(sf::Color::Black);
+        lighting.clear();
         mouseBlock.setPrimitiveType(sf::Lines);
         mouseBlock.resize(8);
         sandboxView.setSize(WIDTH, HEIGHT);
@@ -273,12 +277,12 @@ struct App{
         }
     }
     void pushEdge(const sfu::Line& edge){
-        lighting.m_edgePool.push_back(edge);
+        edgePool.push_back(edge);
         edgeVertices.append(sf::Vertex(edge.m_origin));
         edgeVertices.append(sf::Vertex(edge.point(1.f)));
     }
     void popEdge(){
-        lighting.m_edgePool.pop_back();
+        edgePool.pop_back();
         edgeVertices.resize(edgeVertices.getVertexCount() - 2);
     }
     void pushBlock(const sf::Vector2f& pos){
@@ -329,7 +333,7 @@ struct App{
     }
     void castAllLights(){
         for(auto& l: lights1){
-            l -> castLight();
+            l -> castLight(edgePool.begin(), edgePool.end());
         }
     }
     void click(){
@@ -390,16 +394,16 @@ struct App{
                 break;
             case RADIAL:
                 radialLight.setPosition(mp);
-                radialLight.castLight();
+                radialLight.castLight(edgePool.begin(), edgePool.end());
                 break;
             case DIRECTED:
                 directedLight.setPosition(mp);
-                directedLight.castLight();
+                directedLight.castLight(edgePool.begin(), edgePool.end());
                 break;
             case LINE:
                 if(lineStarted){
-                    int n = lighting.m_edgePool.size();
-                    sf::Vector2f orig = lighting.m_edgePool[n-1].m_origin;
+                    int n = edgePool.size();
+                    sf::Vector2f orig = edgePool[n-1].m_origin;
                     popEdge();
                     pushEdge(sfu::Line(orig, mp));
                     castAllLights();
@@ -420,7 +424,7 @@ struct App{
                 }else{
                     radialLight.setRange(std::max(0.f, radialLight.getRange() + d*10));
                 }
-                radialLight.castLight();
+                radialLight.castLight(edgePool.begin(), edgePool.end());
                 break;
             case DIRECTED:
                 if(alt){
@@ -430,7 +434,7 @@ struct App{
                 }else{
                     directedLight.setRange(std::max(0.f, directedLight.getRange() + d*10));
                 }
-                directedLight.castLight();
+                directedLight.castLight(edgePool.begin(), edgePool.end());
                 break;
             case BLOCK:
                 setMouseBlockSize(blockSize + d*CELL_W);
@@ -442,6 +446,9 @@ struct App{
     }
     void updateOnPressKey(sf::Keyboard::Key k){
         switch(k){
+        case sf::Keyboard::T:
+            persistent_fog = !persistent_fog;
+            break;
         case sf::Keyboard::P:
             capture();
             break;
@@ -549,6 +556,7 @@ struct App{
         lights2.clear();
     }
     void clearEdges(){
+        edgePool.clear();
         edgeVertices.clear();
         lineStarted = false;
         if(brush == BLOCK) pushBlock(getMousePosition());
@@ -600,7 +608,9 @@ struct App{
                 }
             }
             
-            lighting.clear();
+            if(persistent_fog){
+                lighting.clear();
+            }
             for(auto& l: lights1){
                 lighting.draw(*l);
             }
@@ -646,7 +656,7 @@ struct App{
                         + " ms] ("
                         + std::to_string(lights1.size() + (brush==RADIAL || brush==DIRECTED))
                         + " Light/s  "
-                        + std::to_string(lighting.m_edgePool.size())
+                        + std::to_string(edgePool.size())
                         + " Edge/s)");
         }
     }

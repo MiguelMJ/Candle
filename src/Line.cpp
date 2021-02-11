@@ -1,4 +1,4 @@
-#include <cmath>
+#include <limits>
 
 #include "sfml-util/geometry/Line.hpp"
 #include "sfml-util/geometry/Vector2.hpp"

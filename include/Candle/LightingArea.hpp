@@ -42,13 +42,6 @@ namespace candle{
         sf::Color getActualColor() const;
         void initializeRenderTexture(const sf::Vector2f& size);
     public:
-        /**
-         * @brief List of edges that cast shadows.
-         * @details Every LightSource added to this layer will add this 
-         * edge pool pointer to its list.
-         * @see LightSource::m_ptrEdgePool
-         */
-        std::vector<sfu::Line> m_edgePool;
         
         /**
          * @brief Constructor.

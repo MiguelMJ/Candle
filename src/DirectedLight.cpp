@@ -3,6 +3,7 @@
 #include <queue>
 
 #include "sfml-util/geometry/Vector2.hpp"
+#include "sfml-util/geometry/Line.hpp"
 #include "sfml-util/graphics/VertexArray.hpp"
 
 namespace candle{
@@ -44,13 +45,11 @@ namespace candle{
         m_polygon.setPrimitiveType(sf::Quads);
         m_polygon.resize(2);
         setBeamWidth(10.f);
-        m_shouldRecast = true;
         // castLight();
     }
     
     void DirectedLight::setBeamWidth(float width){
         m_beamWidth = width;
-        m_shouldRecast = true;
     }
     
     float DirectedLight::getBeamWidth() const{
@@ -69,7 +68,7 @@ namespace candle{
     bool operator < (const LineParam& a, const LineParam& b){
         return a.param < b.param;
     }
-    void DirectedLight::castLight(){
+    void DirectedLight::castLight(const EdgeVector::iterator& begin, const EdgeVector::iterator& end){
         sf::Transform trm = Transformable::getTransform();
         sf::Transform trm_i = trm.getInverse();
         
@@ -93,33 +92,32 @@ namespace candle{
         
         rays.emplace(0.f, lim1);
         rays.emplace(1.f, lim2);
-        for(auto& pool: m_ptrEdgePool){
-            for(auto& seg: *pool){
-                float tRng, tSeg;
-                if(
-                    rayRng.intersection(seg, tRng, tSeg) == sfu::Line::SECANT
-                    && tRng <= 1
-                    && tRng >= 0
-                    && tSeg <= 1
-                    && tSeg >= 0
-                ){
-                    rays.emplace(raySrc.point(tRng), lightDir, tRng);
-                }
-                float t;
-                sf::Vector2f end = seg.m_origin;
-                if(baseBeam.contains(trm_i.transformPoint(end))){
-                    raySrc.intersection(sfu::Line(end, end-lightDir), t);
-                    rays.emplace(raySrc.point(t - off), lightDir, t - off);
-                    rays.emplace(raySrc.point(t), lightDir, t);
-                    rays.emplace(raySrc.point(t + off), lightDir, t + off);
-                }
-                end = seg.point(1.f);
-                if(baseBeam.contains(trm_i.transformPoint(end))){
-                    raySrc.intersection(sfu::Line(end, end-lightDir), t);
-                    rays.emplace(raySrc.point(t - off), lightDir, t - off);
-                    rays.emplace(raySrc.point(t), lightDir, t);
-                    rays.emplace(raySrc.point(t + off), lightDir, t + off);
-                }
+        for(auto it = begin; it != end; it++){
+            auto& seg = *it;
+            float tRng, tSeg;
+            if(
+                rayRng.intersection(seg, tRng, tSeg) == sfu::Line::SECANT
+                && tRng <= 1
+                && tRng >= 0
+                && tSeg <= 1
+                && tSeg >= 0
+            ){
+                rays.emplace(raySrc.point(tRng), lightDir, tRng);
+            }
+            float t;
+            sf::Vector2f end = seg.m_origin;
+            if(baseBeam.contains(trm_i.transformPoint(end))){
+                raySrc.intersection(sfu::Line(end, end-lightDir), t);
+                rays.emplace(raySrc.point(t - off), lightDir, t - off);
+                rays.emplace(raySrc.point(t), lightDir, t);
+                rays.emplace(raySrc.point(t + off), lightDir, t + off);
+            }
+            end = seg.point(1.f);
+            if(baseBeam.contains(trm_i.transformPoint(end))){
+                raySrc.intersection(sfu::Line(end, end-lightDir), t);
+                rays.emplace(raySrc.point(t - off), lightDir, t - off);
+                rays.emplace(raySrc.point(t), lightDir, t);
+                rays.emplace(raySrc.point(t + off), lightDir, t + off);
             }
         }
         std::vector<sf::Vector2f> points;
@@ -140,7 +138,7 @@ namespace candle{
             LineParam r = rays.top();
         
             sf::Vector2f p1 = trm_i.transformPoint(r.m_origin);
-            sf::Vector2f p2 = trm_i.transformPoint(castRay(r, m_range));
+            sf::Vector2f p2 = trm_i.transformPoint(sfu::castRay(begin, end, r, m_range));
             points.push_back(p1);
             points.push_back(p2);
 #ifdef CANDLE_DEBUG
@@ -170,7 +168,5 @@ namespace candle{
                 m_polygon[p3].color.a = m_color.a * dr2;
             }  
         }
-        m_transformOfLastCast = Transformable::getTransform();
-        m_shouldRecast = false;
     }
 }

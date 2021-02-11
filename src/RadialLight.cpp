@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Candle/RadialLight.hpp"
 
 #include "SFML/Graphics.hpp"
@@ -62,7 +63,6 @@ namespace candle{
         Transformable::setOrigin(BASE_RADIUS, BASE_RADIUS);
         setRange(1.0f);
         setBeamAngle(360.f);
-        m_shouldRecast = true;
         // castLight();
     }
     
@@ -87,23 +87,19 @@ namespace candle{
     
     void RadialLight::setBeamAngle(float r){
         m_beamAngle = module360(r);
-        m_shouldRecast = true;
     }
     
     float RadialLight::getBeamAngle() const{
         return m_beamAngle;
     }
     
-    void RadialLight::castLight(){
+    void RadialLight::castLight(const EdgeVector::iterator& begin, const EdgeVector::iterator& end){
         float scaledRange = m_range / BASE_RADIUS;
         sf::Transform trm = Transformable::getTransform();
         trm.scale(scaledRange, scaledRange, BASE_RADIUS, BASE_RADIUS);
         std::vector<sfu::Line> rays;
-        int s = 0;
-        for(auto& pool : m_ptrEdgePool){
-            s += pool->size();
-        }
-        rays.reserve(2 + s * 2 * 3); // 2: beam angle, 2: pnts/sgmnt, 3 rays/pnt
+        
+        rays.reserve(2 + std::distance(begin, end) * 2 * 3); // 2: beam angle, 4: corners, 2: pnts/sgmnt, 3 rays/pnt
         
         // Start casting
         float bl1 = module360(getRotation() - m_beamAngle/2);
@@ -124,30 +120,30 @@ namespace candle{
             }
         }
         
-        for(auto& pool : m_ptrEdgePool){
-            for(auto& s : *pool){
-                float d1 = s.distance(castPoint);
-                float d2 = sfu::magnitude(s.m_origin - castPoint);
-                float d3 = sfu::magnitude(s.point(1.f) - castPoint);
-                if(std::max(std::min(d2, d3), d1) <= m_range*std::sqrt(2)){
-                // if(d1 <= m_range){
-                    sfu::Line r1(castPoint, s.m_origin);
-                    sfu::Line r2(castPoint, s.point(1.f));
-                    float a1 = sfu::angle(r1.m_direction);
-                    float a2 = sfu::angle(r2.m_direction);
-                    if(angleInBeam(a1)){
-                        rays.push_back(r1);
-                        rays.emplace_back(castPoint, a1 - off);
-                        rays.emplace_back(castPoint, a1 + off);
-                    }
-                    if(angleInBeam(a2)){
-                        rays.push_back(r2);
-                        rays.emplace_back(castPoint, a2 - off);
-                        rays.emplace_back(castPoint, a2 + off);
-                    }
+        for(auto it = begin; it != end; it++){
+            auto& s = *it;
+            float d1 = s.distance(castPoint);
+            float d2 = sfu::magnitude(s.m_origin - castPoint);
+            float d3 = sfu::magnitude(s.point(1.f) - castPoint);
+            if(std::max(std::min(d2, d3), d1) <= m_range*std::sqrt(2)){
+            // if(d1 <= m_range){
+                sfu::Line r1(castPoint, s.m_origin);
+                sfu::Line r2(castPoint, s.point(1.f));
+                float a1 = sfu::angle(r1.m_direction);
+                float a2 = sfu::angle(r2.m_direction);
+                if(angleInBeam(a1)){
+                    rays.push_back(r1);
+                    rays.emplace_back(castPoint, a1 - off);
+                    rays.emplace_back(castPoint, a1 + off);
+                }
+                if(angleInBeam(a2)){
+                    rays.push_back(r2);
+                    rays.emplace_back(castPoint, a2 - off);
+                    rays.emplace_back(castPoint, a2 + off);
                 }
             }
         }
+        
         if(bl1 > bl2){
             std::sort(
                 rays.begin(),
@@ -180,7 +176,7 @@ namespace candle{
         std::vector<sf::Vector2f> points;
         points.reserve(rays.size());
         for (auto& r: rays){
-            points.push_back(tr_i.transformPoint(castRay(r, m_range*std::sqrt(2))));
+            points.push_back(tr_i.transformPoint(castRay(begin, end,    r, m_range*std::sqrt(2))));
         }
         m_polygon.resize(points.size() + 1 + beamAngleBigEnough); // + center and last
         m_polygon[0].color = m_color;
@@ -212,7 +208,5 @@ namespace candle{
         if(beamAngleBigEnough){
             m_polygon[points.size()+1] = m_polygon[1];
         }
-        m_transformOfLastCast = Transformable::getTransform();
-        m_shouldRecast = false;
     }
 }

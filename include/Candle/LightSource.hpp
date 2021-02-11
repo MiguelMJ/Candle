@@ -8,13 +8,13 @@
 #define __CANDLE_LIGHTSOURCE_HPP__
 
 #include <vector>
-#include <set>
 
 #include "SFML/Graphics.hpp"
 
 #include "sfml-util/geometry/Line.hpp"
 
 namespace candle{
+    typedef std::vector<sfu::Line> EdgeVector;
     /**
      * @brief This function initializes the Texture used for the RadialLights.
      * @details It is called byt the first constructor. Anyways, it could be 
@@ -40,30 +40,14 @@ namespace candle{
         float m_range;
         float m_intensity; // only for fog
         bool m_fade;
-        bool m_shouldRecast;
-        sf::Transform m_transformOfLastCast;
-        
-        /**
-         * @brief Vector of pointers to edge pools.
-         * @details By default, it points at least to @ref s_defaultEdgePool.
-         * @see s_defaultEdgePool
-         */
-        std::set<std::vector<sfu::Line>*> m_ptrEdgePool;
 
 #ifdef CANDLE_DEBUG        
         sf::VertexArray m_debug;
 #endif
         
-        sf::Vector2f castRay(sfu::Line ray, float maxRange=std::numeric_limits<float>::infinity());
         virtual void resetColor() = 0;
-        
+    
     public:
-        /**
-         * @brief Default edge pool for shadow casting. Every LightSource contains it.
-         * @see m_ptrEdgePool
-         */
-        static std::vector<sfu::Line> s_defaultEdgePool;
-        
         /**
          * @brief Constructor
          */
@@ -127,14 +111,6 @@ namespace candle{
         float getRange() const;
         
         /**
-         * @brief Checks if the light may require a call to @ref castLight.
-         * @details This function should be taken only as a guideline, as 
-         * they are external factors that require a light to recast, so it
-         * can return false negatives (but true will always be correct).
-         */
-        bool shouldRecast() const;
-        
-        /**
          * @brief Calculates the area that should be iluminated with a 
          * ray casting algorithm.
          * @details For the calculations, the edges from @ref 
@@ -144,7 +120,7 @@ namespace candle{
          * this function and the next draw.
          * @see m_ptrEdgePool
          */
-        virtual void castLight() = 0;
+        virtual void castLight(const EdgeVector::iterator& begin, const EdgeVector::iterator& end) = 0;
     };
 }
 

@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "Candle/LightingArea.hpp"
 #include "sfml-util/graphics/VertexArray.hpp"
 
@@ -34,6 +36,7 @@ namespace candle{
     , m_areaQuad(sf::Quads, 4)
     , m_color(sf::Color::White)
     {
+        m_opacity = 1.f;
         m_mode = mode;
         m_baseTexture = nullptr;
         initializeRenderTexture(size);
@@ -94,7 +97,7 @@ namespace candle{
             sf::RenderStates fogrs;
             fogrs.blendMode = l_substractAlpha;
             fogrs.transform *= Transformable::getTransform().getInverse();
-            m_renderTexture.draw(light);
+            m_renderTexture.draw(light, fogrs);
         }
     }
     

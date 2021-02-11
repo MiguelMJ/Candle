@@ -44,7 +44,7 @@ namespace candle{
         /**
          * @copydoc LightSource::draw
          */
-        void castLight() override;
+        void castLight(const EdgeVector::iterator& begin, const EdgeVector::iterator& end) override;
         
         /**
          * @brief Set the range for which the rays may be casted.
