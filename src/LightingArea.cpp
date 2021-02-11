@@ -64,7 +64,8 @@ namespace candle{
     void LightingArea::clear(){
         if(m_baseTexture != nullptr){
             m_renderTexture.clear(sf::Color::Transparent);
-            m_renderTexture.draw(m_baseTextureQuad);
+            m_renderTexture.draw(m_baseTextureQuad, m_baseTexture);
+            // m_renderTexture.draw(sf::Sprite(*m_baseTexture));
         }else{
             m_renderTexture.clear(getActualColor());
         }
@@ -72,6 +73,7 @@ namespace candle{
     
     void LightingArea::setAreaColor(sf::Color c){
         m_color = c;
+        sfu::setColor(m_baseTextureQuad, getActualColor());
     }
     
     sf::Color LightingArea::getAreaColor() const{
@@ -86,6 +88,7 @@ namespace candle{
     
     void LightingArea::setAreaOpacity(float o){
         m_opacity = o;
+        sfu::setColor(m_baseTextureQuad, getActualColor());
     }
     
     float LightingArea::getAreaOpacity() const{
@@ -103,6 +106,10 @@ namespace candle{
     
     void LightingArea::setAreaTexture(const sf::Texture* texture, sf::IntRect rect){
         m_baseTexture = texture;
+        if(rect.width == 0 && rect.height == 0 && texture != nullptr){
+            rect.width = texture->getSize().x;
+            rect.height = texture->getSize().y;
+        }
         initializeRenderTexture(sf::Vector2f(rect.width, rect.height));
         setTextureRect(rect);
     }
@@ -111,7 +118,7 @@ namespace candle{
         m_baseTextureQuad[0].texCoords = sf::Vector2f(rect.left, rect.top);
         m_baseTextureQuad[1].texCoords = sf::Vector2f(rect.left + rect.width, rect.top);
         m_baseTextureQuad[2].texCoords = sf::Vector2f(rect.left + rect.width, rect.top + rect.height);
-            m_baseTextureQuad[3].texCoords = sf::Vector2f(rect.left, rect.top + rect.height);
+        m_baseTextureQuad[3].texCoords = sf::Vector2f(rect.left, rect.top + rect.height);
     }
     
     sf::IntRect LightingArea::getTextureRect() const{

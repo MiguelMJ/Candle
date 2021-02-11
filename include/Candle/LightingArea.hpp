@@ -16,8 +16,9 @@
 
 namespace candle{
     /**
-     * @brief Object to manage light, fog and shadows in an area.
-     * @details ...
+     * @brief Object to manage ambiental light and fog.
+     * @details
+     * A LightingArea is a wrapper class to a sf::RenderTexture. 
      */
     class LightingArea: public sf::Transformable, public sf::Drawable{
     public:

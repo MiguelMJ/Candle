@@ -38,6 +38,7 @@ struct App{
     std::vector<std::shared_ptr<candle::LightSource>> lights2; // glowing
     candle::EdgeVector edgePool;
     sf::VertexArray edgeVertices;
+    sf::Texture fogTex;
 
     /*
     * BACKGROUND
@@ -66,6 +67,7 @@ struct App{
     candle::RadialLight radialLight;
     candle::DirectedLight directedLight;
     bool control, shift, alt;
+    
     /*
     * INTERACTIVITY - Menu
     */
@@ -126,7 +128,13 @@ struct App{
         edgeVertices.setPrimitiveType(sf::Lines);
         background.setPrimitiveType(sf::Quads);
         background.resize(ROWS * COLS * 4);
-        lighting.setAreaColor(sf::Color::Black);
+        if(fogTex.loadFromFile("texture.png")){
+            lighting.setAreaTexture(&fogTex);
+            lighting.scale(WIDTH/fogTex.getSize().x, HEIGHT/fogTex.getSize().y);
+        }else{
+            std::cout << "No texture detected" << std::endl;
+            lighting.setAreaColor(sf::Color::Black);
+        }
         lighting.clear();
         mouseBlock.setPrimitiveType(sf::Lines);
         mouseBlock.resize(8);
