@@ -14,18 +14,38 @@
 #include "sfml-util/geometry/Line.hpp"
 
 namespace candle{
+    /**
+     * @brief Typedef to shorten the use of vectors as edge pools
+     */
     typedef std::vector<sfu::Line> EdgeVector;
+    
     /**
      * @brief This function initializes the Texture used for the RadialLights.
-     * @details It is called byt the first constructor. Anyways, it could be 
-     * necessary to call it explicitly if you declare a RadialLight that, for 
-     * some reason, you have a global or static RadialLight.
+     * @details This function is called the first time a RadialLight is created
+     * , so the user shouldn't need to do it. Anyways, it could be 
+     * necessary to do it explicitly if you declare a RadialLight that, for 
+     * some reason, is global or static RadialLight and is not constructed in
+     * a normal order.
      */
     void initializeTextures();
     
     /**
      * @brief Interface for objects that emit light
-     * @details LightSources must be created and drawn from a @ref Lighting object.
+     * @details
+     * 
+     * LightSources use raycasting algorithms to compute the polygon
+     * illuminated by the light. The main difference between the 
+     * implementations, @ref RadialLight and @ref DirectedLight, is whether
+     * the constant is the origin or the direction of the rays.
+     * 
+     * LightSources manage their colour separating the alpha value from the RGB
+     * . This is convenient to manipulate color of the light (interpreted as 
+     * the RGB value) and intensity (interpreted as the alpha value) 
+     * separately.
+     * 
+     * By default, they use a sf::BlendAdd mode. This means that you can
+     * specify any other blend mode you want except sf::BlendAlpha, that
+     * will be converted to the additive mode.
      */
     class LightSource: public sf::Transformable, public sf::Drawable{
     private:
@@ -56,69 +76,90 @@ namespace candle{
          /**
          * @brief Set the light intensity.
          * @details The @p intensity of the light determines two things: 
-         * how much fog opacity it reduces, and how much of its color is 
-         * added to the layers below when the _glow_ is active.
+         * how much fog opacity it reduces when drawn in a LightingArea * in 
+         * FOG mode, and how much presence its color has when drawn normally.
+         * 
+         * The default value is 1.
+         * 
          * @param intensity Value from 0 to 1. At 0 the light is
          * invisible.
-         * @see setGlow
+         * @see getIntensity
          */
         void setIntensity(float intensity);
         
         /**
          * @brief Get the intensity of the light.
+         * @returns The light intensity.
+         * @see setIntensity
          */
         float getIntensity() const;
         
         /**
          * @brief Set the light color.
-         * @details The light will only show color if the _glow_ is 
-         * active.
-         * @param color New color of the light.
-         * @see setGlow
+         * @details The light color refers only to the RGB values.
+         * 
+         * The default value is sf::Color::White
+         * 
+         * @param color New color of the light. The alpha value is ignored.
+         * @see getColor
          */
         void setColor(const sf::Color& color);
         
         /**
          * @brief Get the plain color of the light.
-         * @details The alpha value is always 255.
+         * @details The light color refers only to the RGB values.
+         * @returns The light color.
+         * @see setColor
          */
         sf::Color getColor() const;
         
         /**
-         * @brief Set the falue of the _fade_ flag.
-         * @details when the @p fade is set, the light will lose intensity
+         * @brief Set the value of the _fade_ flag.
+         * @details when the @p fade flag is set, the light will lose intensity
          * in the limits of its range. Otherwise, the intensity will remain
          * constant.
+         * 
+         * The default value is true.
+         * 
          * @param fade Value to set the flag.
+         * @see getFade
          */
         virtual void setFade(bool fade);
         
         /**
          * @brief Check if the light fades or not.
-         * @return The value of the _fade_ flag.
+         * @returns The value of the _fade_ flag.
+         * @see setFade
          */
         virtual bool getFade() const;
             
         /**
          * @brief Set the range of the illuminated area.
+         * @details The range of the light indicates the how far a light ray
+         * may hit from its origin.
          * @param range Range of the illuminated area.
+         * @see getRange, setFade
          */
         void setRange(float range);
         
         /**
          * @brief Get the range of the illuminated area.
+         * @returns The range of the illuminated area.
+         * @see setRange
          */
         float getRange() const;
         
         /**
-         * @brief Calculates the area that should be iluminated with a 
-         * ray casting algorithm.
-         * @details For the calculations, the edges from @ref 
-         * m_ptrEdgePool are used. If the [fog opacity](@ref 
-         * Lighting::setFogOpacity) is not 0, then @ref 
-         * Lighting::updateFog should be called somewhere between 
-         * this function and the next draw.
-         * @see m_ptrEdgePool
+         * @brief Modifies the polygon of the illuminated area with a 
+         * raycasting algorithm.
+         * @details The algorithm needs to know what edges to use to cast 
+         * shadows. They are specified within a range of two iterators of a
+         * vector of edges of type @ref sfu::Line.
+         * @param begin Iterator to the first sfu::Line of the vector to take 
+         * into account.
+         * @param end Iterator to the first sfu::Line of the vector not to be
+         * taken into account.
+         * @see setRange, [EdgeVector](@ref LightSource.hpp)
          */
         virtual void castLight(const EdgeVector::iterator& begin, const EdgeVector::iterator& end) = 0;
     };
