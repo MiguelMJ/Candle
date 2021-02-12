@@ -11,7 +11,7 @@
 
 namespace candle{
     /**
-     * @brief LightSource that emits light from a single point@details 
+     * @brief LightSource that emits light from a single point
      * @details
      * 
      * A RadialLight is defined, mainly, by the origin of the rays, the range of the light, the 
@@ -31,9 +31,6 @@ namespace candle{
     private:
         float m_beamAngle;
         
-        /**
-         * @copydoc LightSource::draw
-         */
         void draw(sf::RenderTarget& t, sf::RenderStates st) const override;
         void resetColor() override;
         
@@ -43,9 +40,6 @@ namespace candle{
          */
         RadialLight();
         
-        /**
-         * @copydoc LightSource::castLight
-         */
         void castLight(const EdgeVector::iterator& begin, const EdgeVector::iterator& end) override;
         
         /**

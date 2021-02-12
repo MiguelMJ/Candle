@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "Candle/LightingArea.hpp"
 #include "sfml-util/graphics/VertexArray.hpp"
 
@@ -52,20 +50,29 @@ namespace candle{
         setAreaTexture(t, r);
     }
     
+    sf::FloatRect LightingArea::getLocalBounds () const{
+        return m_areaQuad.getBounds();
+    }
+    
+    sf::FloatRect LightingArea::getGlobalBounds () const{
+        return Transformable::getTransform().transformRect(m_areaQuad.getBounds());
+    }
+    
     void  LightingArea::draw(sf::RenderTarget& t, sf::RenderStates s) const{
-        if(m_mode == AMBIENTAL){
-            s.blendMode = sf::BlendAdd;
+        if(m_opacity > 0.f){
+            if(m_mode == AMBIENTAL){
+                s.blendMode = sf::BlendAdd;
+            }
+            s.transform *= Transformable::getTransform();
+            s.texture = &m_renderTexture.getTexture();
+            t.draw(m_areaQuad, s);
         }
-        s.transform *= Transformable::getTransform();
-        s.texture = &m_renderTexture.getTexture();
-        t.draw(m_areaQuad, s);
     }
     
     void LightingArea::clear(){
         if(m_baseTexture != nullptr){
             m_renderTexture.clear(sf::Color::Transparent);
             m_renderTexture.draw(m_baseTextureQuad, m_baseTexture);
-            // m_renderTexture.draw(sf::Sprite(*m_baseTexture));
         }else{
             m_renderTexture.clear(getActualColor());
         }
@@ -112,6 +119,10 @@ namespace candle{
         }
         initializeRenderTexture(sf::Vector2f(rect.width, rect.height));
         setTextureRect(rect);
+    }
+    
+    const sf::Texture* LightingArea::getAreaTexture() const{
+        return m_baseTexture;
     }
     
     void LightingArea::setTextureRect(const sf::IntRect& rect){

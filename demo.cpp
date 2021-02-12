@@ -454,13 +454,15 @@ struct App{
     }
     void updateOnPressKey(sf::Keyboard::Key k){
         switch(k){
-        case sf::Keyboard::M:
-            if(lighting.getMode() == candle::LightingArea::FOG){
-                lighting.setMode(candle::LightingArea::AMBIENTAL);
-                lighting.setAreaColor(sf::Color::Yellow);
-            }else{
-                lighting.setMode(candle::LightingArea::FOG);
-                lighting.setAreaColor(sf::Color::Black);
+        case sf::Keyboard::M:{
+                bool textured = lighting.getAreaTexture() != nullptr;
+                if(lighting.getMode() == candle::LightingArea::FOG){
+                    lighting.setMode(candle::LightingArea::AMBIENTAL);
+                    lighting.setAreaColor(textured? sf::Color::White: sf::Color::Yellow);
+                }else{
+                    lighting.setMode(candle::LightingArea::FOG);
+                    lighting.setAreaColor(textured? sf::Color::White: sf::Color::Black);
+                }
             }
             break;
         case sf::Keyboard::T:

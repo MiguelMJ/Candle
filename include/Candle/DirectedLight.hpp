@@ -33,32 +33,26 @@ namespace candle{
     private:
         float m_beamWidth;
         
-        /**
-         * @copydoc LightSource::draw
-         */
         void draw(sf::RenderTarget& t, sf::RenderStates st) const override;
         void resetColor() override;
     public:
         DirectedLight();
         
-        /**
-         * @copydoc LightSource::draw
-         */
         void castLight(const EdgeVector::iterator& begin, const EdgeVector::iterator& end) override;
         
         /**
-         * @brief Set the range for which the rays may be casted.
-         * @details The rays will be casted in a single direction, from points
-         * contained in the segment normal to them, that also contains the
-         * position of the object. The width specifies the maximum distance
-         * allowed from the center of segment to cast a ray.
-         * @param width
+         * @brief Set the width of the beam.
+         * @details The width specifies the maximum distance allowed from the 
+         * center of segment to cast a ray, along a segment normal to the ligh
+         * direction.
+         * @param width Width of the beam.
          * @see getBeamWidth
          */
         void setBeamWidth(float width);
         
         /**
-         * @brief Get the range for which the rays may be casted.
+         * @brief Get the width of the beam.
+         * @returns Width of the beam
          * @see setBeamWidth
          */
         float getBeamWidth() const;
