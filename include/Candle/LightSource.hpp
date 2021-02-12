@@ -2,7 +2,8 @@
  * @file
  * @author Miguel Mejía Jiménez
  * @copyright MIT License
- * @brief This file contains the LightingSource class.
+ * @brief This file contains the LightingSource class and the EdgeVector 
+ * typedef.
  */
 #ifndef __CANDLE_LIGHTSOURCE_HPP__
 #define __CANDLE_LIGHTSOURCE_HPP__

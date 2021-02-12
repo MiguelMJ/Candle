@@ -1,3 +1,9 @@
+/**
+ * @file
+ * @author Miguel Mejía Jiménez
+ * @copyright MIT License
+ * @brief This file contains the auxiliary Polygon class.
+ */
 #ifndef __SFML_UTIL_GEOMETRY_POLYGON_HPP__
 #define __SFML_UTIL_GEOMETRY_POLYGON_HPP__
 
@@ -10,6 +16,10 @@
 #include "Candle/geometry/Line.hpp"
 
 namespace sfu{
+    /**
+     * @brief Auxiliary class to represent a polygon as vector of lines.
+     * Not meant to be used outside Candle.
+     */
     struct Polygon{
         std::vector<sfu::Line> lines;
         Polygon(const sf::Vector2f* points, int n);
