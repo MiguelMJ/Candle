@@ -1,5 +1,5 @@
 #include "Candle/LightingArea.hpp"
-#include "sfml-util/graphics/VertexArray.hpp"
+#include "Candle/graphics/VertexArray.hpp"
 
 
 namespace candle{

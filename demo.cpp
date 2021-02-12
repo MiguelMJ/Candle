@@ -4,8 +4,8 @@
 #include <ctime>
 #include <cmath>
 
-#include "sfml-util/geometry/Polygon.hpp"
-#include "sfml-util/graphics/VertexArray.hpp"
+#include "Candle/geometry/Polygon.hpp"
+#include "Candle/graphics/VertexArray.hpp"
 
 #include "Candle/LightingArea.hpp"
 #include "Candle/LightSource.hpp"

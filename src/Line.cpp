@@ -1,7 +1,7 @@
 #include <limits>
 
-#include "sfml-util/geometry/Line.hpp"
-#include "sfml-util/geometry/Vector2.hpp"
+#include "Candle/geometry/Line.hpp"
+#include "Candle/geometry/Vector2.hpp"
 
 namespace sfu{
     Line::Line(const sf::Vector2f& p1, const sf::Vector2f& p2):

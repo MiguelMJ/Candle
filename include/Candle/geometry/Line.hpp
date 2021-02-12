@@ -5,7 +5,7 @@
 
 #include <SFML/System/Vector2.hpp>
 
-#include "sfml-util/geometry/Vector2.hpp"
+#include "Candle/geometry/Vector2.hpp"
 
 namespace sfu{
     struct Line{

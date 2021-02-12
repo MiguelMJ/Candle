@@ -3,9 +3,9 @@
 
 #include "SFML/Graphics.hpp"
 
-#include "sfml-util/graphics/VertexArray.hpp"
-#include "sfml-util/geometry/Vector2.hpp"
-#include "sfml-util/geometry/Line.hpp"
+#include "Candle/graphics/VertexArray.hpp"
+#include "Candle/geometry/Vector2.hpp"
+#include "Candle/geometry/Line.hpp"
 
 namespace candle{
     const float BASE_RADIUS = 400.0f;

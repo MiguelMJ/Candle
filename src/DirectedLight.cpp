@@ -2,9 +2,9 @@
 
 #include <queue>
 
-#include "sfml-util/geometry/Vector2.hpp"
-#include "sfml-util/geometry/Line.hpp"
-#include "sfml-util/graphics/VertexArray.hpp"
+#include "Candle/geometry/Vector2.hpp"
+#include "Candle/geometry/Line.hpp"
+#include "Candle/graphics/VertexArray.hpp"
 
 namespace candle{
     void DirectedLight::draw(sf::RenderTarget& t, sf::RenderStates st) const{

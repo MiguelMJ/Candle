@@ -1,4 +1,4 @@
-#include "sfml-util/graphics/Color.hpp"
+#include "Candle/graphics/Color.hpp"
 
 namespace sfu{
     sf::Color darken(const sf::Color& c, float r){
