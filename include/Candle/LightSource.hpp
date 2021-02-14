@@ -2,8 +2,8 @@
  * @file
  * @author Miguel Mejía Jiménez
  * @copyright MIT License
- * @brief This file contains the LightingSource class and the EdgeVector 
- * typedef.
+ * @brief This file contains the LightingSource class and some convenient
+ * typedefs.
  */
 #ifndef __CANDLE_LIGHTSOURCE_HPP__
 #define __CANDLE_LIGHTSOURCE_HPP__
@@ -16,9 +16,16 @@
 
 namespace candle{
     /**
+     * @typedef Edge
+     * @brief Typedef with mere semantic purposes.
+     */
+    typedef sfu::Line Edge;
+    
+    /**
+     * @typedef EdgeVector
      * @brief Typedef to shorten the use of vectors as edge pools
      */
-    typedef std::vector<sfu::Line> EdgeVector;
+    typedef std::vector<Edge> EdgeVector;
     
     /**
      * @brief This function initializes the Texture used for the RadialLights.
