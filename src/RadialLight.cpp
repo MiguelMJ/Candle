@@ -60,6 +60,19 @@ namespace candle{
             l_texturesReady = true;
         }
         m_polygon.setPrimitiveType(sf::TriangleFan);
+        m_polygon.resize(6);
+        m_polygon[0].position = 
+        m_polygon[0].texCoords = {BASE_RADIUS+1, BASE_RADIUS+1};
+        m_polygon[1].position = 
+        m_polygon[5].position =
+        m_polygon[1].texCoords = 
+        m_polygon[5].texCoords = {0.f, 0.f};
+        m_polygon[2].position = 
+        m_polygon[2].texCoords = {BASE_RADIUS*2 + 2, 0.f};
+        m_polygon[3].position = 
+        m_polygon[3].texCoords = {BASE_RADIUS*2 + 2, BASE_RADIUS*2 + 2};
+        m_polygon[4].position = 
+        m_polygon[4].texCoords = {0.f, BASE_RADIUS*2 + 2};
         Transformable::setOrigin(BASE_RADIUS, BASE_RADIUS);
         setRange(1.0f);
         setBeamAngle(360.f);
