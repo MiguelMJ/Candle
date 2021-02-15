@@ -27,9 +27,9 @@ namespace sfu{
     float Line::distance(const sf::Vector2f& point) const{
         float d;
         if(m_direction.x == 0){
-            d = std::abs(point.y - m_origin.y);
-        }else if(m_direction.y == 0){
             d = std::abs(point.x - m_origin.x);
+        }else if(m_direction.y == 0){
+            d = std::abs(point.y - m_origin.y);
         }else{
             float A = 1.f / m_direction.x;
             float B = - 1.f / m_direction.y;
