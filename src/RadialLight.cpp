@@ -123,10 +123,10 @@ namespace candle{
         for(auto it = begin; it != end; it++){
             auto& s = *it;
             float d1 = s.distance(castPoint);
-            float d2 = sfu::magnitude(s.m_origin - castPoint);
-            float d3 = sfu::magnitude(s.point(1.f) - castPoint);
-            if(std::max(std::min(d2, d3), d1) <= m_range*std::sqrt(2)){
-            // if(d1 <= m_range){
+            // float d2 = sfu::magnitude(s.m_origin - castPoint);
+            // float d3 = sfu::magnitude(s.point(1.f) - castPoint);
+            // if(std::max(std::min(d2, d3), d1) <= m_range*std::sqrt(2)){
+            if(d1 <= m_range){
                 sfu::Line r1(castPoint, s.m_origin);
                 sfu::Line r2(castPoint, s.point(1.f));
                 float a1 = sfu::angle(r1.m_direction);
@@ -176,7 +176,7 @@ namespace candle{
         std::vector<sf::Vector2f> points;
         points.reserve(rays.size());
         for (auto& r: rays){
-            points.push_back(tr_i.transformPoint(castRay(begin, end,    r, m_range*std::sqrt(2))));
+            points.push_back(tr_i.transformPoint(castRay(begin, end,    r, m_range*m_range)));
         }
         m_polygon.resize(points.size() + 1 + beamAngleBigEnough); // + center and last
         m_polygon[0].color = m_color;
