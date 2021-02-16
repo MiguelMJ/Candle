@@ -14,11 +14,13 @@ namespace candle{
      * @brief LightSource that emits light from a single point
      * @details
      * 
-     * A RadialLight is defined, mainly, by the origin of the rays, the range of the light, the 
-     * beam angle and its aperture. To manipulate the position and the orientation of the light,
-     * you can change the position and rotation of the object as you would do with any
-     * sf::Transformable. The range can be manipulated as with other LightSources, with
-     * @ref LightSource::setRange, and the angle of the beam with @ref setBeamAngle.
+     * A RadialLight is defined, mainly, by the position, the orientation, the
+	 * range of the light and the beam angle. To manipulate the
+     * position and the orientation of the light, you can change the position
+	 * and rotation of the object as you would do with any sf::Transformable.
+	 * The range can be manipulated as with other LightSources, with
+     * @ref LightSource::setRange, and the angle of the beam with 
+	 * @ref setBeamAngle.
      * 
      * <table width="100%">
      * <tr>

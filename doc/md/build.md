@@ -18,7 +18,7 @@ cmake --build .
 
 This will generate `libCandle-s.a` or (`Candle-s.lib` on Windows) in `build/lib` folder and the `demo` program (or `demo.exe`) in `build/bin`.
 
-If it happens that CMake can't find the SFML files, you might need to set manually `SFML_ROOT` inside the `CMakeLists.txt` (uncomment and complete line 15).
+If CMake can't manage to find the SFML files, you might need to set `SFML_ROOT` inside the `CMakeLists.txt` manually (uncomment and complete line 15).
 
 # Make
 
@@ -28,10 +28,10 @@ For Linux users, the old Candle build system is still available. You just have t
 make release
 ```
 
-to build `libCandle-s.a` and the `demo` program inside the folder `release`. Alternatively, you can use
+to build `libCandle-s.a` and the `demo` program inside the `release` folder. Alternatively, you can use
 
 ```shell
 make debug
 ```
 
-to build the debug version inside the folder `debug`.
+to build the debug version inside the `debug` folder.

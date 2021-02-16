@@ -52,8 +52,8 @@ namespace candle{
      * separately.
      * 
      * By default, they use a sf::BlendAdd mode. This means that you can
-     * specify any other blend mode you want except sf::BlendAlpha, that
-     * will be converted to the additive mode.
+     * specify any other blend mode you want, except sf::BlendAlpha, that
+     * will be changed to the additive mode.
      */
     class LightSource: public sf::Transformable, public sf::Drawable{
     private:
@@ -158,9 +158,9 @@ namespace candle{
         float getRange() const;
         
         /**
-         * @brief Modifies the polygon of the illuminated area with a 
+         * @brief Modify the polygon of the illuminated area with a 
          * raycasting algorithm.
-         * @details The algorithm needs to know what edges to use to cast 
+         * @details The algorithm needs to know which edges to use to cast 
          * shadows. They are specified within a range of two iterators of a
          * vector of edges of type @ref sfu::Line.
          * @param begin Iterator to the first sfu::Line of the vector to take 

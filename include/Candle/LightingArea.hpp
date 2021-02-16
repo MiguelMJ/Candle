@@ -42,13 +42,14 @@ namespace candle{
      * <img width="300px" src="lightingArea04.png"> <br> <em>LightingArea in FOG mode with texture</em>
      * </div>
      * 
-     * As the sf::RenderTexture may be a heavy resource to be creating, there 
-     * is only two moments in which you are able to do so. The first one and 
-     * most common is upon construction, where you can specify the size of the
-     * area, that will be the size of the sf::RenderTexture. The second one is
-     * upon the assignation of a texture (with @ref setAreaTexture), on which
-     * the area is created again to match the size of the new texture.
-     * 
+     * As the sf::RenderTexture may be a heavy resource to be creating
+     * repeteadly, there are only two moments in which you are able to do so.
+     * The first one and most common is upon construction, where you can
+     * specify the size of the area, which will also be the size of the
+     * sf::RenderTexture. The second one is upon the assignment of a texture
+     * (with @ref setAreaTexture), on which the area is created again to match
+     * the size of the new texture.
+	 *
      * There are two things to note  about this:
      *   1. To change the size of a LightingArea that has already been
      * constructed, without changing the base texture, you have to scale it as
@@ -66,8 +67,8 @@ namespace candle{
          */
         enum Mode {
             /**
-             * In this mode, the area behaves like a mask through which is only
-             * possible to see by drawing light on it.
+             * In this mode, the area behaves like a mask through which it is
+             * only possible to see by drawing light on it.
              */
             FOG,
             /**
@@ -86,7 +87,7 @@ namespace candle{
         sf::Vector2f m_size;
         Mode m_mode;
         /**
-         * @brief Function to draw all the fog and the light sources.
+         * @brief Draw the object to the target.
          */
         void draw(sf::RenderTarget&, sf::RenderStates)const override;
         sf::Color getActualColor() const;

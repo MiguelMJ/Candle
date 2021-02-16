@@ -6,7 +6,7 @@
 
 The two main objects related to shadow casting in Candle are light sources and edges.
 
-For the lights, there is an abstract class called candle::LightSource, implemented by candle::RadialLight and candle::DirectedLight. They inherit for sf::Drawable and sf::Transformable, so they can be used as the more common SFML entities.
+For the lights, there is an abstract class called candle::LightSource, implemented by candle::RadialLight and candle::DirectedLight. They inherit from sf::Drawable and sf::Transformable, so they can be used as common SFML entities.
 
 For the edges, there is a structure called [**candle::Edge**](LightSource_8hpp.html#a232f746b6098d9a876d23e84a67dc0a2), that can represent a segment by the coordinates of its ends. However, the raycasting function requires that the shadow casting edges are stored in a `std::vector`, so Candle provides a convenient alias for `std::vector<candle::Edge>` called [**candle::EdgeVector**](LightSource_8hpp.html#a384b0e96a22f34b27f84a55713279e89). This is what you should be using to manage your edges. 
 
@@ -16,11 +16,11 @@ Let's see with a sample of code.
 
 @include gettingstarted1.cpp
 
-The previous code results in a light that follows the mouse and a vertical edge in the center of the screen.
+The previous code results in a light that follows the pointer and a vertical edge in the center of the screen.
 
 <div align="center"><img src="example.gif" width="250px"><br><em>Preview</em></div>
 
-Note how the `castLight` function is called only when the mouse is moved. Although it shouldn't cost much when a light has a normal amount of edges in range, is preferable not to abuse it unnecesarily. Therefore, we will call it only when the light has  been modified or the edges in range have moved.
+Note how the `castLight` function is called only when the mouse is moved. Although it shouldn't be very expensive when a light has a normal amount of edges in range, it is preferable not to abuse it unnecesarily. Therefore, we will call it only when the light has  been modified or the edges in range have moved.
 
 # Radial light and Directed light
 
@@ -42,7 +42,7 @@ Candle doesn't behave well when segments intersect. The reason is that lights pr
 <td align="center"> <img width="300px" src="intersection_2.png" alt="Intersection of edge and directed light example"> <br> <em>Second case: Intersection between an edge and the source of a directed light</em> </td>
 </tr>
 </table>
-You should avoid this when disposing the edges and lights in the scene.
+You should avoid this when placing the edges and lights in the scene.
 
 # Customizing the lights
 
@@ -74,7 +74,7 @@ Plain color of the light.
 </div>
 ### Range
 
-Max range of the iluminated area.
+Max range of the illuminated area.
 
 - candle::LightSource::getRange
 - candle::LightSource::setRange
