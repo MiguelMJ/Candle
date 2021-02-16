@@ -457,7 +457,7 @@ struct App{
         case sf::Keyboard::M:{
                 bool textured = lighting.getAreaTexture() != nullptr;
                 if(lighting.getMode() == candle::LightingArea::FOG){
-                    lighting.setMode(candle::LightingArea::AMBIENTAL);
+                    lighting.setMode(candle::LightingArea::AMBIENT);
                     lighting.setAreaColor(textured? sf::Color::White: sf::Color::Yellow);
                 }else{
                     lighting.setMode(candle::LightingArea::FOG);

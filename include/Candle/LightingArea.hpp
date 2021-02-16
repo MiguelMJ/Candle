@@ -16,7 +16,7 @@
 
 namespace candle{
     /**
-     * @brief Object to manage ambiental light and fog.
+     * @brief Object to manage ambient light and fog.
      * @details
      * 
      * A LightingArea is a wrapper class to a sf::RenderTexture that provides
@@ -28,7 +28,7 @@ namespace candle{
      * <tr>
      *  <td align="center"> <img src="lightingArea01.png" width="300px"> <br> <em>No LightingArea</em> </td>
      *  <td align="center"> <img src="lightingArea02.png" width="300px"> <br> <em>FOG mode (Color black, medium opacity)</em> </td>
-     *  <td align="center"> <img src="lightingArea03.png" width="300px"> <br> <em>AMBIENTAL mode (Color yellow, low opacity)</em> </td>
+     *  <td align="center"> <img src="lightingArea03.png" width="300px"> <br> <em>AMBIENT mode (Color yellow, low opacity)</em> </td>
      * </tr>
      * </table>
      * 
@@ -73,7 +73,7 @@ namespace candle{
             /**
              * Use the area as an extra layer of light.
              */
-            AMBIENTAL
+            AMBIENT
         };
     private:
         const sf::Texture* m_baseTexture;
@@ -222,7 +222,7 @@ namespace candle{
         /**
          * @brief In FOG mode, makes visible the area illuminated by the light.
          * @details In FOG mode with opacity greater than zero, this function.
-         * is necessary to keep the lighting coherent. In AMBIENTAL mode, this
+         * is necessary to keep the lighting coherent. In AMBIENT mode, this
          * function has no effect. 
          * @param light
          */

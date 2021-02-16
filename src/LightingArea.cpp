@@ -46,6 +46,7 @@ namespace candle{
     , m_areaQuad(sf::Quads, 4)
     , m_color(sf::Color::White)
     {
+        m_opacity = 1.f;
         m_mode = mode;
         setAreaTexture(t, r);
     }
@@ -60,7 +61,7 @@ namespace candle{
     
     void  LightingArea::draw(sf::RenderTarget& t, sf::RenderStates s) const{
         if(m_opacity > 0.f){
-            if(m_mode == AMBIENTAL){
+            if(m_mode == AMBIENT){
                 s.blendMode = sf::BlendAdd;
             }
             s.transform *= Transformable::getTransform();
