@@ -8,17 +8,18 @@
 <img src="https://img.shields.io/badge/version-v1.0-informational?style=flat-square"/>
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-informational?style=flat-square"/></a>
 </p>
-
 Candle is a SFML based C++ library that provides light, shadow casting and field of view  functionalities with easy integration.
+
+[Official documentation](miguelmj.github.io/Candle).
 
 ### Contents
 
 - [Demo](#Demo)
 - [Build](#Build)
 - [Requisites](#Requisites)
-- [Example program](#Example-program)
 - [Contributors](#Contributors)
 - [Contributing](#Contributing)
+- [Example program](#Example-program)
 - [License](#License)
 
 ## Demo
@@ -27,7 +28,7 @@ Before anything, here you have a little example of how it looks.
 
 <p align="center"><img src="doc/img/demo.gif" height="400"></p>
 
-The code comes with a demo program showing the basic functionalities provided by the library. In it you can place lights and blocks that will cast shadows, and modify the opacity of the fog.
+The code comes with a demo program showing the functionalities provided by the library. In it you can place lights and edges that will cast shadows, and modify the behaviour of the fog.
 
 You can check the full manual of the demo [here](https://miguelmj.github.io/Candle/demo_manual.html).
 
@@ -64,6 +65,19 @@ make docs # optional
 _This library is meant to be used in SFML applications, so it's assumed that you are familiar with the process of compiling them. If you are not, [you can learn in the official website](https://www.sfml-dev.org/tutorials/2.5/)_ . 
 
 - If you want to build the docs, Doxygen 1.9.1 is required.
+
+## Contributors
+<ul>
+	<li> <a href="https://github.com/Madour"><img src="https://avatars1.githubusercontent.com/u/11854124?s=400&u=0906a245444942f36510751b175403754553f9c0&v=4" title="Madour" width="100px" > <b>Modar Nasser</b></a> - <a href="https://github.com/MiguelMJ/Candle/issues/created_by/Madour">Bug report</> · <a href="https://github.com/MiguelMJ/Candle/commits?author=Madour">Code</a>
+	</li>
+</ul>
+
+## Contributing
+
+- Read the [contributing guidelines](CONTRIBUTING.md) if you want to contribute to the code.
+- Open a new issue ![](https://img.shields.io/github/issues/MiguelMJ/Candle?logo=github&style=social) to make a request or report a bug.
+- If you use it in a project, you don't have to give any credit. But if you did so, that would be fantastic!
+- And of course, :star:  **star this repository** and give it some visibility ![](https://img.shields.io/github/stars/MiguelMJ/Candle?style=social).
 
 ## Example program
 
@@ -135,23 +149,11 @@ The result will be a simple light casting a shadow over an invisible wall in the
 
 <p align="center"><img src="doc/img/example.gif" height="300"/></p>
 
-## Contributors
-<ul>
-	<li> <a href="https://github.com/Madour"><img src="https://avatars1.githubusercontent.com/u/11854124?s=400&u=0906a245444942f36510751b175403754553f9c0&v=4" title="Madour" width="100px" > <b>Modar Nasser</b></a> - <a href="https://github.com/MiguelMJ/Candle/issues/created_by/Madour">Bug report</> · <a href="https://github.com/MiguelMJ/Candle/commits?author=Madour">Code</a>
-	</li>
-</ul>
-
-## Contributing
-
-- Read the [contributing guidelines](CONTRIBUTING.md) if you want to contribyte to the code.
-
-- Open a new issue ![](https://img.shields.io/github/issues/MiguelMJ/Candle?logo=github&style=social) to make a request or report a bug.
-
-- And of course, :star:  **star this repository** and give it some visibility ![](https://img.shields.io/github/stars/MiguelMJ/Candle?style=social).
-- If you use it in a project, you don't have to give any credit. But if you did so, that would be fantastic!
+## 
 
 ## License
 
 Candle uses the MIT license, a copy of which you can find [here](LICENSE), in the repo.
 
 It uses the external library SFML, that is licensed under the zlib/png license.
+
