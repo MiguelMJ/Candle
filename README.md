@@ -5,17 +5,16 @@
 <img src="https://img.shields.io/badge/C++-11-00599C?style=flat-square&logo=c%2B%2B">
 <img src="https://img.shields.io/badge/SFML-v2.5.1-8CC445?logo=SFML&style=flat-square">
 <a href="https://miguelmj.github.io/Candle"><img src="https://img.shields.io/badge/code-documented-success?style=flat-square"/></a>
-<a href="https://github.com/MiguelMJ/Candle"><img src="https://img.shields.io/github/repo-size/MiguelMJ/Candle?style=flat-square"/></a>
-<img src="https://img.shields.io/badge/version-v0.1-informational?style=flat-square"/>
+<img src="https://img.shields.io/badge/version-v1.0-informational?style=flat-square"/>
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-informational?style=flat-square"/></a>
 </p>
+
 Candle is a SFML based C++ library that provides light, shadow casting and field of view  functionalities with easy integration.
 
 ### Contents
 
 - [Demo](#Demo)
-  - [Controls](#Controls)
-  - [Build](#Build)
+- [Build](#Build)
 - [Requisites](#Requisites)
 - [Example program](#Example-program)
 - [Contributors](#Contributors)
@@ -26,37 +25,34 @@ Candle is a SFML based C++ library that provides light, shadow casting and field
 
 Before anything, here you have a little example of how it looks.
 
-<p align="center"><img src="doc/img/demo.gif" height="450"></p>
+<p align="center"><img src="doc/img/demo.gif" height="400"></p>
 
 The code comes with a demo program showing the basic functionalities provided by the library. In it you can place lights and blocks that will cast shadows, and modify the opacity of the fog.
 
-#### Controls
+You can check the full manual of the demo [here](https://miguelmj.github.io/Candle/demo_manual.html).
 
-- **Right click**. Alternate between block and light.
-- **Left click**. Put a block or light.
-- **Spacebar**. Erase all lights and blocks. 
+## Build
 
-- **Mouse wheel**. Increase / Decrease light radius.
-
-- **G**. Toggle glow.
-- **C**. Alternate glow color between white, magenta, yellow and cyan. 
-- **A** / **S**. Increase / Decrease light intensity. 
-
-- **Z** / **X**. Increase / Decrease fog opacity.
-
-- **P**. Capture  the window content and save it to a png file in the current working directory.
-
-#### Build
+### CMake
 
 You can build the static library and the demo program with CMake.
 
-```cmake
+```shell
 mkdir build && cd build
 cmake .. -DBUILD_DEMO=ON
 cmake --build .
 ```
 
-This will generate libCandle-s.a or (Candle-s.lib on Windows) in build/lib folder, and demo program (or demo.exe) in build/bin.
+This will generate `libCandle-s.a` or (`Candle-s.lib` on Windows) in `build/lib` folder, and the `demo` program (or `demo.exe`) in `build/bin`.
+
+###  Make
+
+Alternatively, if you work in Linux, you can use `make`, and also build the docs with it.
+
+```bash
+make
+make docs # optional	
+```
 
 ## Requisites
 
@@ -67,6 +63,8 @@ This will generate libCandle-s.a or (Candle-s.lib on Windows) in build/lib folde
 
 _This library is meant to be used in SFML applications, so it's assumed that you are familiar with the process of compiling them. If you are not, [you can learn in the official website](https://www.sfml-dev.org/tutorials/2.5/)_ . 
 
+- If you want to build the docs, Doxygen 1.9.1 is required.
+
 ## Example program
 
 I will assume that you have SFML installed in your system. If we have a project with the following structure:
@@ -76,33 +74,29 @@ I will assume that you have SFML installed in your system. If we have a project 
    |- libCandle-s.a
    |- main.cpp
    |- include
-      |- Candle   # Candle headers
-         |- Lighting.hpp
-         |- LightSource.hpp
-         |- Util.hpp
+      |- Candle
+         |- Candle.hpp
+         |- ... # Candle headers
 ```
 
 the `main.cpp` file could look like this:
 
 ```C++
 #include <SFML/Graphics.hpp>
-#include "Candle/Lighting.hpp"
-
+#include "Candle/RadialLight.hpp"
+ 
 int main(){
     // create window
-    sf::RenderWindow w(sf::VideoMode(400,400), "app");
+    sf::RenderWindow w(sf::VideoMode(400, 400), "app");
     
-    // create the lighting area
-    candle::Lighting lighting;
-    lighting.setFogOpacity(0.6);
-    lighting.adjustFog(w.getView());
-    lighting.updateFog();
+    // create a light source
+    candle::RadialLight light;
+    light.setRange(150);
     
-    // create the light and a shadow to cast
-    candle::LightSource light;
-    light.setRadius(150);
-    lighting.addLightSource(&light);
-    lighting.m_segmentPool.push_back({{200,100},{200,300}});
+    // create an edge pool
+    candle::EdgeVector edges;
+    edges.emplace_back(sf::Vector2f(200.f, 100.f), 
+                       sf::Vector2f(200.f, 300.f));
     
     // main loop
     while(w.isOpen()){
@@ -111,20 +105,18 @@ int main(){
             if(e.type == sf::Event::Closed){
                 w.close();
             }else if(e.type == sf::Event::MouseMoved){
-                // make the light follow the mouse
-                sf::Vector2i mpi = sf::Mouse::getPosition(w);
-                light.setPosition(sf::Vector2f(mpi.x,mpi.y));
-                light.castLight();
+                sf::Vector2f mp(sf::Mouse::getPosition(w));
+                light.setPosition(mp);
+                light.castLight(edges.begin(), edges.end());
             }
         }
         
         w.clear();
-        w.draw(lighting);
+        w.draw(light);
         w.display();
     }
-	return 0;
+    return 0;
 }
-
 ```
 
 We can compile it with the following command:
@@ -151,23 +143,12 @@ The result will be a simple light casting a shadow over an invisible wall in the
 
 ## Contributing
 
-Here's a To Do list for Candle:
+- Read the [contributing guidelines](CONTRIBUTING.md) if you want to contribyte to the code.
 
-- Currently this library needs more testing and documentation.
+- Open a new issue ![](https://img.shields.io/github/issues/MiguelMJ/Candle?logo=github&style=social) to make a request or report a bug.
 
-  - **Performance tests** - this library is not yet optimized.
-  - **Functionality tests** - there may be bugs I haven't found yet.
-  - **Tutorials and examples**.
-  - **Documentation review** - [the documentation](https://miguelmj.github.io/Candle) still needs some more writing and maybe spell checking.
-- The functionalities of the library are enough for a basic lighting system, but there is still room for **more complex behaviours**.
-  - Some of the features I plan to implement are:
-    - _More type of light sources_ (directional, flashlight, etc).
-    - _More customization for the light intensity_ - Currently is simply linear; maximum intensity in the origin, zero in the radius; I'd like to add more options to customize that.
-  - If you want to request some feel free to open a new issue ![](https://img.shields.io/github/issues/MiguelMJ/Candle?logo=github&style=social) or even implement it and make a pull request.
-- Use of several technologies I'm still not very familiar with.
-  - Use **shaders** to blur the light or create a penumbra effect.
-  - Implement the algorithms with **Box2D** ray casting and add a **compiler option** to use them instead of the ones I coded (this feature is inspired by the optional use of [fmtlib](https://github.com/fmtlib/fmt) in the [loguru](https://github.com/emilk/loguru) project).
-- Finally, you can still  :star:  **star this repository** and give it some visibility ![](https://img.shields.io/github/stars/MiguelMJ/Candle?style=social).
+- And of course, :star:  **star this repository** and give it some visibility ![](https://img.shields.io/github/stars/MiguelMJ/Candle?style=social).
+- If you use it in a project, you don't have to give any credit. But if you did so, that would be fantastic!
 
 ## License
 
