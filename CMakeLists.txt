@@ -22,9 +22,14 @@ find_package(SFML 2.5 REQUIRED COMPONENTS  graphics)
 
 set(CANDLE_SRC
 
-	src/Lighting.cpp
+	src/LightingArea.cpp
 	src/LightSource.cpp
-	src/Util.cpp
+	src/RadialLight.cpp
+	src/DirectedLight.cpp
+	src/Line.cpp
+	src/Polygon.cpp
+	src/Color.cpp
+	src/VertexArray.cpp
 
 )
 

@@ -2,148 +2,174 @@
  * @file
  * @author Miguel Mejía Jiménez
  * @copyright MIT License
- * @brief This file contains the LightingSource class.
+ * @brief This file contains the LightingSource class and some convenient
+ * typedefs.
  */
 #ifndef __CANDLE_LIGHTSOURCE_HPP__
 #define __CANDLE_LIGHTSOURCE_HPP__
 
-#include <cmath>
 #include <vector>
-#include <set>
-#include <algorithm>
 
 #include "SFML/Graphics.hpp"
 
-#include "Candle/Util.hpp"
+#include "Candle/geometry/Line.hpp"
 
 namespace candle{
     /**
-     * @brief Object that emits light within a 
-     * Lighting object
-     * @details These objects are meant to be drawn as part of a Lighting object.
+     * @typedef Edge
+     * @brief Typedef with mere semantic purposes.
      */
-    class LightSource: public sf::Transformable, private sf::Drawable{
+    typedef sfu::Line Edge;
+    
+    /**
+     * @typedef EdgeVector
+     * @brief Typedef to shorten the use of vectors as edge pools
+     */
+    typedef std::vector<Edge> EdgeVector;
+    
+    /**
+     * @brief This function initializes the Texture used for the RadialLights.
+     * @details This function is called the first time a RadialLight is created
+     * , so the user shouldn't need to do it. Anyways, it could be 
+     * necessary to do it explicitly if you declare a RadialLight that, for 
+     * some reason, is global or static RadialLight and is not constructed in
+     * a normal order.
+     */
+    void initializeTextures();
+    
+    /**
+     * @brief Interface for objects that emit light
+     * @details
+     * 
+     * LightSources use raycasting algorithms to compute the polygon
+     * illuminated by the light. The main difference between the 
+     * implementations, @ref RadialLight and @ref DirectedLight, is whether
+     * the constant is the origin or the direction of the rays.
+     * 
+     * LightSources manage their colour separating the alpha value from the RGB
+     * . This is convenient to manipulate color of the light (interpreted as 
+     * the RGB value) and intensity (interpreted as the alpha value) 
+     * separately.
+     * 
+     * By default, they use a sf::BlendAdd mode. This means that you can
+     * specify any other blend mode you want except sf::BlendAlpha, that
+     * will be converted to the additive mode.
+     */
+    class LightSource: public sf::Transformable, public sf::Drawable{
     private:
-        sf::VertexArray m_polygon;
-        sf::FloatRect m_bounds; 
-        sf::Color m_color;
-        bool m_glow;
-#ifdef CANDLE_DEBUG
-        sf::VertexArray m_debug;
-#endif
-        
-        /**
-         * @brief Pools of segments that cast shadows.
-         * @details By default, it points to @ref s_defaultSegmentPool.
-         * @see s_defaultSegmentPool
-         */
-        std::set<std::vector<Segment>*> m_ptrSegmentPool;
-        
-        /**
-         * @brief This friendship is necessary to change the pointer of the 
-         * segment pool
-         * @see m_ptrSegmentPool Lighting::m_segmentPool
-         */
-        friend class Lighting;
-        
         /**
          * @brief Draw the object to a target
          */
-        void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+        virtual void draw(sf::RenderTarget& t, sf::RenderStates st) const = 0;
+  
+    protected:
+        sf::Color m_color;
+        sf::VertexArray m_polygon;
+        float m_range;
+        float m_intensity; // only for fog
+        bool m_fade;
+
+#ifdef CANDLE_DEBUG        
+        sf::VertexArray m_debug;
+#endif
+        
+        virtual void resetColor() = 0;
+    
     public:
-        
         /**
-         * @brief Default segment pool for shadow casting. Every LightSource contains it
-         * in its own pool.
-         * @see m_ptrSegmentPool
-         */
-        static std::vector<Segment> s_defaultSegmentPool;
-        
-        /**
-         * @brief Constructor.
+         * @brief Constructor
          */
         LightSource();
-                
-        /**
-         * @brief Get the global bounding rectangle of the light source.
-         */
-        sf::FloatRect getGlobalBounds() const;
         
-        /**
-         * @brief Get the local bounding rectangle of the light source.
-         */
-        sf::FloatRect getLocalBounds() const;
-        
-        /**
+         /**
          * @brief Set the light intensity.
          * @details The @p intensity of the light determines two things: 
-         * how much fog opacity it reduces, and how much of its color is 
-         * added to the layers below when the _glow_ is active.
+         * how much fog opacity it reduces when drawn in a LightingArea * in 
+         * FOG mode, and how much presence its color has when drawn normally.
+         * 
+         * The default value is 1.
+         * 
          * @param intensity Value from 0 to 1. At 0 the light is
          * invisible.
-         * @see setGlow
+         * @see getIntensity
          */
         void setIntensity(float intensity);
         
         /**
          * @brief Get the intensity of the light.
+         * @returns The light intensity.
+         * @see setIntensity
          */
         float getIntensity() const;
         
         /**
          * @brief Set the light color.
-         * @details The light will only show color if the _glow_ is 
-         * active.
-         * @param color New color of the light.
-         * @see setGlow
+         * @details The light color refers only to the RGB values.
+         * 
+         * The default value is sf::Color::White
+         * 
+         * @param color New color of the light. The alpha value is ignored.
+         * @see getColor
          */
-        void setColor(sf::Color color);
+        void setColor(const sf::Color& color);
         
         /**
          * @brief Get the plain color of the light.
-         * @details The alpha value is always 255.
+         * @details The light color refers only to the RGB values.
+         * @returns The light color.
+         * @see setColor
          */
         sf::Color getColor() const;
         
         /**
-         * @brief Set the radius of the iluminated area.
-         * @param radius New radius of the area.
+         * @brief Set the value of the _fade_ flag.
+         * @details when the @p fade flag is set, the light will lose intensity
+         * in the limits of its range. Otherwise, the intensity will remain
+         * constant.
+         * 
+         * The default value is true.
+         * 
+         * @param fade Value to set the flag.
+         * @see getFade
          */
-        void setRadius(float radius);
+        virtual void setFade(bool fade);
         
         /**
-         * @brief Get the radius of the light.
+         * @brief Check if the light fades or not.
+         * @returns The value of the _fade_ flag.
+         * @see setFade
          */
-        float getRadius() const;
+        virtual bool getFade() const;
+            
+        /**
+         * @brief Set the range of the illuminated area.
+         * @details The range of the light indicates the how far a light ray
+         * may hit from its origin.
+         * @param range Range of the illuminated area.
+         * @see getRange, setFade
+         */
+        void setRange(float range);
         
         /**
-         * @brief Set the value of the _glow_ flag.
-         * @details When the @p glow is inactive, the @ref Lighting 
-         * will only use the light to reveal the area under the fog. If 
-         * it is active, it will also add the color to the image. Note 
-         * that when the glow is not set, the light won't be visible if 
-         * the [fog opacity](@ref Lighting::setFogOpacity) is 0.
-         * @param glow Value to set the flag.
+         * @brief Get the range of the illuminated area.
+         * @returns The range of the illuminated area.
+         * @see setRange
          */
-        void setGlow(bool glow);
+        float getRange() const;
         
         /**
-         * @brief Check if the light glows or not.
-         * @return The value of the _glow_ flag.
+         * @brief Modifies the polygon of the illuminated area with a 
+         * raycasting algorithm.
+         * @details The algorithm needs to know what edges to use to cast 
+         * shadows. They are specified within a range of two iterators of a
+         * vector of edges of type @ref sfu::Line.
+         * @param begin Iterator to the first sfu::Line of the vector to take 
+         * into account.
+         * @param end Iterator to the first sfu::Line of the vector not to be
+         * taken into account.
+         * @see setRange, [EdgeVector](@ref LightSource.hpp)
          */
-        bool getGlow();
-        
-        /**
-         * @brief Calculates the area that should be iluminated with a 
-         * ray casting algorithm.
-         * @details For the calculations, the segments from @ref 
-         * m_ptrSegmentPool are used. If the [fog opacity](@ref 
-         * Lighting::setFogOpacity) is not 0, then @ref 
-         * Lighting::updateFog should be called somewhere between 
-         * this function and the next draw.
-         * @see m_ptrSegmentPool
-         */
-        void castLight();
+        virtual void castLight(const EdgeVector::iterator& begin, const EdgeVector::iterator& end) = 0;
     };
 }
 

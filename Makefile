@@ -71,6 +71,10 @@ $(shell mkdir -p debug/src release/src )
 debug: $(DBGEXEC)
 
 $(DBGEXEC): $(DBGOBJ)
+	$(call print_info,Building static library)
+	ar -rc $(DBGDIR)/libCandle-s-d.a $(DBGDIR)/src/*.o
+	ranlib $(DBGDIR)/libCandle-s-d.a
+	$(call print_success,$(DBGDIR)/libCandle-s.a built)
 	$(call print_info,Building $@)
 	@$(CXX) $(CXXFLAGS) $(DBGCFLAGS) $^ -o $(DBGEXEC) $(LINKAGE)
 	$(call print_success,$< ready)
@@ -91,6 +95,10 @@ $(DBGDIR)/%.d: %.cpp
 release: $(RELEXEC)
 	
 $(RELEXEC): $(RELOBJ)
+	$(call print_info,Building static library)
+	ar -rc $(RELDIR)/libCandle-s.a $(RELDIR)/src/*.o
+	ranlib $(RELDIR)/libCandle-s.a
+	$(call print_success,$(RELDIR)/libCandle-s.a built)
 	$(call print_info,Building $@)
 	$(CXX) $(CXXFLAGS) $(RELCFLAGS) $^ -o $(RELEXEC) $(LINKAGE)
 	$(call print_success,$< ready)
@@ -100,6 +108,8 @@ $(RELDIR)/%.d: %.cpp
 	$(CPP) $(CFLAGS) $< -MM -MT $(@:.d=.o) >$@
 	@echo '\t$$(call print_info,Building $$@)' >> $@
 	@echo '\t$$(CXX) -c $$(CXXFLAGS) $$(RELCFLAGS) -o $$@ $$<' >> $@
+	
+lib: $(RELOBJ)
 	
 # $(RELDIR)/%.o: %.cpp
 # 	$(call print_info,Building $@)
