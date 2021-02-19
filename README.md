@@ -68,9 +68,11 @@ _This library is meant to be used in SFML applications, so it's assumed that you
 
 ## Contributors
 <ul>
-	<li> <a href="https://github.com/Madour"><img src="https://avatars1.githubusercontent.com/u/11854124?s=400&u=0906a245444942f36510751b175403754553f9c0&v=4" title="Madour" width="100px" > <b>Modar Nasser</b></a> - <a href="https://github.com/MiguelMJ/Candle/issues/created_by/Madour">Bug report</> · <a href="https://github.com/MiguelMJ/Candle/commits?author=Madour">Code</a>
+	<li> <a href="https://github.com/Madour"><img src="https://avatars1.githubusercontent.com/u/11854124?s=400&u=0906a245444942f36510751b175403754553f9c0&v=4" title="Madour" width="100px" > <b>Modar Nasser</b></a> - <a href="https://github.com/MiguelMJ/Candle/issues/created_by/Madour">Bug report</a> · <a href="https://github.com/MiguelMJ/Candle/commits?author=Madour">Code</a>
 	</li>
-</ul>
+	<li><a href="https://github.com/nightroy99"><img src="https://avatars.githubusercontent.com/u/35336823?s=460&v=4" title="nightroy99" width="100px" >
+        <b>Diego Arroyo</b></a> - Documentation
+
 
 ## Contributing
 
