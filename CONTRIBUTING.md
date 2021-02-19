@@ -20,11 +20,10 @@ This is a list of topics that could make it to a future version of Candle.
 
 - **Optimization to raycasting algorithms**. This algorithms have already several optimizations, but I don't know if it is possible to speed them up more. 
 
-  Relevant fiels: `src/Line.hpp`, `src/RadialLight.cpp`, `src/DirectedLight.cpp`
+  Relevant fields: `src/Line.hpp`, `src/RadialLight.cpp`, `src/DirectedLight.cpp`
 
-  There is only one case where I know it would be possible but I have not been able to make it work: the comprobation that a RadialLight makes in `src/RadialLight.cpp:142` is intended to filter out edges whose mathematical line definition is far away. It is better than no filter, but it would be better to use the distance to the mathematical line `src/RadialLight.cpp:138` only when the orthogonal projection is contained within the edge segment, and otherwise use the minimum between the distance to the ends of the edge (see commented in `src/RadialLight.cpp:141`).
+  There is only one case where I know it would be possible but I have not been able to make it work: the check that a RadialLight makes in `src/RadialLight.cpp:142` is intended to filter out edges whose mathematical line definition is far away. It is better than no filter, but it would be better to use the distance to the mathematical line `src/RadialLight.cpp:138` only when the orthogonal projection is contained within the edge segment, and otherwise use the minimum between the distance to the ends of the edge (see commented in `src/RadialLight.cpp:141`).
 
-  Use of several technologies I'm still not very familiar with.
 
 ## Where is help NOT wanted?
 

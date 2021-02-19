@@ -151,8 +151,6 @@ The result will be a simple light casting a shadow over an invisible wall in the
 
 <p align="center"><img src="doc/img/example.gif" height="300"/></p>
 
-## 
-
 ## License
 
 Candle uses the MIT license, a copy of which you can find [here](LICENSE), in the repo.
