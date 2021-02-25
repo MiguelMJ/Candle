@@ -7,9 +7,9 @@
 #ifndef __CANDLE_LIB_HPP__
 #define __CANDLE_LIB_HPP__
 
-#include "Candle/LightSource"
-#include "Candle/RadialLight"
-#include "Candle/DirectedLight"
-#include "Candle/LightingArea"
+#include "Candle/LightSource.hpp"
+#include "Candle/RadialLight.hpp"
+#include "Candle/DirectedLight.hpp"
+#include "Candle/LightingArea.hpp"
 
 #endif
