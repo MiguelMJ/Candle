@@ -77,9 +77,9 @@ _This library is meant to be used in SFML applications, so it's assumed that you
 ## Contributing
 
 - Read the [contributing guidelines](CONTRIBUTING.md) if you want to contribute to the code.
-- Open a new issue ![](https://img.shields.io/github/issues/MiguelMJ/Candle?logo=github&style=social) to make a request or report a bug.
+- Open a new issue [![(issues)](https://img.shields.io/github/issues/MiguelMJ/Candle?logo=github&style=social)](https://github.com/MiguelMJ/Candle/issues/new) to make a request or report a bug.
 - If you use it in a project, you don't have to give any credit. But if you did so, that would be fantastic!
-- And of course, :star:  **star this repository** and give it some visibility ![](https://img.shields.io/github/stars/MiguelMJ/Candle?style=social).
+- And of course, :star:  **star this repository** and give it some visibility [![(stargazers)](https://img.shields.io/github/stars/MiguelMJ/Candle?style=social)](https://github.com/MiguelMJ/Candle/stargazers).
 
 ## Example program
 
