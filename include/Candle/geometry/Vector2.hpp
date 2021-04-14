@@ -11,6 +11,8 @@
 
 #include <SFML/System/Vector2.hpp>
 
+#include "Candle/Constants.hpp"
+
 namespace sfu{
     /**
      * Get the magnitude of a 2D vector.
@@ -50,7 +52,7 @@ namespace sfu{
      */
     template <typename T, typename Q>
     float angle(const sf::Vector2<T>& v1, const sf::Vector2<Q>& v2){
-        return std::acos(dot(v1,v2)/(magnitude(v1)*magnitude(v2))) * 180/M_PI;
+        return std::acos(dot(v1,v2)/(magnitude(v1)*magnitude(v2))) * 180/sfu::PI;
     }
     
     /**
@@ -58,7 +60,7 @@ namespace sfu{
      */
     template <typename T>
     float angle(const sf::Vector2<T>& v){
-        return fmod(std::atan2(v.y, v.x) * 180.f/M_PI + 360.f, 360.f);
+        return fmod(std::atan2(v.y, v.x) * 180.f/sfu::PI + 360.f, 360.f);
     }
 }
 

@@ -21,7 +21,7 @@ namespace candle{
         lightTexturePlain.create(BASE_RADIUS*2 + 2, BASE_RADIUS*2 + 2);
         
         sf::VertexArray lightShape(sf::TriangleFan, points+2);
-        float step = M_PI*2.f/points;
+        float step = sfu::PI*2.f/points;
         lightShape[0].position = {BASE_RADIUS + 1, BASE_RADIUS + 1};
         for(int i = 1; i < points+2; i++){
             lightShape[i].position = {
@@ -195,8 +195,8 @@ namespace candle{
         m_polygon[0].color = m_color;
         m_polygon[0].position = m_polygon[0].texCoords = tr_i.transformPoint(castPoint);
 #ifdef CANDLE_DEBUG
-        float bl1rad = bl1 * M_PI/180.f;
-        float bl2rad = bl2 * M_PI/180.f;
+        float bl1rad = bl1 * sfu::PI/180.f;
+        float bl2rad = bl2 * sfu::PI/180.f;
         sf::Vector2f al1(std::cos(bl1rad), std::sin(bl1rad));
         sf::Vector2f al2(std::cos(bl2rad), std::sin(bl2rad));
         int d_n = points.size()*2 + 4;

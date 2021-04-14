@@ -11,10 +11,10 @@ namespace sfu{
     Line::Line(const sf::Vector2f& p, float angle):
         m_origin(p)
         {
-            const auto PI2 = M_PI*2;
-            float ang = (float)fmod(angle*M_PI/180.f + M_PI , PI2);
+            const auto PI2 = sfu::PI*2;
+            float ang = (float)fmod(angle*sfu::PI/180.f + sfu::PI , PI2);
             if(ang < 0) ang += PI2;
-            ang -= M_PI;
+            ang -= sfu::PI;
             m_direction = {std::cos(ang), std::sin(ang)};
         }
     

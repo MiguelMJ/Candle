@@ -7,11 +7,10 @@
 #ifndef __SFML_UTIL_GEOMETRY_LINE_HPP__
 #define __SFML_UTIL_GEOMETRY_LINE_HPP__
 
-#include <cmath>
-
 #include <SFML/System/Vector2.hpp>
 
 #include "Candle/geometry/Vector2.hpp"
+#include "Candle/Constants.hpp"
 
 namespace sfu{
     /**

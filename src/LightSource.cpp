@@ -1,8 +1,8 @@
 #include "Candle/LightSource.hpp"
 
 #include <algorithm>
-#include <cmath>
 
+#include "Candle/Constants.hpp"
 #include "Candle/geometry/Line.hpp"
 #include "Candle/geometry/Vector2.hpp"
 #include "Candle/graphics/VertexArray.hpp"

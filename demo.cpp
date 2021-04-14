@@ -2,16 +2,15 @@
 #include <iomanip>
 #include <memory>
 #include <ctime>
-#include <cmath>
 
 #include "Candle/geometry/Polygon.hpp"
 #include "Candle/graphics/VertexArray.hpp"
+#include "Candle/Constants.hpp"
 
 #include "Candle/LightingArea.hpp"
 #include "Candle/LightSource.hpp"
 #include "Candle/RadialLight.hpp"
 #include "Candle/DirectedLight.hpp"
-
 /*
  * AUXILIAR
  */
@@ -226,7 +225,7 @@ struct App{
         (*i5)[6].position = {3, 2};
         (*i5)[7].position = {0, 2};
         sfu::setColor(*i5, {255,255,150,255});
-        float a = M_PI/4;
+        float a = sfu::PI/4;
         float s = MENU_W*2/9;
         sfu::transform(*i5, {s*std::cos(a), s*-std::sin(a), MENU_W/2,
                             s*std::sin(a), s*std::cos(a), 0,
