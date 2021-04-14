@@ -30,6 +30,7 @@ set(CANDLE_SRC
 	src/Polygon.cpp
 	src/Color.cpp
 	src/VertexArray.cpp
+	src/Constants.cpp
 
 )
 
