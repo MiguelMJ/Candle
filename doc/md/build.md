@@ -18,7 +18,7 @@ cmake --build .
 
 This will generate `libCandle-s.a` or (`Candle-s.lib` on Windows) in `build/lib` folder and the `demo` program (or `demo.exe`) in `build/bin`.
 
-If CMake can't manage to find the SFML files, you might need to set `SFML_ROOT` inside the `CMakeLists.txt` manually (uncomment and complete line 15).
+If CMake can't manage to find the SFML files, you might need to use the option `-DSFML_ROOT="path/to/sfml"` or alternatively set `SFML_ROOT` inside the `CMakeLists.txt` manually (uncomment and complete line 15).
 
 # Make
 
