@@ -17,7 +17,16 @@
         "bug",
         "infra",
         "doc"
-       ]
+      ]
+    },
+    {
+      "login": "eXpl0it3r",
+      "name": "Lukas Dürrenberger",
+      "avatar_url": "https://avatars.githubusercontent.com/u/920861?v=4",
+      "profile": "https://my-gate.net/",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "projectName": "Candle",
