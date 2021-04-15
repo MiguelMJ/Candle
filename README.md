@@ -75,7 +75,7 @@ Thanks to the people that have contributed to this project: ([emoji key](https:/
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="http://madour.github.io"><img src="https://avatars.githubusercontent.com/u/11854124?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Modar Nasser</b></sub></a><br /><a href="https://github.com/MiguelMJ/Candle/issues?q=author%3AMadour" title="Bug reports">🐛</a> <a href="#infra-Madour" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+    <td align="center"><a href="http://madour.github.io"><img src="https://avatars.githubusercontent.com/u/11854124?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Modar Nasser</b></sub></a><br /><a href="https://github.com/MiguelMJ/Candle/issues?q=author%3AMadour" title="Bug reports">🐛</a> <a href="#infra-Madour" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/MiguelMJ/Candle/commits?author=Madour" title="Documentation">📖</a></td>
   </tr>
 </table>
 
