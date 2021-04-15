@@ -7,5 +7,20 @@
   "contributorsSortAlphabetically": false,
   "badgeTemplate": "[![All Contributors](https://img.shields.io/badge/all_contributors-<%= contributors.length %>-orange.svg?style=flat-square)](#contributors)",
   "skipCi": true,
-  "contributors": []
+  "contributors": [
+    {
+      "login": "Madour",
+      "name": "Modar Nasser",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11854124?v=4",
+      "profile": "http://madour.github.io",
+      "contributions": [
+        "bug",
+        "infra"
+      ]
+    }
+  ],
+  "projectName": "Candle",
+  "projectOwner": "MiguelMJ",
+  "repoType": "github",
+  "repoHost": "https://github.com"
 }
