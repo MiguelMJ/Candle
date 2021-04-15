@@ -15,7 +15,8 @@
       "profile": "http://madour.github.io",
       "contributions": [
         "bug",
-        "infra"
+        "infra",
+        "doc"
       ]
     }
   ],
