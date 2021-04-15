@@ -19,7 +19,7 @@
         "doc"
       ]
     },
-    {
+     {
       "login": "nightroy99",
       "name": "nightroy99",
       "avatar_url": "https://avatars.githubusercontent.com/u/35336823?v=4",
@@ -28,7 +28,16 @@
         "translation",
         "review"
       ]
-    }
+    },
+    {
+      "login": "eXpl0it3r",
+      "name": "Lukas Dürrenberger",
+      "avatar_url": "https://avatars.githubusercontent.com/u/920861?v=4",
+      "profile": "https://my-gate.net/",
+      "contributions": [
+        "bug"
+      ]
+     }
   ],
   "projectName": "Candle",
   "projectOwner": "MiguelMJ",
