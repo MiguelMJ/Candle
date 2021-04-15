@@ -67,12 +67,13 @@ _This library is meant to be used in SFML applications, so it's assumed that you
 - If you want to build the docs, Doxygen 1.9.1 is required.
 
 ## Contributors
-<ul>
-	<li> <a href="https://github.com/Madour"><img src="https://avatars1.githubusercontent.com/u/11854124?s=400&u=0906a245444942f36510751b175403754553f9c0&v=4" title="Madour" width="100px" > <b>Modar Nasser</b></a> - <a href="https://github.com/MiguelMJ/Candle/issues/created_by/Madour">Bug report</a> · <a href="https://github.com/MiguelMJ/Candle/commits?author=Madour">Code</a>
-	</li>
-	<li><a href="https://github.com/nightroy99"><img src="https://avatars.githubusercontent.com/u/35336823?s=460&v=4" title="nightroy99" width="100px" >
-        <b>Diego Arroyo</b></a> - Documentation
 
+Thanks to the people that have contributed to this project: ([emoji key](https://allcontributors.org/docs/en/emoji-key))
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://allcontributors.org/) specification.
 
 ## Contributing
 
