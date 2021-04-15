@@ -19,6 +19,16 @@
         "doc"
       ]
     },
+     {
+      "login": "nightroy99",
+      "name": "nightroy99",
+      "avatar_url": "https://avatars.githubusercontent.com/u/35336823?v=4",
+      "profile": "https://github.com/nightroy99",
+      "contributions": [
+        "translation",
+        "review"
+      ]
+    },
     {
       "login": "eXpl0it3r",
       "name": "Lukas Dürrenberger",
@@ -27,7 +37,7 @@
       "contributions": [
         "bug"
       ]
-    }
+     }
   ],
   "projectName": "Candle",
   "projectOwner": "MiguelMJ",
