@@ -71,6 +71,17 @@ _This library is meant to be used in SFML applications, so it's assumed that you
 Thanks to the people that have contributed to this project: ([emoji key](https://allcontributors.org/docs/en/emoji-key))
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="http://madour.github.io"><img src="https://avatars.githubusercontent.com/u/11854124?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Modar Nasser</b></sub></a><br /><a href="https://github.com/MiguelMJ/Candle/issues?q=author%3AMadour" title="Bug reports">🐛</a> <a href="#infra-Madour" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://allcontributors.org/) specification.
