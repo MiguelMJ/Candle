@@ -92,6 +92,7 @@ This project follows the [all-contributors](https://allcontributors.org/) specif
 
 - Read the [contributing guidelines](CONTRIBUTING.md) if you want to contribute to the code.
 - Open a new issue [![(issues)](https://img.shields.io/github/issues/MiguelMJ/Candle?logo=github&style=social)](https://github.com/MiguelMJ/Candle/issues/new) to make a request or report a bug.
+- Alternatively, comment it on the [SFML forum](https://en.sfml-dev.org/forums/index.php?topic=27631)
 - If you use it in a project, you don't have to give any credit. But if you did so, that would be fantastic!
 - And of course, :star:  **star this repository** and give it some visibility [![(stargazers)](https://img.shields.io/github/stars/MiguelMJ/Candle?style=social)](https://github.com/MiguelMJ/Candle/stargazers).
 
