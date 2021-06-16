@@ -19,7 +19,7 @@
         "doc"
       ]
     },
-     {
+    {
       "login": "nightroy99",
       "name": "nightroy99",
       "avatar_url": "https://avatars.githubusercontent.com/u/35336823?v=4",
@@ -37,7 +37,18 @@
       "contributions": [
         "bug"
       ]
-     }
+    },
+    {
+      "login": "gamepopper",
+      "name": "Tim Stoddard",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6163825?v=4",
+      "profile": "http://gamepopper.co.uk/",
+      "contributions": [
+        "code",
+        "bug",
+        "test"
+      ]
+    }
   ],
   "projectName": "Candle",
   "projectOwner": "MiguelMJ",
