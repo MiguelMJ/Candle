@@ -31,6 +31,7 @@ namespace candle{
      */
     class RadialLight: public LightSource{
     private:
+        static int s_instanceCount;
         float m_beamAngle;
         
         void draw(sf::RenderTarget& t, sf::RenderStates st) const override;
@@ -41,6 +42,11 @@ namespace candle{
          * @brief Constructor
          */
         RadialLight();
+        
+        /**
+         * @brief Destructor
+         */
+        virtual ~RadialLight();
         
         void castLight(const EdgeVector::iterator& begin, const EdgeVector::iterator& end) override;
         

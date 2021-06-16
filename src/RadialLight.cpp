@@ -1,4 +1,8 @@
+#ifdef CANDLE_DEBUG
 #include <iostream>
+#endif
+
+#include <memory>
 #include "Candle/RadialLight.hpp"
 
 #include "SFML/Graphics.hpp"
@@ -8,17 +12,22 @@
 #include "Candle/geometry/Line.hpp"
 
 namespace candle{
+    int RadialLight::s_instanceCount = 0;
     const float BASE_RADIUS = 400.0f;
     bool l_texturesReady(false);
-    sf::Texture l_lightTextureFade;
-    sf::Texture l_lightTexturePlain;
+    std::unique_ptr<sf::RenderTexture> l_lightTextureFade;
+    std::unique_ptr<sf::RenderTexture> l_lightTexturePlain;
       
     void initializeTextures(){
+        #ifdef CANDLE_DEBUG
+        std::cout << "RadialLight: InitializeTextures" << std::endl;
+        #endif
         int points = 100;
         
-        sf::RenderTexture lightTextureFade, lightTexturePlain;
-        lightTextureFade.create(BASE_RADIUS*2 + 2, BASE_RADIUS*2 + 2);
-        lightTexturePlain.create(BASE_RADIUS*2 + 2, BASE_RADIUS*2 + 2);
+        l_lightTextureFade.reset(new sf::RenderTexture);
+        l_lightTexturePlain.reset(new sf::RenderTexture);
+        l_lightTextureFade->create(BASE_RADIUS*2 + 2, BASE_RADIUS*2 + 2);
+        l_lightTexturePlain->create(BASE_RADIUS*2 + 2, BASE_RADIUS*2 + 2);
         
         sf::VertexArray lightShape(sf::TriangleFan, points+2);
         float step = sfu::PI*2.f/points;
@@ -30,19 +39,16 @@ namespace candle{
             };
             lightShape[i].color.a = 0;
         }
-        lightTextureFade.clear(sf::Color::Transparent);
-        lightTextureFade.draw(lightShape);
-        lightTextureFade.display();
-        lightTextureFade.setSmooth(true);
+        l_lightTextureFade->clear(sf::Color::Transparent);
+        l_lightTextureFade->draw(lightShape);
+        l_lightTextureFade->display();
+        l_lightTextureFade->setSmooth(true);
         
         sfu::setColor(lightShape, sf::Color::White);
-        lightTexturePlain.clear(sf::Color::Transparent);
-        lightTexturePlain.draw(lightShape);
-        lightTexturePlain.display();
-        lightTexturePlain.setSmooth(true);
-        
-        l_lightTextureFade = lightTextureFade.getTexture();
-        l_lightTexturePlain = lightTexturePlain.getTexture();
+        l_lightTexturePlain->clear(sf::Color::Transparent);
+        l_lightTexturePlain->draw(lightShape);
+        l_lightTexturePlain->display();
+        l_lightTexturePlain->setSmooth(true);
     }
     
     float module360(float x){
@@ -77,13 +83,31 @@ namespace candle{
         setRange(1.0f);
         setBeamAngle(360.f);
         // castLight();
+        s_instanceCount++;
+    }
+    
+    RadialLight::~RadialLight(){
+        s_instanceCount--;
+        #ifdef RADIAL_LIGHT_FIX
+        if (s_instanceCount == 0 &&
+            l_lightTextureFade &&
+            l_lightTexturePlain)
+        {
+            l_lightTextureFade.reset(nullptr);
+            l_lightTexturePlain.reset(nullptr);
+            l_texturesReady = false;
+            #ifdef CANDLE_DEBUG
+            std::cout << "RadialLight: Textures destroyed" << std::endl;
+            #endif
+        }
+        #endif
     }
     
     void RadialLight::draw(sf::RenderTarget& t, sf::RenderStates s) const{
         sf::Transform trm = Transformable::getTransform();
         trm.scale(m_range/BASE_RADIUS, m_range/BASE_RADIUS, BASE_RADIUS, BASE_RADIUS);
         s.transform *= trm;
-        s.texture = m_fade ? &l_lightTextureFade : &l_lightTexturePlain;
+        s.texture = m_fade ? &l_lightTextureFade->getTexture() : &l_lightTexturePlain->getTexture();
         if(s.blendMode == sf::BlendAlpha){
             s.blendMode = sf::BlendAdd;
         }
@@ -222,4 +246,5 @@ namespace candle{
             m_polygon[points.size()+1] = m_polygon[1];
         }
     }
+
 }
