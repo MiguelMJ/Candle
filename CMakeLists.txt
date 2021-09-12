@@ -36,7 +36,7 @@ set(CANDLE_SRC
 
 # Static library target
 add_library(Candle-s STATIC ${CANDLE_SRC})
-target_include_directories(Candle-s PRIVATE include)
+target_include_directories(Candle-s PUBLIC include)
 target_link_libraries(Candle-s sfml-graphics)
 
 option(RADIAL_LIGHT_FIX "Use RadialLight fix for errors with textures" OFF)
