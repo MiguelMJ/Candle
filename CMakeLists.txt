@@ -13,11 +13,13 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY lib)
 
 # might need to set manually SFML_ROOT to the install location of SFML for Windows users
 # set(SFML_ROOT "")
+if(SFML_ROOT STREQUAL "")
+	find_package(SFML 2.5 REQUIRED COMPONENTS  graphics)
+endif()
 
 # if the user wants to use static SFML libs
 # set(SFML_STATIC_LIBRARIES TRUE)
 
-find_package(SFML 2.5 REQUIRED COMPONENTS  graphics)
 
 
 set(CANDLE_SRC
