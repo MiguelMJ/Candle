@@ -7,7 +7,7 @@ namespace sfu{
     Line::Line(const sf::Vector2f& p1, const sf::Vector2f& p2):
         m_origin(p1),
         m_direction(p2 - p1){}
-        
+
     Line::Line(const sf::Vector2f& p, float angle):
         m_origin(p)
         {
@@ -17,13 +17,26 @@ namespace sfu{
             ang -= sfu::PI;
             m_direction = {std::cos(ang), std::sin(ang)};
         }
-    
-    
+
+    sf::FloatRect Line::getGlobalBounds() const{
+        const sf::Vector2f& point1 = m_origin;
+        sf::Vector2f point2 = m_direction + m_origin;
+
+        //Make sure that the rectangle begin from the upper left corner
+        sf::FloatRect rect;
+        rect.left = (point1.x < point2.x) ? point1.x : point2.x;
+        rect.top = (point1.y < point2.y) ? point1.y : point2.y;
+        rect.width = std::abs(m_direction.x) + 1.0f; //The +1 is here to avoid having a width of zero
+        rect.height = std::abs(m_direction.y) + 1.0f; //(SFML doesn't like 0 in rect)
+
+        return rect;
+    }
+
     int Line::relativePosition(const sf::Vector2f& point) const{
         float f = (point.x-m_origin.x) / m_direction.x - (point.y-m_origin.y) / m_direction.y;
         return (0.f < f) - (f < 0.f);
     }
-    
+
     float Line::distance(const sf::Vector2f& point) const{
         float d;
         if(m_direction.x == 0){
@@ -38,7 +51,7 @@ namespace sfu{
         }
         return d;
     }
-    
+
     Line::LineRelativePosition Line::intersection(const Line& l) const{
         float t1, t2;
         return intersection(l,t1,t2);
@@ -52,7 +65,7 @@ namespace sfu{
         auto& v = m_direction;
         auto& b = l.m_origin;
         auto& w = l.m_direction;
-        
+
         float th = angle(v, w);
         if(th < 0.001f || th > 359.99f){
             if(relativePosition(a) == 0){
@@ -61,7 +74,7 @@ namespace sfu{
                 return PARALLEL;
             }
         }
-        
+
         if(std::abs(w.y) < 0.001f){
             t1 = (b.y-a.y) / v.y;
             t2 = (a.x + t1*v.x - b.x) / w.x;
@@ -69,7 +82,7 @@ namespace sfu{
             t1 = (w.y * (b.x-a.x) + w.x * (a.y-b.y)) / (v.x*w.y - v.y*w.x);
             t2 = (t1*v.y + a.y - b.y) / w.y;
         }
-        
+
         return SECANT;
     }
     sf::Vector2f Line::point(float param) const{
