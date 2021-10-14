@@ -58,6 +58,16 @@
         "infra",
         "bug"
       ]
+    },
+    {
+      "login": "JonathSpirit",
+      "name": "GuillaumeG.",
+      "avatar_url": "https://avatars.githubusercontent.com/u/48102745?v=4",
+      "profile": "https://github.com/JonathSpirit",
+      "contributions": [
+        "bug",
+        "test"
+      ]
     }
   ],
   "projectName": "Candle",
