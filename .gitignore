@@ -1,2 +1,7 @@
 # Ignoring build dir
 build/
+release/
+debug/
+
+# Ignore generated docs
+doc/
