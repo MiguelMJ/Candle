@@ -68,12 +68,12 @@ namespace sfu{
 
         //When the lines are parallel, we consider that there is not intersection.
         float lineAngle = angle(lineAdirection, lineBdirection);
-        if(lineAngle < 0.001f || lineAngle > 359.999f){
+        if( (lineAngle < 0.001f || lineAngle > 359.999f) || ((lineAngle < 180.001f) && (lineAngle > 179.999f)) ){
             return false;
         }
 
         //Math resolving, you can find more information here : https://ncase.me/sight-and-light/
-        if (lineAngle > 180.0f)
+        if ( (std::abs(lineBdirection.y) >= 0.0f) && (std::abs(lineBdirection.x) < 0.001f) || (std::abs(lineAdirection.y) < 0.001f) && (std::abs(lineAdirection.x) >= 0.0f) )
         {
             normB = (lineAdirection.x*(lineAorigin.y-lineBorigin.y) + lineAdirection.y*(lineBorigin.x-lineAorigin.x))/(lineBdirection.y*lineAdirection.x - lineBdirection.x*lineAdirection.y);
             normA = (lineBorigin.x+lineBdirection.x*normB-lineAorigin.x)/lineAdirection.x;
