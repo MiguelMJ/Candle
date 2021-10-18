@@ -131,7 +131,7 @@ namespace candle{
     }
 
     sf::FloatRect RadialLight::getLocalBounds() const{
-        return sf::FloatRect(0.0f, 0.0f, m_range*4, m_range*4);
+        return sf::FloatRect(0.0f, 0.0f, BASE_RADIUS*2, BASE_RADIUS*2);
     }
 
     sf::FloatRect RadialLight::getGlobalBounds() const{
