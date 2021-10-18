@@ -3,5 +3,6 @@ build/
 release/
 debug/
 
-# Ignore generated docs
-doc/
+# Ignore generated docs and working files
+doc/html/
+doc/*.odg
