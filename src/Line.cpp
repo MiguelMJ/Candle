@@ -52,39 +52,47 @@ namespace sfu{
         return d;
     }
 
-    Line::LineRelativePosition Line::intersection(const Line& l) const{
-        float t1, t2;
-        return intersection(l,t1,t2);
+    bool Line::intersection(const Line& lineB) const{
+        float normA,normB;
+        return intersection(lineB, normA,normB);
     }
-    Line::LineRelativePosition Line::intersection(const Line& l, float& t1) const{
-        float t2;
-        return intersection(l,t1,t2);
+    bool Line::intersection(const Line& lineB, float& normA) const{
+        float normB;
+        return intersection(lineB, normA,normB);
     }
-    Line::LineRelativePosition Line::intersection(const Line& l, float& t1, float& t2) const{
-        auto& a = m_origin;
-        auto& v = m_direction;
-        auto& b = l.m_origin;
-        auto& w = l.m_direction;
+    bool Line::intersection(const Line& lineB, float& normA, float& normB) const{
+        const sf::Vector2f& lineAorigin = m_origin;
+        const sf::Vector2f& lineAdirection = m_direction;
+        const sf::Vector2f& lineBorigin = lineB.m_origin;
+        const sf::Vector2f& lineBdirection = lineB.m_direction;
 
-        float th = angle(v, w);
-        if(th < 0.001f || th > 359.99f){
-            if(relativePosition(a) == 0){
-                return COINCIDENTIAL;
-            }else{
-                return PARALLEL;
-            }
+        //When the lines are parallel, we consider that there is not intersection.
+        float lineAngle = angle(lineAdirection, lineBdirection);
+        if(lineAngle < 0.001f || lineAngle > 359.999f){
+            return false;
         }
 
-        if(std::abs(w.y) < 0.001f){
-            t1 = (b.y-a.y) / v.y;
-            t2 = (a.x + t1*v.x - b.x) / w.x;
-        }else{
-            t1 = (w.y * (b.x-a.x) + w.x * (a.y-b.y)) / (v.x*w.y - v.y*w.x);
-            t2 = (t1*v.y + a.y - b.y) / w.y;
+        //Math resolving, you can find more information here : https://ncase.me/sight-and-light/
+        if (lineAngle > 180.0f)
+        {
+            normB = (lineAdirection.x*(lineAorigin.y-lineBorigin.y) + lineAdirection.y*(lineBorigin.x-lineAorigin.x))/(lineBdirection.y*lineAdirection.x - lineBdirection.x*lineAdirection.y);
+            normA = (lineBorigin.x+lineBdirection.x*normB-lineAorigin.x)/lineAdirection.x;
+        }
+        else
+        {
+            normA = (lineBdirection.x*(lineBorigin.y-lineAorigin.y) + lineBdirection.y*(lineAorigin.x-lineBorigin.x))/(lineAdirection.y*lineBdirection.x - lineAdirection.x*lineBdirection.y);
+            normB = (lineAorigin.x+lineAdirection.x*normA-lineBorigin.x)/lineBdirection.x;
         }
 
-        return SECANT;
+        //Make sure that there is actually an intersection
+        if ( (normB>0) && (normA>0) && (normA<sfu::magnitude(m_direction)) )
+        {
+            return true;
+        }
+
+        return false;
     }
+
     sf::Vector2f Line::point(float param) const{
         return m_origin + param*m_direction;
     }

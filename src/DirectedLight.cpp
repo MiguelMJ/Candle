@@ -19,7 +19,7 @@ namespace candle{
         t.draw(m_debug, deb_s);
 #endif
     }
-    
+
     void DirectedLight::resetColor(){
         int quads = m_polygon.getVertexCount() / 4;
         for(int i = 0; i < quads; i++){
@@ -31,7 +31,7 @@ namespace candle{
             sf::Vector2f r2 = m_polygon[p2].position;
             sf::Vector2f r3 = m_polygon[p4].position;
             sf::Vector2f r4 = m_polygon[p3].position;
-            
+
             float dr1 = 1.f - m_fade * (sfu::magnitude(r2-r1) / m_range);
             float dr2 = 1.f - m_fade * (sfu::magnitude(r4-r3) / m_range);
             m_polygon[p1].color = m_polygon[p2].color =
@@ -40,22 +40,22 @@ namespace candle{
             m_polygon[p3].color.a = m_color.a * dr2;
         }
     }
-    
+
     DirectedLight::DirectedLight(){
         m_polygon.setPrimitiveType(sf::Quads);
         m_polygon.resize(2);
         setBeamWidth(10.f);
         // castLight();
     }
-    
+
     void DirectedLight::setBeamWidth(float width){
         m_beamWidth = width;
     }
-    
+
     float DirectedLight::getBeamWidth() const{
         return m_beamWidth;
     }
-    
+
     struct LineParam: public sfu::Line{
         float param;
         LineParam(float f, const sfu::Line& l)
@@ -71,32 +71,32 @@ namespace candle{
     void DirectedLight::castLight(const EdgeVector::iterator& begin, const EdgeVector::iterator& end){
         sf::Transform trm = Transformable::getTransform();
         sf::Transform trm_i = trm.getInverse();
-        
+
         float widthHalf = m_beamWidth/2.f;
         sf::FloatRect baseBeam(0, -widthHalf, m_range, m_beamWidth);
-        
+
         sf::Vector2f lim1o = trm.transformPoint(0, -widthHalf);
         sf::Vector2f lim1d = trm.transformPoint(m_range, -widthHalf);
         sf::Vector2f lim2o = trm.transformPoint(0, widthHalf);
         sf::Vector2f lim2d = trm.transformPoint(m_range, widthHalf);
-        
+
         float off = 0.01/sfu::magnitude(lim2o - lim1o);
         sf::Vector2f lightDir = lim1d - lim1o;
-        
+
         sfu::Line lim1(lim1o, lim1d);
         sfu::Line lim2(lim2o, lim2d);
         sfu::Line raySrc(lim1o, lim2o);
         sfu::Line rayRng(lim1d, lim2d);
-        
+
         std::priority_queue <LineParam> rays;
-        
+
         rays.emplace(0.f, lim1);
         rays.emplace(1.f, lim2);
         for(auto it = begin; it != end; it++){
             auto& seg = *it;
             float tRng, tSeg;
             if(
-                rayRng.intersection(seg, tRng, tSeg) == sfu::Line::SECANT
+                rayRng.intersection(seg, tRng, tSeg)
                 && tRng <= 1
                 && tRng >= 0
                 && tSeg <= 1
@@ -136,7 +136,7 @@ namespace candle{
 #endif
         while(!rays.empty()){
             LineParam r = rays.top();
-        
+
             sf::Vector2f p1 = trm_i.transformPoint(r.m_origin);
             sf::Vector2f p2 = trm_i.transformPoint(sfu::castRay(begin, end, r, m_range));
             points.push_back(p1);
@@ -159,14 +159,14 @@ namespace candle{
                 m_polygon[p2].position = points[r2];
                 m_polygon[p3].position = points[r4];
                 m_polygon[p4].position = points[r3];
-                
+
                 float dr1 = 1.f - m_fade * (sfu::magnitude(points[r2]-points[r1]) / m_range);
                 float dr2 = 1.f - m_fade * (sfu::magnitude(points[r4]-points[r3]) / m_range);
                 m_polygon[p1].color = m_polygon[p4].color = m_color;
                 m_polygon[p2].color = m_polygon[p3].color = m_color;
                 m_polygon[p2].color.a = m_color.a * dr1;
                 m_polygon[p3].color.a = m_color.a * dr2;
-            }  
+            }
         }
     }
 }

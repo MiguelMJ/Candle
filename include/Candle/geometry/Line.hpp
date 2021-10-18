@@ -20,14 +20,6 @@ namespace sfu{
      * @brief 2D %Line defined by an origin point and a direction vector.
      */
     struct Line{
-        /**
-         * Possible positions between two lines.
-         */
-        enum LineRelativePosition{
-            PARALLEL, ///< They have no points in common.
-            SECANT,  ///< They share one point.
-            COINCIDENTIAL  ///< All of their points are in common
-        };
         sf::Vector2f m_origin; ///< Origin point of the line.
         sf::Vector2f m_direction; ///< Direction vector (not necessarily  normalized)
 
@@ -74,37 +66,38 @@ namespace sfu{
         float distance(const sf::Vector2f& point) const;
 
         /**
-         * @brief Returns the relative position of one line to another.
-         * @param line
-         * @returns The relative position of the two lines.
-         */
-        LineRelativePosition intersection(const Line& line) const;
-
-        /**
-         * @brief Returns the relative position of one line to another.
-         * @details If the relative position is SECANT, the output argument
-         * @p t contains the parameter required to get the intersection
-         * point with **this** line.
-         * @param line
-         * @param t (Output argument)
-         * @returns The relative position of the two lines.
+         * @brief Returns a boolean if there is intersection of **this** line to another.
+         * @param lineB
+         * @returns True, if there is an intersection.
          * @see point
          */
-        LineRelativePosition intersection(const Line& line, float& t) const;
+        bool intersection(const Line& lineB) const;
 
         /**
-         * @brief Returns the relative position of one line to another.
-         * @details If the relative position is SECANT, the output argument
-         * @p t1 contains the parameter required to get the intersection
-         * point with **this** line and @p t2, the parameter required to
-         * get it with @p line.
-         * @param line
-         * @param t1 (Output argument)
-         * @param t2 (Output argument)
-         * @returns The relative position of the two lines.
+         * @brief Returns the magnitude corresponding of the intersection of **this** line to another.
+         * @details If there is an intersection, the output argument
+         * @p normA contains the magnitude required to get the intersection
+         * point from **this** line direction.
+         * @param lineB
+         * @param normA (Output argument)
+         * @returns True, if there is an intersection.
          * @see point
          */
-        LineRelativePosition intersection(const Line& line, float& t1, float& t2) const;
+        bool intersection(const Line& lineB, float& normA) const;
+
+        /**
+         * @brief Returns the magnitudes corresponding of the intersection of **this** line to another.
+         * @details If there is an intersection, the output argument
+         * @p normB contains the magnitude required to get the intersection
+         * point from lineB direction and @p normA, the magnitude required to
+         * get the intersection point from **this** line direction.
+         * @param lineB
+         * @param normA (Output argument)
+         * @param normB (Output argument)
+         * @returns True, if there is an intersection.
+         * @see point
+         */
+        bool intersection(const Line& lineB, float& normA, float& normB) const;
 
         /**
          * @brief Get a point of the line.
@@ -143,7 +136,7 @@ namespace sfu{
         for(auto it = begin; it != end; it++){
             float t_seg, t_ray;
             if(
-                it -> intersection(ray, t_seg, t_ray) == sfu::Line::SECANT
+                it -> intersection(ray, t_seg, t_ray)
                 && t_ray <= minRange
                 && t_ray >= 0.f
                 && t_seg <= 1.f
