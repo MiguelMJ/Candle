@@ -73,7 +73,7 @@ namespace sfu{
         }
 
         //Math resolving, you can find more information here : https://ncase.me/sight-and-light/
-        if ( (std::abs(lineAdirection.y) < 0.001f) || (std::abs(lineAdirection.x) > 0.0f) )
+        if ( (std::abs(lineBdirection.y) >= 0.0f) && (std::abs(lineBdirection.x) < 0.001f) || (std::abs(lineAdirection.y) < 0.001f) && (std::abs(lineAdirection.x) >= 0.0f) )
         {
             normB = (lineAdirection.x*(lineAorigin.y-lineBorigin.y) + lineAdirection.y*(lineBorigin.x-lineAorigin.x))/(lineBdirection.y*lineAdirection.x - lineBdirection.x*lineAdirection.y);
             normA = (lineBorigin.x+lineBdirection.x*normB-lineAorigin.x)/lineAdirection.x;
