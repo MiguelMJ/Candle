@@ -48,6 +48,28 @@
         "bug",
         "test"
       ]
+    },
+    {
+      "login": "Dead-Deus",
+      "name": "Dead-Deus",
+      "avatar_url": "https://avatars.githubusercontent.com/u/89898198?v=4",
+      "profile": "https://github.com/Dead-Deus",
+      "contributions": [
+        "infra",
+        "bug"
+      ]
+    },
+    {
+      "login": "JonathSpirit",
+      "name": "GuillaumeG.",
+      "avatar_url": "https://avatars.githubusercontent.com/u/48102745?v=4",
+      "profile": "https://github.com/JonathSpirit",
+      "contributions": [
+        "bug",
+        "test",
+        "code",
+        "ideas"
+      ]
     }
   ],
   "projectName": "Candle",

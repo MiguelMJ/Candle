@@ -13,15 +13,27 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY lib)
 
 # might need to set manually SFML_ROOT to the install location of SFML for Windows users
 # set(SFML_ROOT "")
+if(SFML_ROOT STREQUAL "")
+	find_package(SFML 2.5 REQUIRED COMPONENTS  graphics)
+endif()
 
 # if the user wants to use static SFML libs
 # set(SFML_STATIC_LIBRARIES TRUE)
 
-find_package(SFML 2.5 REQUIRED COMPONENTS  graphics)
-
+set(CANDLE_HEADERS
+	include/Candle/LightingArea.hpp
+	include/Candle/LightSource.hpp
+	include/Candle/RadialLight.hpp
+	include/Candle/DirectedLight.hpp
+	include/Candle/geometry/Line.hpp
+	include/Candle/geometry/Polygon.hpp
+    include/Candle/geometry/Vector2.hpp
+	include/Candle/graphics/Color.hpp
+	include/Candle/graphics/VertexArray.hpp
+	include/Candle/Constants.hpp
+)
 
 set(CANDLE_SRC
-
 	src/LightingArea.cpp
 	src/LightSource.cpp
 	src/RadialLight.cpp
@@ -31,11 +43,10 @@ set(CANDLE_SRC
 	src/Color.cpp
 	src/VertexArray.cpp
 	src/Constants.cpp
-
 )
 
 # Static library target
-add_library(Candle-s STATIC ${CANDLE_SRC})
+add_library(Candle-s STATIC ${CANDLE_SRC} ${CANDLE_HEADERS})
 target_include_directories(Candle-s PUBLIC include)
 target_link_libraries(Candle-s sfml-graphics)
 
