@@ -33,6 +33,10 @@ namespace candle{
     private:
         static int s_instanceCount;
         float m_beamAngle;
+        unsigned int m_localRadius;
+
+        sf::Texture* m_lightTextureFade;
+        sf::Texture* m_lightTexturePlain;
 
         void draw(sf::RenderTarget& t, sf::RenderStates st) const override;
         void resetColor() override;
@@ -65,6 +69,48 @@ namespace candle{
          * @see setBeamAngle
          */
         float getBeamAngle() const;
+
+        /**
+         * @brief Set the light fade texture.
+         * @details The default texture is generated internally.
+         * @see getLightFadeTexture
+         */
+        void setLightFadeTexture(sf::Texture& texture);
+
+        /**
+         * @brief Get the light fade texture.
+         * @returns The actual light fade texture.
+         * @see setLightFadeTexture
+         */
+        sf::Texture* getLightFadeTexture();
+
+        /**
+         * @brief Set the light plain texture.
+         * @details The default texture is generated internally.
+         * @see getLightPlainTexture
+         */
+        void setLightPlainTexture(sf::Texture& texture);
+
+        /**
+         * @brief Get the light plain texture.
+         * @returns The actual light plain texture.
+         * @see setLightPlainTexture
+         */
+        sf::Texture* getLightPlainTexture();
+
+        /**
+         * @brief Get the default internally generated light fade texture.
+         * @returns The default light fade texture.
+         * @see getLightFadeTexture
+         */
+        std::shared_ptr<sf::Texture> getDefaultLightFadeTexture() const;
+
+        /**
+         * @brief Get the default internally generated light plain texture.
+         * @returns The default light plain texture.
+         * @see getLightFadeTexture
+         */
+        std::shared_ptr<sf::Texture> getDefaultLightPlainTexture() const;
 
         /**
          * @brief Get the local bounding rectangle of the light.
