@@ -54,6 +54,8 @@ namespace candle{
 
         void castLight(const EdgeVector::iterator& begin, const EdgeVector::iterator& end) override;
 
+        void setTexture(sf::Texture* texture) override;
+
         /**
          * @brief Set the range for which rays may be casted.
          * @details The angle shall be specified in degrees. The angle in which the rays will be casted will be
@@ -71,13 +73,6 @@ namespace candle{
         float getBeamAngle() const;
 
         /**
-         * @brief Set the light fade texture.
-         * @details The default texture is generated internally.
-         * @see getLightFadeTexture
-         */
-        void setLightFadeTexture(sf::Texture& texture);
-
-        /**
          * @brief Get the light fade texture.
          * @returns The actual light fade texture.
          * @see setLightFadeTexture
@@ -85,32 +80,11 @@ namespace candle{
         sf::Texture* getLightFadeTexture();
 
         /**
-         * @brief Set the light plain texture.
-         * @details The default texture is generated internally.
-         * @see getLightPlainTexture
-         */
-        void setLightPlainTexture(sf::Texture& texture);
-
-        /**
          * @brief Get the light plain texture.
          * @returns The actual light plain texture.
          * @see setLightPlainTexture
          */
         sf::Texture* getLightPlainTexture();
-
-        /**
-         * @brief Get the default internally generated light fade texture.
-         * @returns The default light fade texture.
-         * @see getLightFadeTexture
-         */
-        std::shared_ptr<sf::Texture> getDefaultLightFadeTexture() const;
-
-        /**
-         * @brief Get the default internally generated light plain texture.
-         * @returns The default light plain texture.
-         * @see getLightFadeTexture
-         */
-        std::shared_ptr<sf::Texture> getDefaultLightPlainTexture() const;
 
         /**
          * @brief Get the local bounding rectangle of the light.

@@ -2,6 +2,7 @@
 #include <iostream>
 #endif
 
+#include <map>
 #include <memory>
 #include "Candle/RadialLight.hpp"
 
@@ -15,8 +16,9 @@ namespace candle{
     int RadialLight::s_instanceCount = 0;
     const unsigned int BASE_RADIUS = 400;
     bool l_texturesReady(false);
-    std::shared_ptr<sf::Texture> l_lightTextureFade;
-    std::shared_ptr<sf::Texture> l_lightTexturePlain;
+    std::map<sf::Texture*, std::pair<std::unique_ptr<sf::Texture>, std::unique_ptr<sf::Texture> >> l_lightTexturesCache;
+    std::unique_ptr<sf::Texture> l_lightTextureFade;
+    std::unique_ptr<sf::Texture> l_lightTexturePlain;
 
     void initializeTextures(){
         #ifdef CANDLE_DEBUG
@@ -32,20 +34,16 @@ namespace candle{
 
         sf::Vector2f center = {BASE_RADIUS, BASE_RADIUS};
 
-        for (unsigned int y=1; y<BASE_RADIUS*2; ++y)
-        {
-            for (unsigned int x=1; x<BASE_RADIUS*2; ++x)
-            {
+        for (unsigned int y=1; y<BASE_RADIUS*2; ++y){
+            for (unsigned int x=1; x<BASE_RADIUS*2; ++x){
                 //Get distance of the pixel from the center, normalize it with the radius and inverse it
                 float distanceFromCenter = 1.0f - sfu::magnitude(sf::Vector2f(x,y) - center) / BASE_RADIUS;
 
-                if ( distanceFromCenter < 0.0f )
-                {//Too far from center, pixel will be fully transparent
+                if ( distanceFromCenter < 0.0f ){
+                    //Too far from center, pixel will be fully transparent
                     lightImageFade.setPixel(x,y, sf::Color(255,255,255,0));
                     lightImagePlain.setPixel(x,y, sf::Color(255,255,255,0));
-                }
-                else
-                {
+                }else{
                     lightImageFade.setPixel(x,y, sf::Color(255,255,255, static_cast<unsigned int>(255.0f*distanceFromCenter)));
                     lightImagePlain.setPixel(x,y, sf::Color(255,255,255,255));
                 }
@@ -76,8 +74,7 @@ namespace candle{
             l_texturesReady = true;
         }
 
-        setLightFadeTexture( *l_lightTextureFade.get() );
-        setLightPlainTexture( *l_lightTexturePlain.get() );
+        setTexture(nullptr);
 
         setRange(1.0f);
         setBeamAngle(360.f);
@@ -131,9 +128,57 @@ namespace candle{
         return m_beamAngle;
     }
 
-    void RadialLight::setLightFadeTexture(sf::Texture& texture){
-        m_lightTextureFade = &texture;
-        m_localRadius = (texture.getSize().x > texture.getSize().y) ? texture.getSize().x/2+1 : texture.getSize().y/2+1;
+    void RadialLight::setTexture(sf::Texture* texture){
+        if (texture != nullptr){
+            //Custom texture
+            m_lightTexturePlain = texture;
+            auto cachedTextureIter = l_lightTexturesCache.find(texture);
+
+            if (cachedTextureIter != l_lightTexturesCache.end()){
+                m_lightTexturePlain = cachedTextureIter->second.first.get();
+                m_lightTextureFade = cachedTextureIter->second.second.get();
+            }else{
+                sf::Image userTexture = texture->copyToImage();
+
+                //Put 1px transparent border to avoid bad clamp
+                sf::Image plainImage;
+                sf::Image fadeImage;
+                fadeImage.create(userTexture.getSize().x+2, userTexture.getSize().y+2, sf::Color(255,255,255,0));
+                plainImage.create(userTexture.getSize().x+2, userTexture.getSize().y+2, sf::Color(255,255,255,0));
+
+                sf::Vector2f center = static_cast<sf::Vector2f>(userTexture.getSize())/2.0f;
+
+                for (unsigned int y=0; y<userTexture.getSize().y; ++y)
+                {
+                    for (unsigned int x=0; x<userTexture.getSize().x; ++x)
+                    {
+                        sf::Color pixel = userTexture.getPixel(x,y);
+                        plainImage.setPixel(x+1,y+1, pixel);
+
+                        //Get distance of the pixel from the center, normalize it with the radius and inverse it
+                        float distanceFromCenter = 1.0f - sfu::magnitude(sf::Vector2f(x,y) - center) / BASE_RADIUS;
+                        pixel.a *= distanceFromCenter;
+                        fadeImage.setPixel(x+1,y+1, pixel);
+                    }
+                }
+
+                sf::Texture* plainTexture = new sf::Texture();
+                sf::Texture* fadeTexture = new sf::Texture();
+                plainTexture->loadFromImage(plainImage);
+                fadeTexture->loadFromImage(fadeImage);
+
+                l_lightTexturesCache[texture] = std::make_pair(std::unique_ptr<sf::Texture>(plainTexture), std::unique_ptr<sf::Texture>(fadeTexture));
+
+                m_lightTexturePlain = plainTexture;
+                m_lightTextureFade = fadeTexture;
+            }
+        }else{
+            //Default texture
+            m_lightTexturePlain = l_lightTexturePlain.get();
+            m_lightTextureFade = l_lightTextureFade.get();
+        }
+
+        m_localRadius = (m_lightTexturePlain->getSize().x > m_lightTexturePlain->getSize().y) ? m_lightTexturePlain->getSize().x/2+1 : m_lightTexturePlain->getSize().y/2+1;
 
         m_polygon.setPrimitiveType(sf::TriangleFan);
         m_polygon.resize(6);
@@ -156,37 +201,8 @@ namespace candle{
         return m_lightTextureFade;
     }
 
-    void RadialLight::setLightPlainTexture(sf::Texture& texture){
-        m_lightTexturePlain = &texture;
-        m_localRadius = (texture.getSize().x > texture.getSize().y) ? texture.getSize().x/2 : texture.getSize().y/2;
-
-        m_polygon.setPrimitiveType(sf::TriangleFan);
-        m_polygon.resize(6);
-        m_polygon[0].position =
-        m_polygon[0].texCoords = {static_cast<float>(m_localRadius), static_cast<float>(m_localRadius)};
-        m_polygon[1].position =
-        m_polygon[5].position =
-        m_polygon[1].texCoords =
-        m_polygon[5].texCoords = {0.f, 0.f};
-        m_polygon[2].position =
-        m_polygon[2].texCoords = {static_cast<float>(m_localRadius)*2, 0.f};
-        m_polygon[3].position =
-        m_polygon[3].texCoords = {static_cast<float>(m_localRadius)*2, static_cast<float>(m_localRadius)*2};
-        m_polygon[4].position =
-        m_polygon[4].texCoords = {0.f, static_cast<float>(m_localRadius)*2};
-        Transformable::setOrigin(m_localRadius, m_localRadius);
-    }
-
     sf::Texture* RadialLight::getLightPlainTexture(){
         return m_lightTexturePlain;
-    }
-
-    std::shared_ptr<sf::Texture> RadialLight::getDefaultLightFadeTexture() const{
-        return l_lightTextureFade;
-    }
-
-    std::shared_ptr<sf::Texture> RadialLight::getDefaultLightPlainTexture() const{
-        return l_lightTexturePlain;
     }
 
     sf::FloatRect RadialLight::getLocalBounds() const{
