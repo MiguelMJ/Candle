@@ -154,25 +154,33 @@ namespace candle{
             }else{
                 sf::Image userTexture = texture->copyToImage();
 
+                unsigned int diameter = ((userTexture.getSize().x > userTexture.getSize().y) ? userTexture.getSize().x : userTexture.getSize().y) + 2;
+
                 //Put 1px transparent border to avoid bad clamp
                 sf::Image plainImage;
                 sf::Image fadeImage;
-                fadeImage.create(userTexture.getSize().x+2, userTexture.getSize().y+2, sf::Color(255,255,255,0));
-                plainImage.create(userTexture.getSize().x+2, userTexture.getSize().y+2, sf::Color(255,255,255,0));
+                fadeImage.create(diameter, diameter, sf::Color(255,255,255,0));
+                plainImage.create(diameter, diameter, sf::Color(255,255,255,0));
 
-                sf::Vector2f center = static_cast<sf::Vector2f>(userTexture.getSize())/2.0f;
+                sf::Vector2f center = sf::Vector2f(diameter/2.0f, diameter/2.0f);
 
-                for (unsigned int y=0; y<userTexture.getSize().y; ++y)
+                for (unsigned int y=0; y<diameter; ++y)
                 {
-                    for (unsigned int x=0; x<userTexture.getSize().x; ++x)
+                    for (unsigned int x=0; x<diameter; ++x)
                     {
-                        sf::Color pixel = userTexture.getPixel(x,y);
+                        sf::Color pixel = userTexture.getPixel(x%userTexture.getSize().x,y%userTexture.getSize().y);
                         plainImage.setPixel(x+1,y+1, pixel);
 
                         //Get distance of the pixel from the center, normalize it with the radius and inverse it
-                        float distanceFromCenter = 1.0f - sfu::magnitude(sf::Vector2f(x,y) - center) / BASE_RADIUS;
-                        pixel.a *= distanceFromCenter;
-                        fadeImage.setPixel(x+1,y+1, pixel);
+                        float distanceFromCenter = 1.0f - sfu::magnitude(sf::Vector2f(x,y) - center) / (diameter/2.0f);
+
+                        if ( distanceFromCenter < 0.0f ){
+                            //Too far from center, pixel will be fully transparent
+                            fadeImage.setPixel(x+1,y+1, sf::Color(255,255,255,0));
+                        }else{
+                            pixel.a = static_cast<unsigned int>(255.0f*distanceFromCenter);
+                            fadeImage.setPixel(x+1,y+1, pixel);
+                        }
                     }
                 }
 
@@ -194,7 +202,7 @@ namespace candle{
             m_lightTextureFade = l_lightTextureFade.get();
         }
 
-        m_localRadius = (m_lightTexturePlain->getSize().x > m_lightTexturePlain->getSize().y) ? m_lightTexturePlain->getSize().x/2+1 : m_lightTexturePlain->getSize().y/2+1;
+        m_localRadius = m_lightTexturePlain->getSize().x/2+1;
 
         m_polygon.setPrimitiveType(sf::TriangleFan);
         m_polygon.resize(6);
