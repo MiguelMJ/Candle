@@ -164,9 +164,9 @@ namespace candle{
 
                 sf::Vector2f center = sf::Vector2f(diameter/2.0f, diameter/2.0f);
 
-                for (unsigned int y=0; y<diameter; ++y)
+                for (unsigned int y=0; y<diameter-2; ++y)
                 {
-                    for (unsigned int x=0; x<diameter; ++x)
+                    for (unsigned int x=0; x<diameter-2; ++x)
                     {
                         sf::Color pixel = userTexture.getPixel(x%userTexture.getSize().x,y%userTexture.getSize().y);
                         plainImage.setPixel(x+1,y+1, pixel);
