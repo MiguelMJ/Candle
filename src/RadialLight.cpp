@@ -59,6 +59,20 @@ namespace candle{
         l_lightTexturePlain->setSmooth(true);
     }
 
+    void cleanupTexture(sf::Texture* texture){
+        if (texture != nullptr){
+            //Custom texture
+            auto cachedTextureIter = l_lightTexturesCache.find(texture);
+
+            if (cachedTextureIter != l_lightTexturesCache.end()){
+                l_lightTexturesCache.erase(cachedTextureIter);
+            }
+        }else{
+            //Every texture
+            l_lightTexturesCache.clear();
+        }
+    }
+
     float module360(float x){
         x = (float)fmod(x,360.f);
         if(x < 0.f) x += 360.f;
@@ -166,6 +180,8 @@ namespace candle{
                 sf::Texture* fadeTexture = new sf::Texture();
                 plainTexture->loadFromImage(plainImage);
                 fadeTexture->loadFromImage(fadeImage);
+                plainTexture->setSmooth(true);
+                fadeTexture->setSmooth(true);
 
                 l_lightTexturesCache[texture] = std::make_pair(std::unique_ptr<sf::Texture>(plainTexture), std::unique_ptr<sf::Texture>(fadeTexture));
 

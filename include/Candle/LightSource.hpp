@@ -38,6 +38,11 @@ namespace candle{
     void initializeTextures();
 
     /**
+     * @brief This function cleanup texture created by RadialLights.
+     */
+    void cleanupTexture(sf::Texture* texture);
+
+    /**
      * @brief Interface for objects that emit light
      * @details
      *
