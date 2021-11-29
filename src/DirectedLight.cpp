@@ -12,6 +12,7 @@ namespace candle{
         if(st.blendMode == sf::BlendAlpha){ // the default
             st.blendMode = sf::BlendAdd;
         }
+        st.texture = m_texture;
         t.draw(m_polygon, st);
 #ifdef CANDLE_DEBUG
         sf::RenderStates deb_s;
@@ -45,6 +46,7 @@ namespace candle{
         m_polygon.setPrimitiveType(sf::Quads);
         m_polygon.resize(2);
         setBeamWidth(10.f);
+        m_texture = nullptr;
         // castLight();
     }
 
@@ -54,6 +56,10 @@ namespace candle{
 
     float DirectedLight::getBeamWidth() const{
         return m_beamWidth;
+    }
+
+    void DirectedLight::setTexture(sf::Texture* texture){
+        m_texture = texture;
     }
 
     struct LineParam: public sfu::Line{

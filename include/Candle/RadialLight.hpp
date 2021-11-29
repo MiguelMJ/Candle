@@ -33,6 +33,10 @@ namespace candle{
     private:
         static int s_instanceCount;
         float m_beamAngle;
+        unsigned int m_localRadius;
+
+        sf::Texture* m_lightTextureFade;
+        sf::Texture* m_lightTexturePlain;
 
         void draw(sf::RenderTarget& t, sf::RenderStates st) const override;
         void resetColor() override;
@@ -50,6 +54,8 @@ namespace candle{
 
         void castLight(const EdgeVector::iterator& begin, const EdgeVector::iterator& end) override;
 
+        void setTexture(sf::Texture* texture) override;
+
         /**
          * @brief Set the range for which rays may be casted.
          * @details The angle shall be specified in degrees. The angle in which the rays will be casted will be
@@ -65,6 +71,20 @@ namespace candle{
          * @see setBeamAngle
          */
         float getBeamAngle() const;
+
+        /**
+         * @brief Get the light fade texture.
+         * @returns The actual light fade texture.
+         * @see setLightFadeTexture
+         */
+        sf::Texture* getLightFadeTexture();
+
+        /**
+         * @brief Get the light plain texture.
+         * @returns The actual light plain texture.
+         * @see setLightPlainTexture
+         */
+        sf::Texture* getLightPlainTexture();
 
         /**
          * @brief Get the local bounding rectangle of the light.
