@@ -15,39 +15,45 @@ namespace candle{
     int RadialLight::s_instanceCount = 0;
     const float BASE_RADIUS = 400.0f;
     bool l_texturesReady(false);
-    std::unique_ptr<sf::RenderTexture> l_lightTextureFade;
-    std::unique_ptr<sf::RenderTexture> l_lightTexturePlain;
+    std::unique_ptr<sf::Texture> l_lightTextureFade;
+    std::unique_ptr<sf::Texture> l_lightTexturePlain;
 
     void initializeTextures(){
         #ifdef CANDLE_DEBUG
         std::cout << "RadialLight: InitializeTextures" << std::endl;
         #endif
-        int points = 100;
 
-        l_lightTextureFade.reset(new sf::RenderTexture);
-        l_lightTexturePlain.reset(new sf::RenderTexture);
-        l_lightTextureFade->create(BASE_RADIUS*2 + 2, BASE_RADIUS*2 + 2);
-        l_lightTexturePlain->create(BASE_RADIUS*2 + 2, BASE_RADIUS*2 + 2);
+        sf::Image lightImageFade;
+        sf::Image lightImagePlain;
 
-        sf::VertexArray lightShape(sf::TriangleFan, points+2);
-        float step = sfu::PI*2.f/points;
-        lightShape[0].position = {BASE_RADIUS + 1, BASE_RADIUS + 1};
-        for(int i = 1; i < points+2; i++){
-            lightShape[i].position = {
-                (std::sin(step*(i)) + 1) * BASE_RADIUS + 1,
-                (std::cos(step*(i)) + 1) * BASE_RADIUS + 1
-            };
-            lightShape[i].color.a = 0;
+        //We create an image of the radius*2 + 2 more pixels
+        lightImageFade.create(BASE_RADIUS*2+2, BASE_RADIUS*2+2, sf::Color(255,255,255,0));
+        lightImagePlain.create(BASE_RADIUS*2+2, BASE_RADIUS*2+2, sf::Color(255,255,255,0));
+
+        sf::Vector2f center = {BASE_RADIUS, BASE_RADIUS};
+
+        for (unsigned int y=1; y<BASE_RADIUS*2; ++y){
+            for (unsigned int x=1; x<BASE_RADIUS*2; ++x){
+                //Get distance of the pixel from the center, normalize it with the radius and inverse it
+                float distanceFromCenter = 1.0f - sfu::magnitude(sf::Vector2f(x,y) - center) / BASE_RADIUS;
+
+                if ( distanceFromCenter < 0.0f ){
+                    //Too far from center, pixel will be fully transparent
+                    lightImageFade.setPixel(x,y, sf::Color(255,255,255,0));
+                    lightImagePlain.setPixel(x,y, sf::Color(255,255,255,0));
+                }else{
+                    lightImageFade.setPixel(x,y, sf::Color(255,255,255, static_cast<unsigned int>(255.0f*distanceFromCenter)));
+                    lightImagePlain.setPixel(x,y, sf::Color(255,255,255,255));
+                }
+            }
         }
-        l_lightTextureFade->clear(sf::Color::Transparent);
-        l_lightTextureFade->draw(lightShape);
-        l_lightTextureFade->display();
+
+        l_lightTextureFade.reset( new sf::Texture() );
+        l_lightTextureFade->loadFromImage(lightImageFade);
         l_lightTextureFade->setSmooth(true);
 
-        sfu::setColor(lightShape, sf::Color::White);
-        l_lightTexturePlain->clear(sf::Color::Transparent);
-        l_lightTexturePlain->draw(lightShape);
-        l_lightTexturePlain->display();
+        l_lightTexturePlain.reset( new sf::Texture() );
+        l_lightTexturePlain->loadFromImage(lightImagePlain);
         l_lightTexturePlain->setSmooth(true);
     }
 
@@ -107,7 +113,7 @@ namespace candle{
         sf::Transform trm = Transformable::getTransform();
         trm.scale(m_range/BASE_RADIUS, m_range/BASE_RADIUS, BASE_RADIUS, BASE_RADIUS);
         s.transform *= trm;
-        s.texture = m_fade ? &l_lightTextureFade->getTexture() : &l_lightTexturePlain->getTexture();
+        s.texture = m_fade ? l_lightTextureFade.get() : l_lightTexturePlain.get();
         if(s.blendMode == sf::BlendAlpha){
             s.blendMode = sf::BlendAdd;
         }
