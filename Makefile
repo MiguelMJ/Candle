@@ -82,8 +82,8 @@ $(DBGEXEC): $(DBGOBJ)
 $(DBGDIR)/%.d: %.cpp
 	$(call print_info,Checking debug dependencies for $<)
 	$(CPP) $(CFLAGS) $< -MM -MT $(@:.d=.o) >$@
-	@echo '\t$$(call print_info,Building $$@)' >> $@
-	@echo '\t$$(CXX) -c $$(CXXFLAGS) $$(DBGCFLAGS) -o $$@ $$<' >> $@
+	@echo -e '\t$$(call print_info,Building $$@)' >> $@
+	@echo -e '\t$$(CXX) -c $$(CXXFLAGS) $$(DBGCFLAGS) -o $$@ $$<' >> $@
 
 # $(DBGDIR)/%.o: %.cpp
 # 	$(call print_info,Building $@)
@@ -106,8 +106,8 @@ $(RELEXEC): $(RELOBJ)
 $(RELDIR)/%.d: %.cpp
 	$(call print_info,Checking release dependencies for $<)
 	$(CPP) $(CFLAGS) $< -MM -MT $(@:.d=.o) >$@
-	@echo '\t$$(call print_info,Building $$@)' >> $@
-	@echo '\t$$(CXX) -c $$(CXXFLAGS) $$(RELCFLAGS) -o $$@ $$<' >> $@
+	@echo -e '\t$$(call print_info,Building $$@)' >> $@
+	@echo -e '\t$$(CXX) -c $$(CXXFLAGS) $$(RELCFLAGS) -o $$@ $$<' >> $@
 	
 lib: $(RELOBJ)
 	
@@ -126,6 +126,7 @@ clean: clean-release clean-debug
 clean-release:
 	@rm -f -r $(RELDIR)
 	@mkdir -p $(RELDIR)/src
+
 clean-debug:
 	@rm -f -r $(DBGDIR)
 	@mkdir -p $(DBGDIR)/src
