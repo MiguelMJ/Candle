@@ -151,4 +151,5 @@ gh-pages:
 	@echo -e " ../doxygen-awesome-css/doxygen-awesome-sidebar-only.css" >> doxy
 
 	@doxygen doxy
+	@touch docs/.nojekyll
 	@rm doxy
