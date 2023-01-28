@@ -139,3 +139,16 @@ DOXYFILE = doc/Doxyfile
 docs:
 	@doxygen $(DOXYFILE)
 	
+gh-pages:
+	@rm -rf docs
+	@cp $(DOXYFILE) doxy
+	@echo "OUTPUT_DIRECTORY = docs" >> doxy
+	@echo "HTML_OUTPUT = ." >> doxy
+	@echo -e "GENERATE_TREEVIEW      = YES" >> doxy
+	@echo -e "DISABLE_INDEX          = NO" >> doxy
+	@echo -e "FULL_SIDEBAR           = NO" >> doxy
+	@echo -e "HTML_EXTRA_STYLESHEET  = ../doxygen-awesome-css/doxygen-awesome.css \\" >> doxy
+	@echo -e " ../doxygen-awesome-css/doxygen-awesome-sidebar-only.css" >> doxy
+
+	@doxygen doxy
+	@rm doxy
