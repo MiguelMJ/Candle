@@ -45,10 +45,10 @@ LIBS += -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-system
 # Custom output functions
 #
 define print_info
-	@echo "\033[1;38;2;250;250;50m$(1)\033[0m"
+	@echo -e "\033[1;38;2;250;250;50m$(1)\033[0m"
 endef
 define print_success
-	@echo "\033[1;38;2;50;250;50m$(1)\033[0m"
+	@echo -e "\033[1;38;2;50;250;50m$(1)\033[0m"
 endef
 
 #
