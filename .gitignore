@@ -6,3 +6,6 @@ debug/
 # Ignore generated docs and working files
 doc/html/
 doc/*.odg
+
+# Config files
+.vscode
