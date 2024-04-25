@@ -127,7 +127,7 @@ struct App{
         edgeVertices.setPrimitiveType(sf::Lines);
         background.setPrimitiveType(sf::Quads);
         background.resize(ROWS * COLS * 4);
-        if(fogTex.loadFromFile("texture.png")){
+        if(fogTex.loadFromFile("fog.png")){
             lighting.setAreaTexture(&fogTex);
             lighting.scale(WIDTH/fogTex.getSize().x, HEIGHT/fogTex.getSize().y);
         }else{
@@ -143,7 +143,7 @@ struct App{
         menuView.setSize(MENU_W, HEIGHT);
         menuView.setCenter(MENU_W/2, HEIGHT/2);
         menuView.setViewport({WIDTH/totalWidth, 0.f, MENU_W/totalWidth, 1.f});
-        radialLight.setRange(100.f);
+        radialLight.setRange(10.f);
         directedLight.setRange(200.f);
         directedLight.setBeamWidth(200.f);
         static const sf::Color BG_COLORS[] = {
@@ -503,14 +503,30 @@ struct App{
             break;
         case sf::Keyboard::S:
             if(brush == RADIAL || brush == DIRECTED){
-                radialLight.setIntensity(clamp(radialLight.getIntensity()+0.1));
-                directedLight.setIntensity(clamp(directedLight.getIntensity()+0.1));
+                if(control){
+                    radialLight.setBleed(radialLight.getBleed()+1);
+                    directedLight.setBleed(directedLight.getBleed()+1);
+                }else if(shift){
+                    radialLight.setLinearFactor(clamp(radialLight.getLinearFactor()+0.1));
+                    directedLight.setLinearFactor(clamp(directedLight.getLinearFactor()+0.1));
+                }else{
+                    radialLight.setIntensity(clamp(radialLight.getIntensity()+0.1));
+                    directedLight.setIntensity(clamp(directedLight.getIntensity()+0.1));
+                }
             }
             break;
         case sf::Keyboard::X:
             if(brush == RADIAL || brush == DIRECTED){
-                radialLight.setIntensity(clamp(radialLight.getIntensity()-0.1));
-                directedLight.setIntensity(clamp(directedLight.getIntensity()-0.1));
+                if(control){
+                    radialLight.setBleed(std::max(radialLight.getBleed()-1, 0.f));
+                    directedLight.setBleed(directedLight.getBleed()-1);
+                }else if(shift){
+                    radialLight.setLinearFactor(clamp(radialLight.getLinearFactor()-0.1));
+                    directedLight.setLinearFactor(clamp(directedLight.getLinearFactor()-0.1));
+                }else{
+                    radialLight.setIntensity(clamp(radialLight.getIntensity()-0.1));
+                    directedLight.setIntensity(clamp(directedLight.getIntensity()-0.1));
+                }
             }
             break;
         case sf::Keyboard::G:
@@ -528,9 +544,12 @@ struct App{
             if(brush == RADIAL || brush == DIRECTED){
                 static const sf::Color L_COLORS[] = {
                     sf::Color::White,
-                    sf::Color::Magenta,
                     sf::Color::Cyan,
-                    sf::Color::Yellow
+                    sf::Color::Magenta,
+                    sf::Color::Yellow,
+                    sf::Color::Red,
+                    sf::Color::Green,
+                    sf::Color::Blue,
                 };
                 static int color_i = 0;
                 int n = sizeof(L_COLORS)/sizeof(*L_COLORS);

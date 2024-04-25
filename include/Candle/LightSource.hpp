@@ -68,6 +68,8 @@ namespace candle{
         float m_range;
         float m_intensity; // only for fog
         bool m_fade;
+        float m_linearFactor;
+        float m_bleed;
 
 #ifdef CANDLE_DEBUG        
         sf::VertexArray m_debug;
@@ -157,6 +159,48 @@ namespace candle{
          */
         float getRange() const;
         
+         /**
+         * @brief Set the light intensity.
+         * @details The @p intensity of the light determines two things: 
+         * how much fog opacity it reduces when drawn in a LightingArea * in 
+         * FOG mode, and how much presence its color has when drawn normally.
+         * 
+         * The default value is 1.
+         * 
+         * @param intensity Value from 0 to 1. At 0 the light is
+         * invisible.
+         * @see getIntensity
+         */
+        void setLinearFactor(float intensity);
+        
+        /**
+         * @brief Get the intensity of the light.
+         * @returns The light intensity.
+         * @see setIntensity
+         */
+        float getLinearFactor() const;
+        
+         /**
+         * @brief Set the light intensity.
+         * @details The @p intensity of the light determines two things: 
+         * how much fog opacity it reduces when drawn in a LightingArea * in 
+         * FOG mode, and how much presence its color has when drawn normally.
+         * 
+         * The default value is 1.
+         * 
+         * @param intensity Value from 0 to 1. At 0 the light is
+         * invisible.
+         * @see getIntensity
+         */
+        void setBleed(float intensity);
+        
+        /**
+         * @brief Get the intensity of the light.
+         * @returns The light intensity.
+         * @see setIntensity
+         */
+        float getBleed() const;        
+
         /**
          * @brief Modify the polygon of the illuminated area with a 
          * raycasting algorithm.

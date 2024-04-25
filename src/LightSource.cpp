@@ -17,12 +17,11 @@ namespace candle{
         {}
     
     void LightSource::setIntensity(float intensity){
-        m_color.a = 255 * intensity;
-        resetColor();
+        m_intensity = intensity;
     }
     
     float LightSource::getIntensity() const{
-        return (float)m_color.a/255.f;
+        return m_intensity;
     }
     
     void LightSource::setColor(const sf::Color& c){
@@ -50,6 +49,22 @@ namespace candle{
     
     float LightSource::getRange() const{
         return m_range;
+    }
+    
+    void LightSource::setLinearFactor(float lf){
+        m_linearFactor = lf;
+    }
+    
+    float LightSource::getLinearFactor() const{
+        return m_linearFactor;
+    }
+    
+    void LightSource::setBleed(float b){
+        m_bleed = b;
+    }
+    
+    float LightSource::getBleed() const{
+        return m_bleed;
     }
     
 }
