@@ -74,8 +74,6 @@ namespace candle{
 #ifdef CANDLE_DEBUG        
         sf::VertexArray m_debug;
 #endif
-        
-        virtual void resetColor() = 0;
     
     public:
         /**

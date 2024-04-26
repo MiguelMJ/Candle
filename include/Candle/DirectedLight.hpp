@@ -34,7 +34,6 @@ namespace candle{
         float m_beamWidth;
         
         void draw(sf::RenderTarget& t, sf::RenderStates st) const override;
-        void resetColor() override;
     public:
         DirectedLight();
         

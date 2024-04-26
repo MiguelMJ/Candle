@@ -1,4 +1,9 @@
+#ifdef CANDLE_DEBUG
+#include <iostream>
+#endif
+
 #include "Candle/DirectedLight.hpp"
+#include "Candle/Constants.hpp"
 
 #include <queue>
 
@@ -7,45 +12,80 @@
 #include "Candle/graphics/VertexArray.hpp"
 
 namespace candle{
-    void DirectedLight::draw(sf::RenderTarget& t, sf::RenderStates st) const{
-        st.transform *= Transformable::getTransform();
-        if(st.blendMode == sf::BlendAlpha){ // the default
-            st.blendMode = sf::BlendAdd;
+
+    namespace {
+        const char *shaderText = R"===(
+            uniform vec2 sourcePoint;
+            uniform vec2 sourceNormal;
+            uniform float sourceAngle;
+            uniform float radius;
+            uniform vec4 color;
+            uniform float bleed;
+            uniform float intensity;
+            uniform float linearFactor;
+
+
+            void main() {
+                vec2 pixel = gl_FragCoord.xy;
+
+                float angle = atan(sourceNormal.y, sourceNormal.x);
+                angle = sourceAngle;
+                float dist = abs(cos(angle)*(pixel.y - sourcePoint.y) - sin(angle)*(pixel.x - sourcePoint.x));
+                
+
+                float distFromFalloff = radius - dist;
+
+                float attenuation = 0.0;
+                attenuation = distFromFalloff * (bleed / (dist*dist) + linearFactor/radius);
+                        
+                attenuation = clamp(attenuation, 0.0, 1.0);
+
+                gl_FragColor = vec4(color.rgb, attenuation * intensity);
+            }
+        )===";
+        sf::Shader g_directedLightShader;
+    }
+
+    void DirectedLight::draw(sf::RenderTarget& target, sf::RenderStates renderStates) const{
+
+        
+        sf::Vector2f shaderCenter(getPosition().x, target.getView().getSize().y-getPosition().y);
+        float rotation = getRotation() * sfu::PI / 180.f;
+
+        g_directedLightShader.setUniform("sourcePoint", shaderCenter);
+        g_directedLightShader.setUniform("sourceAngle", sfu::PI/2.f-rotation);
+        g_directedLightShader.setUniform("radius", m_range);
+        g_directedLightShader.setUniform("color", sf::Glsl::Vec4(m_color));
+        g_directedLightShader.setUniform("bleed", m_bleed);
+        g_directedLightShader.setUniform("intensity", m_intensity);
+        g_directedLightShader.setUniform("linearFactor", m_linearFactor);
+
+        renderStates.transform *= Transformable::getTransform();
+        if(renderStates.blendMode == sf::BlendAlpha){ // the default
+            renderStates.blendMode = sf::BlendAdd;
         }
-        t.draw(m_polygon, st);
+        renderStates.shader = &g_directedLightShader;
+        target.draw(m_polygon, renderStates);
 #ifdef CANDLE_DEBUG
         sf::RenderStates deb_s;
-        deb_s.transform = st.transform;
-        t.draw(m_debug, deb_s);
+        deb_s.transform = renderStates.transform;
+        target.draw(m_debug, deb_s);
 #endif
     }
 
-    void DirectedLight::resetColor(){
-        int quads = m_polygon.getVertexCount() / 4;
-        for(int i = 0; i < quads; i++){
-            float p1 = i*4;
-            float p2 = p1+1;
-            float p3 = p1+2;
-            float p4 = p1+3;
-            sf::Vector2f r1 = m_polygon[p1].position;
-            sf::Vector2f r2 = m_polygon[p2].position;
-            sf::Vector2f r3 = m_polygon[p4].position;
-            sf::Vector2f r4 = m_polygon[p3].position;
-
-            float dr1 = 1.f - m_fade * (sfu::magnitude(r2-r1) / m_range);
-            float dr2 = 1.f - m_fade * (sfu::magnitude(r4-r3) / m_range);
-            m_polygon[p1].color = m_polygon[p2].color =
-                m_polygon[p3].color = m_polygon[p4].color = m_color;
-            m_polygon[p2].color.a = m_color.a * dr1;
-            m_polygon[p3].color.a = m_color.a * dr2;
-        }
-    }
-
     DirectedLight::DirectedLight(){
+        if(g_directedLightShader.getNativeHandle() == 0){
+            g_directedLightShader.loadFromMemory(shaderText, sf::Shader::Fragment);
+        }
+
         m_polygon.setPrimitiveType(sf::Quads);
         m_polygon.resize(2);
+
         setBeamWidth(10.f);
-        // castLight();
+        setRange(20.f);
+        setBleed(0.f);
+        setLinearFactor(1.f);
+        setIntensity(1.f);
     }
 
     void DirectedLight::setBeamWidth(float width){
@@ -56,16 +96,16 @@ namespace candle{
         return m_beamWidth;
     }
 
-    struct LineParam: public sfu::Line{
+    struct LineAndNormalParam: public sfu::Line{
         float param;
-        LineParam(float f, const sfu::Line& l)
+        LineAndNormalParam(float f, const sfu::Line& l)
             : sfu::Line(l)
             , param(f) { }
-        LineParam(const sf::Vector2f& orig, const sf::Vector2f& dir, float p)
+        LineAndNormalParam(const sf::Vector2f& orig, const sf::Vector2f& dir, float p)
             : sfu::Line(orig, orig + dir)
             , param(p) { }
     };
-    bool operator < (const LineParam& a, const LineParam& b){
+    bool operator < (const LineAndNormalParam& a, const LineAndNormalParam& b){
         return a.param < b.param;
     }
     void DirectedLight::castLight(const EdgeVector::iterator& begin, const EdgeVector::iterator& end){
@@ -88,7 +128,7 @@ namespace candle{
         sfu::Line raySrc(lim1o, lim2o);
         sfu::Line rayRng(lim1d, lim2d);
 
-        std::priority_queue <LineParam> rays;
+        std::priority_queue <LineAndNormalParam> rays;
 
         rays.emplace(0.f, lim1);
         rays.emplace(1.f, lim2);
@@ -135,7 +175,7 @@ namespace candle{
         m_debug[deb_r-4].position = {m_range, widthHalf};
 #endif
         while(!rays.empty()){
-            LineParam r = rays.top();
+            LineAndNormalParam r = rays.top();
 
             sf::Vector2f p1 = trm_i.transformPoint(r.m_origin);
             sf::Vector2f p2 = trm_i.transformPoint(sfu::castRay(begin, end, r, m_range));
@@ -160,12 +200,12 @@ namespace candle{
                 m_polygon[p3].position = points[r4];
                 m_polygon[p4].position = points[r3];
 
-                float dr1 = 1.f - m_fade * (sfu::magnitude(points[r2]-points[r1]) / m_range);
-                float dr2 = 1.f - m_fade * (sfu::magnitude(points[r4]-points[r3]) / m_range);
-                m_polygon[p1].color = m_polygon[p4].color = m_color;
-                m_polygon[p2].color = m_polygon[p3].color = m_color;
-                m_polygon[p2].color.a = m_color.a * dr1;
-                m_polygon[p3].color.a = m_color.a * dr2;
+                //float dr1 = 1.f - m_fade * (sfu::magnitude(points[r2]-points[r1]) / m_range);
+                //float dr2 = 1.f - m_fade * (sfu::magnitude(points[r4]-points[r3]) / m_range);
+                // m_polygon[p1].color = m_polygon[p4].color = m_color;
+                // m_polygon[p2].color = m_polygon[p3].color = m_color;
+                // m_polygon[p2].color.a = m_color.a * dr1;
+                // m_polygon[p3].color.a = m_color.a * dr2;
             }
         }
     }

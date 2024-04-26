@@ -44,9 +44,10 @@ namespace sfu{
         }else if(m_direction.y == 0){
             d = std::abs(point.y - m_origin.y);
         }else{
-            float A = 1.f / m_direction.x;
-            float B = - 1.f / m_direction.y;
-            float C = - B*m_origin.y - A*m_origin.x;
+            sf::Vector2f origin2 = m_origin + m_direction;
+            float A = m_direction.y;
+            float B = m_direction.x;
+            float C = m_origin.x * origin2.y + origin2.x * m_origin.y;
             d = std::abs(A*point.x + B*point.y + C) / std::sqrt(A*A + B*B);
         }
         return d;

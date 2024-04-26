@@ -26,7 +26,6 @@ namespace candle{
     
     void LightSource::setColor(const sf::Color& c){
         m_color = {c.r, c.g, c.b, m_color.a};
-        resetColor();
     }
     
     sf::Color LightSource::getColor() const{
@@ -35,8 +34,7 @@ namespace candle{
     }
     
     void LightSource::setFade(bool fade){
-        m_fade = fade;
-        resetColor();
+        m_fade = fade;  
     }
     
     bool LightSource::getFade() const{
