@@ -12,17 +12,17 @@ Thanks for thinking about contributing to Candle! Here are the steps to do it.
 
 This is a list of topics that could make it to a future version of Candle.
 
-- **Use of shaders**. I'm afraid I have zero practical knowledge about programming shaders. If any of the functionalities achieved using blending modes and prerendered textures (the case of RadialLight.cpp) can be replicated with shaders, that would be awesome.
+- **Use of shaders**. I'm afraid I have zero practical knowledge about programming shaders. If any of the functionalities achieved using blending modes and prerendered textures (the case of PointLight.cpp) can be replicated with shaders, that would be awesome.
 
   - Not only replicating the already available effects, but also adding new ones like penumbra, blur, more complex fading functions...
 
-  Relevant files: `src/RadialLight.cpp`, `src/DirectedLight.cpp`, `src/LightingArea.cpp`
+  Relevant files: `src/PointLight.cpp`, `src/DirectedLight.cpp`, `src/LightingArea.cpp`
 
 - **Optimization to raycasting algorithms**. This algorithms have already several optimizations, but I don't know if it is possible to speed them up more. 
 
-  Relevant fields: `src/Line.hpp`, `src/RadialLight.cpp`, `src/DirectedLight.cpp`
+  Relevant fields: `src/Line.hpp`, `src/PointLight.cpp`, `src/DirectedLight.cpp`
 
-  There is only one case where I know it would be possible but I have not been able to make it work: the check that a RadialLight makes in `src/RadialLight.cpp:142` is intended to filter out edges whose mathematical line definition is far away. It is better than no filter, but it would be better to use the distance to the mathematical line `src/RadialLight.cpp:138` only when the orthogonal projection is contained within the edge segment, and otherwise use the minimum between the distance to the ends of the edge (see commented in `src/RadialLight.cpp:141`).
+  There is only one case where I know it would be possible but I have not been able to make it work: the check that a PointLight makes in `src/PointLight.cpp:142` is intended to filter out edges whose mathematical line definition is far away. It is better than no filter, but it would be better to use the distance to the mathematical line `src/PointLight.cpp:138` only when the orthogonal projection is contained within the edge segment, and otherwise use the minimum between the distance to the ends of the edge (see commented in `src/PointLight.cpp:141`).
 
 
 ## Where is help NOT wanted?

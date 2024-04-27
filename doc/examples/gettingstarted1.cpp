@@ -6,7 +6,7 @@ int main(){
     sf::RenderWindow w(sf::VideoMode(400, 400), "app");
     
     // create a light source
-    candle::RadialLight light;
+    candle::PointLight light;
     light.setRange(150);
     
     // create an edge pool

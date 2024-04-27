@@ -23,7 +23,7 @@ endif()
 set(CANDLE_HEADERS
 	include/Candle/LightingArea.hpp
 	include/Candle/LightSource.hpp
-	include/Candle/RadialLight.hpp
+	include/Candle/PointLight.hpp
 	include/Candle/DirectedLight.hpp
 	include/Candle/geometry/Line.hpp
 	include/Candle/geometry/Polygon.hpp
@@ -36,7 +36,7 @@ set(CANDLE_HEADERS
 set(CANDLE_SRC
 	src/LightingArea.cpp
 	src/LightSource.cpp
-	src/RadialLight.cpp
+	src/PointLight.cpp
 	src/DirectedLight.cpp
 	src/Line.cpp
 	src/Polygon.cpp
@@ -50,7 +50,7 @@ add_library(Candle-s STATIC ${CANDLE_SRC} ${CANDLE_HEADERS})
 target_include_directories(Candle-s PUBLIC include)
 target_link_libraries(Candle-s sfml-graphics)
 
-option(RADIAL_LIGHT_FIX "Use RadialLight fix for errors with textures" OFF)
+option(RADIAL_LIGHT_FIX "Use PointLight fix for errors with textures" OFF)
 
 if(RADIAL_LIGHT_FIX)
 	target_compile_definitions(Candle-s PUBLIC -DRADIAL_LIGHT_FIX)

@@ -3,7 +3,7 @@
 #endif
 
 #include <memory>
-#include "Candle/RadialLight.hpp"
+#include "Candle/PointLight.hpp"
 
 #include "SFML/Graphics.hpp"
 
@@ -46,7 +46,7 @@ namespace candle{
         return x;
     }
 
-    RadialLight::RadialLight() : LightSource() {
+    PointLight::PointLight() : LightSource() {
         // check if the shader is loaded and do it if necessary
         if(g_pointLightShader.getNativeHandle() == 0){
             g_pointLightShader.loadFromMemory(shaderText, sf::Shader::Fragment);
@@ -70,7 +70,7 @@ namespace candle{
 
 
 
-    void RadialLight::draw(sf::RenderTarget& target, sf::RenderStates renderStates) const{
+    void PointLight::draw(sf::RenderTarget& target, sf::RenderStates renderStates) const{
         
         sf::Vector2f shaderCenter(getPosition().x, target.getSize().y-getPosition().y);
 
@@ -100,25 +100,25 @@ namespace candle{
 
     }
 
-    void RadialLight::setBeamAngle(float r){
+    void PointLight::setBeamAngle(float r){
         m_beamAngle = module360(r);
     }
 
-    float RadialLight::getBeamAngle() const{
+    float PointLight::getBeamAngle() const{
         return m_beamAngle;
     }
 
-    sf::FloatRect RadialLight::getLocalBounds() const{
+    sf::FloatRect PointLight::getLocalBounds() const{
         return sf::FloatRect(-1.0f, -1.0f, 2.0f, 2.0f);
     }
 
-    sf::FloatRect RadialLight::getGlobalBounds() const{
+    sf::FloatRect PointLight::getGlobalBounds() const{
         sf::Transform transform = Transformable::getTransform();
         transform.scale(m_range, m_range);
         return transform.transformRect( getLocalBounds() );
     }
 
-    void RadialLight::castLight(const EdgeVector::iterator& beginEdges, const EdgeVector::iterator& endEdges){
+    void PointLight::castLight(const EdgeVector::iterator& beginEdges, const EdgeVector::iterator& endEdges){
         sf::Transform transform = Transformable::getTransform();
         transform.scale(m_range, m_range);
         std::vector<sfu::Line> rays;

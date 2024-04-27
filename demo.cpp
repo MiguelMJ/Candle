@@ -9,7 +9,7 @@
 
 #include "Candle/LightingArea.hpp"
 #include "Candle/LightSource.hpp"
-#include "Candle/RadialLight.hpp"
+#include "Candle/PointLight.hpp"
 #include "Candle/DirectedLight.hpp"
 /*
  * AUXILIAR
@@ -63,7 +63,7 @@ struct App{
     sf::VertexArray mouseBlock;
     float blockSize;
 
-    candle::RadialLight radialLight;
+    candle::PointLight pointLight;
     candle::DirectedLight directedLight;
     bool control, shift, alt;
     
@@ -143,7 +143,7 @@ struct App{
         menuView.setSize(MENU_W, HEIGHT);
         menuView.setCenter(MENU_W/2, HEIGHT/2);
         menuView.setViewport({WIDTH/totalWidth, 0.f, MENU_W/totalWidth, 1.f});
-        radialLight.setRange(10.f);
+        pointLight.setRange(10.f);
         directedLight.setRange(200.f);
         directedLight.setBeamWidth(200.f);
         static const sf::Color BG_COLORS[] = {
@@ -363,7 +363,7 @@ struct App{
         }else{
             switch(brush){
             case RADIAL:{
-                std::shared_ptr<candle::LightSource> nl(new candle::RadialLight(radialLight));
+                std::shared_ptr<candle::LightSource> nl(new candle::PointLight(pointLight));
                 lights1.push_back(nl);
                 if(glow){
                     lights2.push_back(nl);
@@ -400,8 +400,8 @@ struct App{
                 castAllLights();
                 break;
             case RADIAL:
-                radialLight.setPosition(mp);
-                radialLight.castLight(edgePool.begin(), edgePool.end());
+                pointLight.setPosition(mp);
+                pointLight.castLight(edgePool.begin(), edgePool.end());
                 break;
             case DIRECTED:
                 directedLight.setPosition(mp);
@@ -425,13 +425,13 @@ struct App{
             switch(brush){
             case RADIAL:
                 if(alt){
-                    radialLight.rotate(d*6);
+                    pointLight.rotate(d*6);
                 }else if(shift){
-                    radialLight.setBeamAngle(radialLight.getBeamAngle() + d*5);
+                    pointLight.setBeamAngle(pointLight.getBeamAngle() + d*5);
                 }else{
-                    radialLight.setRange(std::max(0.f, radialLight.getRange() + d*10));
+                    pointLight.setRange(std::max(0.f, pointLight.getRange() + d*10));
                 }
-                radialLight.castLight(edgePool.begin(), edgePool.end());
+                pointLight.castLight(edgePool.begin(), edgePool.end());
                 break;
             case DIRECTED:
                 if(alt){
@@ -504,13 +504,13 @@ struct App{
         case sf::Keyboard::S:
             if(brush == RADIAL || brush == DIRECTED){
                 if(control){
-                    radialLight.setBleed(radialLight.getBleed()+1);
+                    pointLight.setBleed(pointLight.getBleed()+1);
                     directedLight.setBleed(directedLight.getBleed()+1);
                 }else if(shift){
-                    radialLight.setLinearFactor(clamp(radialLight.getLinearFactor()+0.1));
+                    pointLight.setLinearFactor(clamp(pointLight.getLinearFactor()+0.1));
                     directedLight.setLinearFactor(clamp(directedLight.getLinearFactor()+0.1));
                 }else{
-                    radialLight.setIntensity(clamp(radialLight.getIntensity()+0.1));
+                    pointLight.setIntensity(clamp(pointLight.getIntensity()+0.1));
                     directedLight.setIntensity(clamp(directedLight.getIntensity()+0.1));
                 }
             }
@@ -518,13 +518,13 @@ struct App{
         case sf::Keyboard::X:
             if(brush == RADIAL || brush == DIRECTED){
                 if(control){
-                    radialLight.setBleed(std::max(radialLight.getBleed()-1, 0.f));
+                    pointLight.setBleed(std::max(pointLight.getBleed()-1, 0.f));
                     directedLight.setBleed(directedLight.getBleed()-1);
                 }else if(shift){
-                    radialLight.setLinearFactor(clamp(radialLight.getLinearFactor()-0.1));
+                    pointLight.setLinearFactor(clamp(pointLight.getLinearFactor()-0.1));
                     directedLight.setLinearFactor(clamp(directedLight.getLinearFactor()-0.1));
                 }else{
-                    radialLight.setIntensity(clamp(radialLight.getIntensity()-0.1));
+                    pointLight.setIntensity(clamp(pointLight.getIntensity()-0.1));
                     directedLight.setIntensity(clamp(directedLight.getIntensity()-0.1));
                 }
             }
@@ -536,7 +536,7 @@ struct App{
             break;
         case sf::Keyboard::F:
             if(brush == RADIAL || brush == DIRECTED){
-                radialLight.setFade(!radialLight.getFade());
+                pointLight.setFade(!pointLight.getFade());
                 directedLight.setFade(!directedLight.getFade());
             }
             break;
@@ -554,7 +554,7 @@ struct App{
                 static int color_i = 0;
                 int n = sizeof(L_COLORS)/sizeof(*L_COLORS);
                 color_i = (color_i+1) % n;
-                radialLight.setColor(L_COLORS[color_i]);
+                pointLight.setColor(L_COLORS[color_i]);
                 directedLight.setColor(L_COLORS[color_i]);
             }
             break;
@@ -652,7 +652,7 @@ struct App{
                 lighting.draw(*l);
             }
             if(brush == RADIAL){
-                lighting.draw(radialLight);
+                lighting.draw(pointLight);
             }else if(brush == DIRECTED){
                 lighting.draw(directedLight);
             }
@@ -674,7 +674,7 @@ struct App{
             }
             if(glow){
                 if(brush == RADIAL){
-                    w.draw(radialLight);
+                    w.draw(pointLight);
                 }else if(brush == DIRECTED){
                     w.draw(directedLight);
                 }

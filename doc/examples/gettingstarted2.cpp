@@ -7,7 +7,7 @@ int main(){
     sf::RenderWindow w(sf::VideoMode(300, 379), "app");
     
     // create a light source
-    candle::RadialLight light;
+    candle::PointLight light;
     light.setRange(100);
     light.setFade(false);
     

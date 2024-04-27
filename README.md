@@ -14,13 +14,15 @@ Candle is a SFML based C++ library that provides light, shadow casting and field
 
 ### Contents
 
-- [Demo](#Demo)
-- [Build](#Build)
-- [Requisites](#Requisites)
-- [Contributors](#Contributors)
-- [Contributing](#Contributing)
-- [Example program](#Example-program)
-- [License](#License)
+- [Demo](#demo)
+- [Build](#build)
+  - [CMake](#cmake)
+  - [Make](#make)
+- [Requisites](#requisites)
+- [Contributors](#contributors)
+- [Contributing](#contributing)
+- [Example program](#example-program)
+- [License](#license)
 
 ## Demo
 
@@ -117,14 +119,14 @@ the `main.cpp` file could look like this:
 
 ```C++
 #include <SFML/Graphics.hpp>
-#include "Candle/RadialLight.hpp"
+#include "Candle/PointLight.hpp"
  
 int main(){
     // create window
     sf::RenderWindow w(sf::VideoMode(400, 400), "app");
     
     // create a light source
-    candle::RadialLight light;
+    candle::PointLight light;
     light.setRange(150);
     
     // create an edge pool

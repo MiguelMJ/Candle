@@ -2,7 +2,7 @@
  * @file
  * @author Miguel Mejía Jiménez
  * @copyright MIT License
- * @brief This file contains the LightingSource class and some convenient
+ * @brief This file contains the LightSource class and some convenient
  * typedefs.
  */
 #ifndef __CANDLE_LIGHTSOURCE_HPP__
@@ -28,22 +28,12 @@ namespace candle{
     typedef std::vector<Edge> EdgeVector;
     
     /**
-     * @brief This function initializes the Texture used for the RadialLights.
-     * @details This function is called the first time a RadialLight is created
-     * , so the user shouldn't need to do it. Anyways, it could be 
-     * necessary to do it explicitly if you declare a RadialLight that, for 
-     * some reason, is global or static RadialLight and is not constructed in
-     * a normal order.
-     */
-    void initializeTextures();
-    
-    /**
      * @brief Interface for objects that emit light
      * @details
      * 
      * LightSources use raycasting algorithms to compute the polygon
      * illuminated by the light. The main difference between the 
-     * implementations, @ref RadialLight and @ref DirectedLight, is whether
+     * implementations, @ref PointLight and @ref DirectedLight, is whether
      * the constant is the origin or the direction of the rays.
      * 
      * LightSources manage their colour separating the alpha value from the RGB

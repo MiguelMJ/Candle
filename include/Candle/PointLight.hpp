@@ -2,7 +2,7 @@
  * @file
  * @author Miguel Mejía Jiménez
  * @copyright MIT License
- * @brief This file contains the RadialLight class.
+ * @brief This file contains the PointLight class.
  */
 #ifndef __CANDLE_RADIAL_LIGHT_HPP__
 #define __CANDLE_RADIAL_LIGHT_HPP__
@@ -14,7 +14,7 @@ namespace candle{
      * @brief LightSource that emits light from a single point
      * @details
      *
-     * A RadialLight is defined, mainly, by the position, the orientation, the
+     * A PointLight is defined, mainly, by the position, the orientation, the
 	 * range of the light and the beam angle. To manipulate the
      * position and the orientation of the light, you can change the position
 	 * and rotation of the object as you would do with any sf::Transformable.
@@ -29,7 +29,7 @@ namespace candle{
      * </tr>
      * </table>
      */
-    class RadialLight: public LightSource{
+    class PointLight: public LightSource{
     private:
         float m_beamAngle;
 
@@ -39,7 +39,7 @@ namespace candle{
         /**
          * @brief Constructor
          */
-        RadialLight();
+        PointLight();
 
         void castLight(const EdgeVector::iterator& begin, const EdgeVector::iterator& end) override;
 
