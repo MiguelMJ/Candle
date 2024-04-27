@@ -8,7 +8,7 @@
 #define __CANDLE_LIB_HPP__
 
 #include "Candle/LightSource.hpp"
-#include "Candle/RadialLight.hpp"
+#include "Candle/PointLight.hpp"
 #include "Candle/DirectedLight.hpp"
 #include "Candle/LightingArea.hpp"
 

@@ -2,7 +2,7 @@
  * @file
  * @author Miguel Mejía Jiménez
  * @copyright MIT License
- * @brief This file contains the RadialLight class.
+ * @brief This file contains the DirectedlLight class.
  */
 #ifndef __CANDLE_DIRECTED_LIGHT_HPP__
 #define __CANDLE_DIRECTED_LIGHT_HPP__

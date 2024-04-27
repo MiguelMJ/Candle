@@ -1,6 +1,6 @@
 #ifdef CANDLE_DEBUG
 #include <iostream>
-#endif
+#endif  
 
 #include <memory>
 #include "Candle/PointLight.hpp"

@@ -1,5 +1,5 @@
 #include <SFML/Graphics.hpp>
-#include "Candle/RadialLight.hpp"
+#include "Candle/PointLight.hpp"
 
 int main(){
     // create window

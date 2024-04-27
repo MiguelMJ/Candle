@@ -6,7 +6,7 @@
 
 The two main objects related to shadow casting in Candle are light sources and edges.
 
-For the lights, there is an abstract class called candle::LightSource, implemented by candle::RadialLight and candle::DirectedLight. They inherit from sf::Drawable and sf::Transformable, so they can be used as common SFML entities.
+For the lights, there is an abstract class called candle::LightSource, implemented by candle::PointLight and candle::DirectedLight. They inherit from sf::Drawable and sf::Transformable, so they can be used as common SFML entities.
 
 For the edges, there is a structure called [**candle::Edge**](LightSource_8hpp.html#a232f746b6098d9a876d23e84a67dc0a2), that can represent a segment by the coordinates of its ends. However, the raycasting function requires that the shadow casting edges are stored in a `std::vector`, so Candle provides a convenient alias for `std::vector<candle::Edge>` called [**candle::EdgeVector**](LightSource_8hpp.html#a384b0e96a22f34b27f84a55713279e89). This is what you should be using to manage your edges. 
 
@@ -24,7 +24,7 @@ Note how the `castLight` function is called only when the mouse is moved. Althou
 
 # Radial light and Directed light
 
-In the previous example we have used a candle::RadialLight. This is the light type that casts rays in any direction from a single point. The other type is candle::DirectedLight, that casts rays in a single direction, from any point within a segment.
+In the previous example we have used a candle::PointLight. This is the light type that casts rays in any direction from a single point. The other type is candle::DirectedLight, that casts rays in a single direction, from any point within a segment.
 
 <table width="100%">
 <tr>
@@ -94,14 +94,14 @@ Flag that indicates if the light fades towards the range limit.
     <img width="300px" src="param_fade_1.png" alt="Fade preview">
     <br><em>Top left: Fade off. Bottom right: Fade on.</em>
 </div>
-## RadialLight parameters
+## PointLight parameters
 
 ### Beam angle
 
 Angle (in degrees) that limits the difference between the angles of the casted rays and the rotation of the light.
 
-- candle::RadialLight::getBeamAngle
-- candle::RadialLight::setBeamAngle
+- candle::PointLight::getBeamAngle
+- candle::PointLight::setBeamAngle
 
 <div align="center">
     <img width="300px" src="param_beamangle_1.png" alt="Beam angle preview">
