@@ -70,10 +70,21 @@
         "code",
         "ideas"
       ]
+    },
+    {
+      "login": "TheGiraffe3",
+      "name": "Loymdayddaud",
+      "avatar_url": "https://avatars.githubusercontent.com/u/145969603?v=4",
+      "profile": "https://github.com/TheGiraffe3",
+      "contributions": [
+        "test"
+      ]
     }
   ],
   "projectName": "Candle",
   "projectOwner": "MiguelMJ",
   "repoType": "github",
-  "repoHost": "https://github.com"
+  "repoHost": "https://github.com",
+  "commitType": "docs",
+  "commitConvention": "angular"
 }
