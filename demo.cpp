@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <iomanip>
 #include <memory>
 #include <ctime>
@@ -85,7 +85,7 @@ struct App{
             rect.setOutlineColor(buttonZ2);
             rect.setOutlineThickness(2);
             rect.setSize({bw, bw});
-            setPosition(2, 2 + (BC)*(bw + 4));
+            setPosition({ 2, 2 + (BC) * (bw + 4) });
             icon = d;
             function = f;
             BC++;
@@ -121,28 +121,28 @@ struct App{
     App()
     : lighting(candle::LightingArea::FOG, {0.f,0.f}, {WIDTH, HEIGHT})
     {
-        w.create(sf::VideoMode(WIDTH+MENU_W, HEIGHT), "Candle - demo");
+        w.create(sf::VideoMode({ uint16_t(WIDTH + MENU_W), uint16_t(HEIGHT) }), "Candle - demo");
         w.setFramerateLimit(60);
         float totalWidth = WIDTH + MENU_W;
-        edgeVertices.setPrimitiveType(sf::Lines);
-        background.setPrimitiveType(sf::Quads);
+        edgeVertices.setPrimitiveType(sf::PrimitiveType::Lines);
+        background.setPrimitiveType(sf::PrimitiveType::Triangles);
         background.resize(ROWS * COLS * 4);
         if(fogTex.loadFromFile("texture.png")){
             lighting.setAreaTexture(&fogTex);
-            lighting.scale(WIDTH/fogTex.getSize().x, HEIGHT/fogTex.getSize().y);
+            lighting.scale({ WIDTH / fogTex.getSize().x, HEIGHT / fogTex.getSize().y });
         }else{
             std::cout << "No texture detected" << std::endl;
             lighting.setAreaColor(sf::Color::Black);
         }
         lighting.clear();
-        mouseBlock.setPrimitiveType(sf::Lines);
+        mouseBlock.setPrimitiveType(sf::PrimitiveType::Lines);
         mouseBlock.resize(8);
-        sandboxView.setSize(WIDTH, HEIGHT);
-        sandboxView.setCenter(WIDTH/2.f, HEIGHT/2.f);
-        sandboxView.setViewport({0.f, 0.f, WIDTH/totalWidth, 1.f});
-        menuView.setSize(MENU_W, HEIGHT);
-        menuView.setCenter(MENU_W/2, HEIGHT/2);
-        menuView.setViewport({WIDTH/totalWidth, 0.f, MENU_W/totalWidth, 1.f});
+        sandboxView.setSize({ WIDTH, HEIGHT });
+        sandboxView.setCenter({ WIDTH / 2.f, HEIGHT / 2.f });
+        sandboxView.setViewport({ {0.f, 0.f}, {WIDTH / totalWidth, 1.f } });
+        menuView.setSize({ MENU_W, HEIGHT });
+        menuView.setCenter({ MENU_W / 2, HEIGHT / 2 });
+        menuView.setViewport({ {WIDTH / totalWidth, 0.f}, {MENU_W / totalWidth, 1.f } });
         radialLight.setRange(100.f);
         directedLight.setRange(200.f);
         directedLight.setBeamWidth(200.f);
@@ -179,74 +179,103 @@ struct App{
         i1->setFillColor({255,255,150,255});
         i1->setOutlineColor(sf::Color::White);
         i1->setOutlineThickness(2);
-        i1->move(MENU_W/6, MENU_W/6);
+        i1->move({ MENU_W / 6, MENU_W / 6 });
         buttons.emplace_back(i1, [](App* app){ app->setBrush(RADIAL); });
         
         auto i2 = new sf::RectangleShape({MENU_W*2/3, MENU_W/2});
-        i2->move(MENU_W/6, MENU_W/4);
+        i2->move({ MENU_W / 6, MENU_W / 4 });
         i2->setFillColor({255,255,150,255});
         i2->setOutlineColor(sf::Color::White);
         i2->setOutlineThickness(1);
         buttons.emplace_back(i2, [](App* app){ app->setBrush(DIRECTED); });
         
         auto i3 = new sf::RectangleShape({MENU_W/2, MENU_W/2});
-        i3->move(MENU_W/4, MENU_W/4);
+        i3->move({ MENU_W / 4, MENU_W / 4 });
         i3->setFillColor({25,25,25,255});
         buttons.emplace_back(i3, [](App* app){ app->setBrush(BLOCK); });
         
         auto i4 = new sf::RectangleShape({MENU_W, 3});
-        i4->move(MENU_W*2/15, MENU_W*2/15);
-        i4->rotate(45.f);
+        i4->move({ MENU_W * 2 / 15, MENU_W * 2 / 15 });
+        i4->rotate(sf::degrees(45.f));
         i4->setFillColor({25,25,25,255});
         buttons.emplace_back(i4, [](App* app){ app->setBrush(LINE); });
         
-        auto  i7 = new sf::VertexArray(sf::Quads, 12);
-        for(int i=0; i < 12; i++){
-            (*i7)[i] = background[i];
+        auto i7 = new sf::VertexArray(sf::PrimitiveType::Triangles, 18); // 3 vertices * 6 triangles (from 3 quads)
+        for (int q = 0; q < 3; ++q) {
+            int base = q * 4;
+            int tri = q * 6;
+            (*i7)[tri + 0] = background[base + 0];
+            (*i7)[tri + 1] = background[base + 1];
+            (*i7)[tri + 2] = background[base + 2];
+            (*i7)[tri + 3] = background[base + 0];
+            (*i7)[tri + 4] = background[base + 2];
+            (*i7)[tri + 5] = background[base + 3];
         }
-        sfu::transform(*i7, {MENU_W*2/7/CELL_W, 0, MENU_W/14 - 1,
-                            0, MENU_W*2/7/CELL_H, MENU_W*5/14 - 1,
-                            0, 0, 1
-                            });
+        sfu::transform(*i7, {
+            MENU_W * 2 / 7 / CELL_W, 0, MENU_W / 14 - 1,
+            0, MENU_W * 2 / 7 / CELL_H, MENU_W * 5 / 14 - 1,
+            0, 0, 1
+            });
         sfu::darken(*i7, 0.2);
-        buttons.emplace_back(i7, [](App *app){ app->lighting.setAreaOpacity(clamp(app->lighting.getAreaOpacity() - 0.1)); });
-        
-        auto  i8 = new sf::VertexArray(*i7);
+        buttons.emplace_back(i7, [](App* app) {
+            app->lighting.setAreaOpacity(clamp(app->lighting.getAreaOpacity() - 0.1));
+            });
+
+        auto i8 = new sf::VertexArray(*i7);
         sfu::darken(*i8, 0.5);
-        buttons.emplace_back(i8, [](App *app){ app->lighting.setAreaOpacity(clamp(app->lighting.getAreaOpacity() + 0.1)); });
+        buttons.emplace_back(i8, [](App* app) {
+            app->lighting.setAreaOpacity(clamp(app->lighting.getAreaOpacity() + 0.1));
+            });
+
         
-        auto i5 = new sf::VertexArray(sf::Quads, 8);
-        (*i5)[0].position = {1, 0};
-        (*i5)[1].position = {2, 0};
-        (*i5)[2].position = {2, 3};
-        (*i5)[3].position = {1, 3};
-        (*i5)[4].position = {0, 1};
-        (*i5)[5].position = {3, 1};
-        (*i5)[6].position = {3, 2};
-        (*i5)[7].position = {0, 2};
-        sfu::setColor(*i5, {255,255,150,255});
-        float a = sfu::PI/4;
-        float s = MENU_W*2/9;
-        sfu::transform(*i5, {s*std::cos(a), s*-std::sin(a), MENU_W/2,
-                            s*std::sin(a), s*std::cos(a), 0,
-                            0, 0, 1
-                            });
-        buttons.emplace_back(i5, [](App* app){ app->clearLights(); });
-        
+        auto i5 = new sf::VertexArray(sf::PrimitiveType::Triangles, 12); // 2 quads → 4 triangles → 12 vertices
+
+        // First quad (1,0)-(2,0)-(2,3)-(1,3)
+        (*i5)[0].position = { 1, 0 };
+        (*i5)[1].position = { 2, 0 };
+        (*i5)[2].position = { 2, 3 };
+        (*i5)[3].position = { 1, 0 };
+        (*i5)[4].position = { 2, 3 };
+        (*i5)[5].position = { 1, 3 };
+
+        // Second quad (0,1)-(3,1)-(3,2)-(0,2)
+        (*i5)[6].position = { 0, 1 };
+        (*i5)[7].position = { 3, 1 };
+        (*i5)[8].position = { 3, 2 };
+        (*i5)[9].position = { 0, 1 };
+        (*i5)[10].position = { 3, 2 };
+        (*i5)[11].position = { 0, 2 };
+
+        sfu::setColor(*i5, { 255, 255, 150, 255 });
+        float a = sfu::PI / 4;
+        float s = MENU_W * 2 / 9;
+        sfu::transform(*i5, {
+            s * std::cos(a), s * -std::sin(a), MENU_W / 2,
+            s * std::sin(a), s * std::cos(a), 0,
+            0, 0, 1
+            });
+        buttons.emplace_back(i5, [](App* app) {
+            app->clearLights();
+            });
+
         auto i6 = new sf::VertexArray(*i5);
-        sfu::setColor(*i6, {25,25,25,255});
-        buttons.emplace_back(i6, [](App *app){ app->clearEdges(); app->castAllLights(); });
+        sfu::setColor(*i6, { 25, 25, 25, 255 });
+        buttons.emplace_back(i6, [](App* app) {
+            app->clearEdges();
+            app->castAllLights();
+            });
+
         
         
         
     }
     void capture(){
         sf::Texture tex;
-        tex.create(w.getSize().x, w.getSize().y);
+        if (!tex.resize({ w.getSize().x, w.getSize().y })) throw std::runtime_error("Error resizing texture!");
         tex.update(w);
         
         sf::RenderTexture rt;
-        rt.create(WIDTH, HEIGHT);
+		if (!rt.resize({ uint16_t(WIDTH), uint16_t(HEIGHT) })) throw std::runtime_error("Error resizing render texture!");
         rt.setView(sf::View({WIDTH/2, HEIGHT/2}, {WIDTH, HEIGHT}));
         rt.draw(sf::Sprite(tex));
         rt.display();
@@ -285,8 +314,8 @@ struct App{
     }
     void pushEdge(const sfu::Line& edge){
         edgePool.push_back(edge);
-        edgeVertices.append(sf::Vertex(edge.m_origin));
-        edgeVertices.append(sf::Vertex(edge.point(1.f)));
+        edgeVertices.append(sf::Vertex({ edge.m_origin }));
+        edgeVertices.append(sf::Vertex({ edge.point(1.f) }));
     }
     void popEdge(){
         edgePool.pop_back();
@@ -425,7 +454,7 @@ struct App{
             switch(brush){
             case RADIAL:
                 if(alt){
-                    radialLight.rotate(d*6);
+                    radialLight.rotate(sf::degrees(6 * d));
                 }else if(shift){
                     radialLight.setBeamAngle(radialLight.getBeamAngle() + d*5);
                 }else{
@@ -435,7 +464,7 @@ struct App{
                 break;
             case DIRECTED:
                 if(alt){
-                    directedLight.rotate(6 * d);
+                    directedLight.rotate(sf::degrees(6 * d));
                 }else if(shift){
                     directedLight.setBeamWidth(directedLight.getBeamWidth() + d*5);
                 }else{
@@ -453,7 +482,7 @@ struct App{
     }
     void updateOnPressKey(sf::Keyboard::Key k){
         switch(k){
-        case sf::Keyboard::M:{
+        case sf::Keyboard::Key::M:{
                 bool textured = lighting.getAreaTexture() != nullptr;
                 if(lighting.getMode() == candle::LightingArea::FOG){
                     lighting.setMode(candle::LightingArea::AMBIENT);
@@ -464,67 +493,67 @@ struct App{
                 }
             }
             break;
-        case sf::Keyboard::T:
+        case sf::Keyboard::Key::T:
             persistent_fog = !persistent_fog;
             break;
-        case sf::Keyboard::P:
+        case sf::Keyboard::Key::P:
             capture();
             break;
-        case sf::Keyboard::Q:
-        case sf::Keyboard::Escape:
+        case sf::Keyboard::Key::Q:
+        case sf::Keyboard::Key::Escape:
             w.close();
             break;
-        case sf::Keyboard::LControl:
+        case sf::Keyboard::Key::LControl:
             control = true;
             break;
-        case sf::Keyboard::LAlt:
+        case sf::Keyboard::Key::LAlt:
             alt = true;
             break;
-        case sf::Keyboard::LShift:
+        case sf::Keyboard::Key::LShift:
             shift = true;
             break;
-        case sf::Keyboard::R:
+        case sf::Keyboard::Key::R:
             setBrush(RADIAL);
             break;
-        case sf::Keyboard::D:
+        case sf::Keyboard::Key::D:
             setBrush(DIRECTED);
             break;
-        case sf::Keyboard::B:
+        case sf::Keyboard::Key::B:
             setBrush(BLOCK);
             break;
-        case sf::Keyboard::L:
+        case sf::Keyboard::Key::L:
             setBrush(LINE);
             break;
-        case sf::Keyboard::A:
+        case sf::Keyboard::Key::A:
             lighting.setAreaOpacity(clamp(lighting.getAreaOpacity()+0.1));
             break;
-        case sf::Keyboard::Z:
+        case sf::Keyboard::Key::Z:
             lighting.setAreaOpacity(clamp(lighting.getAreaOpacity()-0.1));
             break;
-        case sf::Keyboard::S:
+        case sf::Keyboard::Key::S:
             if(brush == RADIAL || brush == DIRECTED){
                 radialLight.setIntensity(clamp(radialLight.getIntensity()+0.1));
                 directedLight.setIntensity(clamp(directedLight.getIntensity()+0.1));
             }
             break;
-        case sf::Keyboard::X:
+        case sf::Keyboard::Key::X:
             if(brush == RADIAL || brush == DIRECTED){
                 radialLight.setIntensity(clamp(radialLight.getIntensity()-0.1));
                 directedLight.setIntensity(clamp(directedLight.getIntensity()-0.1));
             }
             break;
-        case sf::Keyboard::G:
+        case sf::Keyboard::Key::G:
             if(brush == RADIAL || brush == DIRECTED){
                 glow = !glow;
             }
             break;
-        case sf::Keyboard::F:
+        case sf::Keyboard::Key::F:
             if(brush == RADIAL || brush == DIRECTED){
                 radialLight.setFade(!radialLight.getFade());
                 directedLight.setFade(!directedLight.getFade());
             }
             break;
-        case sf::Keyboard::C:
+        case sf::Keyboard::Key::C:
             if(brush == RADIAL || brush == DIRECTED){
                 static const sf::Color L_COLORS[] = {
                     sf::Color::White,
@@ -539,7 +568,7 @@ struct App{
                 directedLight.setColor(L_COLORS[color_i]);
             }
             break;
-        case sf::Keyboard::Space:
+        case sf::Keyboard::Key::Space:
             lineStarted = false;
             if(alt){
                 clearEdges();
@@ -556,13 +585,13 @@ struct App{
     }
     void updateOnReleaseKey(sf::Keyboard::Key k){
         switch(k){
-        case sf::Keyboard::LControl:
+        case sf::Keyboard::Key::LControl:
             control = false;
             break;
-        case sf::Keyboard::LAlt:
+        case sf::Keyboard::Key::LAlt:
             alt = false;
             break;
-        case sf::Keyboard::LShift:
+        case sf::Keyboard::Key::LShift:
             shift = false;
             break;
         default:
@@ -586,43 +615,39 @@ struct App{
     void mainLoop(){
         //candle::initializeTextures();
         sf::Clock clock;
-        while(w.isOpen()){
-            sf::Event e;
-            while(w.pollEvent(e)){
-                switch(e.type){
-                case sf::Event::Closed:
+        while (w.isOpen()) {
+            while (const std::optional event = w.pollEvent()) {
+                if (event->is<sf::Event::Closed>()) {
                     w.close();
-                    break;
-                case sf::Event::MouseMoved:
+                }
+                else if (const auto* mouseMoved = event->getIf<sf::Event::MouseMoved>()) {
                     updateOnMouseMove();
-                    break;
-                case sf::Event::MouseWheelScrolled:
-                    updateOnMouseScroll((0 < e.mouseWheelScroll.delta) - (e.mouseWheelScroll.delta < 0));
-                    break;
-                case sf::Event::KeyPressed:
-                    updateOnPressKey(e.key.code);
-                    break;
-                case sf::Event::KeyReleased:
-                    updateOnReleaseKey(e.key.code);
-                    break;
-                case sf::Event::MouseButtonPressed:
-                    if(e.mouseButton.button == sf::Mouse::Left){
+                }
+                else if (const auto* mouseScrolled = event->getIf<sf::Event::MouseWheelScrolled>()) {
+                    updateOnMouseScroll((0 < mouseScrolled->delta) - (mouseScrolled->delta < 0));
+                }
+                else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+                    updateOnPressKey(keyPressed->code);
+                }
+                else if (const auto* keyReleased = event->getIf<sf::Event::KeyReleased>()) {
+                    updateOnReleaseKey(keyReleased->code);
+                }
+                else if (const auto* mousePressed = event->getIf<sf::Event::MouseButtonPressed>()) {
+                    if (mousePressed->button == sf::Mouse::Button::Left) {
                         click();
-                    }else{
+                    }
+                    else {
                         setBrush(NONE);
                     }
-                    break;
-                case sf::Event::MouseButtonReleased:
-                    if(e.mouseButton.button == sf::Mouse::Left){
+                }
+                else if (const auto* mouseReleased = event->getIf<sf::Event::MouseButtonReleased>()) {
+                    if (mouseReleased->button == sf::Mouse::Button::Left) {
                         lineStarted = false;
-                        for(auto& b: buttons){
+                        for (auto& b : buttons) {
                             b.rect.setFillColor(Button::buttonZ1);
                             b.rect.setOutlineColor(Button::buttonZ2);
                         }
                     }
-                    break;
-                default:
-                    break;
                 }
             }
             

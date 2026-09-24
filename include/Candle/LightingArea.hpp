@@ -79,11 +79,11 @@ namespace candle{
     private:
         const sf::Texture* m_baseTexture;
         sf::IntRect m_baseTextureRect;
-        sf::VertexArray m_baseTextureQuad;
+        sf::VertexArray m_baseTextureTriangles;
         sf::RenderTexture m_renderTexture;
-        sf::VertexArray m_areaQuad;
+        sf::VertexArray m_areaTriangles;
         sf::Color m_color;
-        float m_opacity;
+        uint8_t m_opacity;
         sf::Vector2f m_size;
         Mode m_mode;
         /**
@@ -113,7 +113,7 @@ namespace candle{
          * @param texture
          * @param rect
          */
-        LightingArea(Mode mode, const sf::Texture* texture, sf::IntRect rect=sf::IntRect());
+        LightingArea(Mode mode, const sf::Texture* texture, sf::FloatRect rect=sf::FloatRect());
         
         /**
          * @brief Get the local bounding rectangle of the area.
@@ -158,7 +158,7 @@ namespace candle{
          * @param opacity
          * @see getAreaOpacity, setAreaColor
          */
-        void setAreaOpacity(float opacity);
+        void setAreaOpacity(uint8_t opacity);
         
         /**
          * @brief Get the opacity of the fog/light.
@@ -175,7 +175,7 @@ namespace candle{
          * is specified, the whole texture is used.
          * @see getAreaTexture
          */
-        void setAreaTexture(const sf::Texture* texture, sf::IntRect rect=sf::IntRect());
+        void setAreaTexture(const sf::Texture* texture, sf::FloatRect rect=sf::FloatRect());
         
         /**
          * @brief Get the texture of the fog/light.
@@ -191,7 +191,7 @@ namespace candle{
          * @param rect
          * @see getTextureRect
          */
-        void setTextureRect(const sf::IntRect& rect);
+        void setTextureRect(const sf::FloatRect& rect);
         
         /**
          * @brief Get the rectangle of the used sub-section of the texture.

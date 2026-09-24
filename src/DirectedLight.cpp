@@ -20,29 +20,38 @@ namespace candle{
 #endif
     }
 
-    void DirectedLight::resetColor(){
-        int quads = m_polygon.getVertexCount() / 4;
-        for(int i = 0; i < quads; i++){
-            float p1 = i*4;
-            float p2 = p1+1;
-            float p3 = p1+2;
-            float p4 = p1+3;
-            sf::Vector2f r1 = m_polygon[p1].position;
-            sf::Vector2f r2 = m_polygon[p2].position;
-            sf::Vector2f r3 = m_polygon[p4].position;
-            sf::Vector2f r4 = m_polygon[p3].position;
+    void DirectedLight::resetColor() {
+        int triangles = static_cast<int>(m_polygon.getVertexCount() / 3);
+        for (int i = 0; i < triangles; ++i) {
+            int idx0 = i * 3;
+            int idx1 = idx0 + 1;
+            int idx2 = idx0 + 2;
 
-            float dr1 = 1.f - m_fade * (sfu::magnitude(r2-r1) / m_range);
-            float dr2 = 1.f - m_fade * (sfu::magnitude(r4-r3) / m_range);
-            m_polygon[p1].color = m_polygon[p2].color =
-                m_polygon[p3].color = m_polygon[p4].color = m_color;
-            m_polygon[p2].color.a = m_color.a * dr1;
-            m_polygon[p3].color.a = m_color.a * dr2;
+            sf::Vector2f p0 = m_polygon[idx0].position;
+            sf::Vector2f p1 = m_polygon[idx1].position;
+            sf::Vector2f p2 = m_polygon[idx2].position;
+
+            // Base vertex gets full color
+            m_polygon[idx0].color = m_color;
+
+            // Fade others based on distance from base
+            float d1 = sfu::magnitude(p1 - p0);
+            float d2 = sfu::magnitude(p2 - p0);
+
+            sf::Color fadedColor1 = m_color;
+            sf::Color fadedColor2 = m_color;
+
+            fadedColor1.a = static_cast<uint8_t>(m_color.a * (1.f - m_fade * (d1 / m_range)));
+            fadedColor2.a = static_cast<uint8_t>(m_color.a * (1.f - m_fade * (d2 / m_range)));
+
+            m_polygon[idx1].color = fadedColor1;
+            m_polygon[idx2].color = fadedColor2;
         }
     }
 
+
     DirectedLight::DirectedLight(){
-        m_polygon.setPrimitiveType(sf::Quads);
+        m_polygon.setPrimitiveType(sf::PrimitiveType::Triangles);
         m_polygon.resize(2);
         setBeamWidth(10.f);
         // castLight();
@@ -73,14 +82,14 @@ namespace candle{
         sf::Transform trm_i = trm.getInverse();
 
         float widthHalf = m_beamWidth/2.f;
-        sf::FloatRect baseBeam(0, -widthHalf, m_range, m_beamWidth);
+        sf::FloatRect baseBeam({ 0, -widthHalf }, { m_range, m_beamWidth });
 
-        sf::Vector2f lim1o = trm.transformPoint(0, -widthHalf);
-        sf::Vector2f lim1d = trm.transformPoint(m_range, -widthHalf);
-        sf::Vector2f lim2o = trm.transformPoint(0, widthHalf);
-        sf::Vector2f lim2d = trm.transformPoint(m_range, widthHalf);
+        sf::Vector2f lim1o = trm.transformPoint({ 0, -widthHalf });
+        sf::Vector2f lim1d = trm.transformPoint({ m_range, -widthHalf });
+        sf::Vector2f lim2o = trm.transformPoint({ 0, widthHalf });
+        sf::Vector2f lim2d = trm.transformPoint({ m_range, widthHalf });
 
-        float off = 0.01/sfu::magnitude(lim2o - lim1o);
+        float off = 0.01f/sfu::magnitude(lim2o - lim1o);
         sf::Vector2f lightDir = lim1d - lim1o;
 
         sfu::Line lim1(lim1o, lim1d);
@@ -147,26 +156,46 @@ namespace candle{
 #endif
             rays.pop();
         }
-        if(!points.empty()){
-            int quads = points.size()/2-1; // a quad between every two rays
-            m_polygon.resize(quads * 4);
-            for(int i = 0; i < quads; i++){
-                float p1 = i*4,  r1 = i*2;
-                float p2 = p1+1, r2 = r1+1;
-                float p3 = p1+2, r3 = r1+2;
-                float p4 = p1+3, r4 = r1+3;
-                m_polygon[p1].position = points[r1];
-                m_polygon[p2].position = points[r2];
-                m_polygon[p3].position = points[r4];
-                m_polygon[p4].position = points[r3];
+        if (!points.empty()) {
+            int segments = static_cast<int>(points.size() / 2 - 1); // a quad between every two rays
+            m_polygon.resize(segments * 6); // 2 triangles per quad, 3 vertices each
 
-                float dr1 = 1.f - m_fade * (sfu::magnitude(points[r2]-points[r1]) / m_range);
-                float dr2 = 1.f - m_fade * (sfu::magnitude(points[r4]-points[r3]) / m_range);
-                m_polygon[p1].color = m_polygon[p4].color = m_color;
-                m_polygon[p2].color = m_polygon[p3].color = m_color;
-                m_polygon[p2].color.a = m_color.a * dr1;
-                m_polygon[p3].color.a = m_color.a * dr2;
+            for (int i = 0; i < segments; i++) {
+                int p = i * 6;
+                int r = i * 2;
+
+                const sf::Vector2f& tl = points[r];       // top-left
+                const sf::Vector2f& tr = points[r + 1];   // top-right
+                const sf::Vector2f& br = points[r + 3];   // bottom-right
+                const sf::Vector2f& bl = points[r + 2];   // bottom-left
+
+                float dr1 = 1.f - m_fade * (sfu::magnitude(tr - tl) / m_range);
+                float dr2 = 1.f - m_fade * (sfu::magnitude(br - bl) / m_range);
+
+                sf::Color faded1 = m_color;
+                sf::Color faded2 = m_color;
+                faded1.a = static_cast<uint8_t>(m_color.a * dr1);
+                faded2.a = static_cast<uint8_t>(m_color.a * dr2);
+
+                // First triangle (tl, tr, br)
+                m_polygon[p + 0].position = tl;
+                m_polygon[p + 1].position = tr;
+                m_polygon[p + 2].position = br;
+
+                m_polygon[p + 0].color = m_color;
+                m_polygon[p + 1].color = faded1;
+                m_polygon[p + 2].color = faded2;
+
+                // Second triangle (tl, br, bl)
+                m_polygon[p + 3].position = tl;
+                m_polygon[p + 4].position = br;
+                m_polygon[p + 5].position = bl;
+
+                m_polygon[p + 3].color = m_color;
+                m_polygon[p + 4].color = faded2;
+                m_polygon[p + 5].color = faded1;
             }
         }
+
     }
 }

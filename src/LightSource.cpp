@@ -17,7 +17,7 @@ namespace candle{
         {}
     
     void LightSource::setIntensity(float intensity){
-        m_color.a = 255 * intensity;
+        m_color.a = uint8_t(255 * intensity);
         resetColor();
     }
     

@@ -1,3 +1,10 @@
+<h3>Candle-SFML3</h3>
+<p>This is a port of Candle to SFML3. No additional work/modification/upgrades have been added other than getting the project to compile and run. It has been successfully integrated into an existing SFML3 project, but not all features have been tested.</p>
+
+<p>The only major change to note, though it should not affect existing projects, is that with the deprecation and removal of sf::Quads as a Primitive Type for Vertex Arrays, LightingArea and DirectedLight have had their Vertex Arrays adjusted to use sf::PrimitiveType::Triangles instead. They should function the same, as far as the user is concerned.</p>
+
+<p>The original ReadMe is below.</p>
+
 <p align="center"><a href="https://miguelmj.github.io/Candle"><img src="doc/logo.svg" alt="logo" height="200px"/></a></p>
 <h1 align="center">Candle</h1>
 <h3 align="center">2D lighting for SFML</h3>

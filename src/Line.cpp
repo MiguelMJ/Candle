@@ -24,10 +24,10 @@ namespace sfu{
 
         //Make sure that the rectangle begin from the upper left corner
         sf::FloatRect rect;
-        rect.left = (point1.x < point2.x) ? point1.x : point2.x;
-        rect.top = (point1.y < point2.y) ? point1.y : point2.y;
-        rect.width = std::abs(m_direction.x) + 1.0f; //The +1 is here to avoid having a width of zero
-        rect.height = std::abs(m_direction.y) + 1.0f; //(SFML doesn't like 0 in rect)
+        rect.position.x = (point1.x < point2.x) ? point1.x : point2.x;
+        rect.position.y = (point1.y < point2.y) ? point1.y : point2.y;
+        rect.size.x = std::abs(m_direction.x) + 1.0f; //The +1 is here to avoid having a width of zero
+        rect.size.y = std::abs(m_direction.y) + 1.0f; //(SFML doesn't like 0 in rect)
 
         return rect;
     }
