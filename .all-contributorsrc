@@ -70,10 +70,21 @@
         "code",
         "ideas"
       ]
+    },
+    {
+      "login": "CoreySelover",
+      "name": "Corey S",
+      "avatar_url": "https://avatars.githubusercontent.com/u/42557438?v=4",
+      "profile": "https://github.com/CoreySelover",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "projectName": "Candle",
   "projectOwner": "MiguelMJ",
   "repoType": "github",
-  "repoHost": "https://github.com"
+  "repoHost": "https://github.com",
+  "commitType": "docs",
+  "commitConvention": "angular"
 }
